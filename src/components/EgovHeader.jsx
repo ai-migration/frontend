@@ -288,7 +288,7 @@ function EgovHeader() {
             <ul>
               <li>
                 <NavLink
-                  to="/intro/transform"
+                  to={URL.INTRO_TRANSFORM}
                   className={({ isActive }) => (isActive ? "cur" : "")}
                 >
                   변환 소개
@@ -296,7 +296,7 @@ function EgovHeader() {
               </li>
               <li>
                 <NavLink
-                  to="/intro/security"
+                  to={URL.INTRO_SECURITY}
                   className={({ isActive }) => (isActive ? "cur" : "")}
                 >
                   보안 소개
@@ -304,7 +304,7 @@ function EgovHeader() {
               </li>
               <li>
                 <NavLink
-                  to="/intro/chatbot"
+                  to={URL.INTRO_CHATBOT}
                   className={({ isActive }) => (isActive ? "cur" : "")}
                 >
                   챗봇 소개

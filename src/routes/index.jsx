@@ -270,6 +270,7 @@ const SecondRoutes = () => {
 
         {/* INTRO */}
         <Route path={URL.INTRO} element={<Navigate to={URL.INTRO_TRANSFORM} />} />
+        <Route path={URL.INTRO_TRANSFORM} element={<EgovIntroTransform />} />
         <Route path={URL.INTRO_SECURITY} element={<EgovIntroSecurity />} />
         <Route path={URL.INTRO_CHATBOT} element={<EgovIntroChatbot />} />
 

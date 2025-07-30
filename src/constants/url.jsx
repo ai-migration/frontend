@@ -15,8 +15,9 @@ const URL = {
 
   // INTRO
   INTRO: `${BASE}/intro`,
-  INTRO_WORKS: `${BASE}/intro/works`,
-  INTRO_SERVICE: `${BASE}/intro/service`,
+  INTRO_TRANSFORM: `${BASE}/intro/transform`,
+  INTRO_SECURITY: `${BASE}/intro/security`,
+  INTRO_CHATBOT: `${BASE}/intro/chatbot`,
 
   // SUPPORT
   SUPPORT: `${BASE}/support`,
