@@ -345,30 +345,22 @@ function EgovHeader() {
             <h3>알림마당</h3>
             <ul>
               <li>
-                <NavLink to={URL.INFORM_DAILY}>오늘의 행사</NavLink>
+                <NavLink to={URL.INFORM_NOTICE}>공지사항</NavLink>
               </li>
               <li>
                 <NavLink
-                  to={URL.INFORM_WEEKLY}
+                  to={URL.INFORM_FAQ}
                   className={({ isActive }) => (isActive ? "cur" : "")}
                 >
-                  금주의 행사
+                  FAQ
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to={URL.INFORM_NOTICE}
+                  to={URL.INFORM_QNA}
                   className={({ isActive }) => (isActive ? "cur" : "")}
                 >
-                  공지사항
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INFORM_GALLERY}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  사이트 갤러리
+                  Q&A
                 </NavLink>
               </li>
             </ul>

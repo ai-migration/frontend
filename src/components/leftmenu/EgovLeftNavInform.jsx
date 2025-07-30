@@ -13,22 +13,6 @@ function EgovLeftNavInform() {
         <ul className="menu4">
           <li>
             <NavLink
-              to={URL.INFORM_DAILY}
-              className={({ isActive }) => (isActive ? "cur" : "")}
-            >
-              오늘의행사
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={URL.INFORM_WEEKLY}
-              className={({ isActive }) => (isActive ? "cur" : "")}
-            >
-              금주의행사
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
               to={URL.INFORM_NOTICE}
               className={({ isActive }) => (isActive ? "cur" : "")}
             >
@@ -37,7 +21,15 @@ function EgovLeftNavInform() {
           </li>
           <li>
             <NavLink
-              to={URL.INFORM_GALLERY}
+              to={URL.INFORM_FAQ}
+              className={({ isActive }) => (isActive ? "cur" : "")}
+            >
+              FAQ
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to={URL.INFORM_QNA}
               className={({ isActive }) => (isActive ? "cur" : "")}
             >
               Q&A
