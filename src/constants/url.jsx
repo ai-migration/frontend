@@ -53,6 +53,15 @@ const URL = {
   INFORM_GALLERY_MODIFY: `${BASE}/inform/gallery/modify`,
   INFORM_GALLERY_REPLY: `${BASE}/inform/gallery/reply`,
 
+  INFORM_FAQ: `${BASE}/inform/faq`,
+  INFORM_FAQ_CREATE: `${BASE}/inform/faq/create`,
+  INFORM_FAQ_MODIFY: `${BASE}/inform/faq/modify`,
+
+  INFORM_QNA: `${BASE}/inform/qna`,
+  INFORM_QNA_DETAIL: `${BASE}/inform/qna/detail`,
+  INFORM_QNA_CREATE: `${BASE}/inform/qna/create`,
+  INFORM_QNA_MODIFY: `${BASE}/inform/qna/modify`,
+
   // ADMIN
   ADMIN: `${BASE}/admin`,
   ADMIN_NOTICE: `${BASE}/admin/notice`,
