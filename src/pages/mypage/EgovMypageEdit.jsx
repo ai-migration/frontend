@@ -182,6 +182,24 @@ function EgovMypageEdit(props) {
     }
     return true;
   };
+  
+  const requestToken = () => {
+    
+    let requestOptions = {};
+    
+    alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
+    EgovNet.requestFetch('/users/token', 'POST', (resp) => {
+      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+        alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
+        // navigate({ pathname: URL.MAIN });
+      } else {
+        navigate(
+          { pathname: URL.ERROR },
+          { state: { msg: resp.resultMessage } }
+        );
+      }
+    });
+  }
 
   const updateMember = () => {
     let modeStr = modeInfo.mode === CODE.MODE_CREATE ? "POST" : "PUT";
@@ -318,7 +336,7 @@ function EgovMypageEdit(props) {
             <div className="board_view2">
               <dl>
                 <dt>
-                  <label htmlFor="mberId">회원ID</label>
+                  <label htmlFor="mberId">Email</label>
                   <span className="req">필수</span>
                 </dt>
                 <dd>
@@ -441,16 +459,53 @@ function EgovMypageEdit(props) {
                   />
                 </dd>
               </dl>
+              
+              {/* 수정/조회 일때 */}
+              {modeInfo.mode === CODE.MODE_MODIFY && (
+              <dl>
+                <dt>
+                  <label htmlFor="bbsNm">토큰</label>
+                  {/* <span className="req">필수</span> */}
+                </dt>
+                <dd>
+                  <input
+                    className="f_input2 w_full"
+                    type="text"
+                    name="mberToken"
+                    title=""
+                    id="mberToken"
+                    placeholder="Token"
+                    defaultValue=""
+                    // onChange={(e) =>
+                    //   setMemberDetail({
+                    //     ...memberDetail,
+                    //     mberNm: e.target.value,
+                    //   })
+                    // }
+                    ref={(el) => (checkRef.current[2] = el)}
+                    required
+                  />
+                </dd>
+              </dl>
+              )}
 
               {/* <!-- 버튼영역 --> */}
               <div className="board_btn_area">
                 <div className="left_col btn1">
                   <button
                     className="btn btn_skyblue_h46 w_100"
+                    onClick={() => requestToken()}
+                  >
+                    토큰요청
+                  </button>
+
+                  <button
+                    className="btn btn_skyblue_h46 w_100"
                     onClick={() => updateMember()}
                   >
                     저장
                   </button>
+
                   {modeInfo.mode === CODE.MODE_MODIFY && (
                     <button
                       className="btn btn_skyblue_h46 w_100"

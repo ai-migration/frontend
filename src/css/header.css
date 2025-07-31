@@ -1,206 +1,92 @@
-/* 헤더 높이 설정 */
-.header {
-  height: 120px; /* 헤더 전체 높이 */
-  border-bottom: 1px solid #eee; /* 구분선 추가 (선택사항) */
-}
-
-/* 헤더 내부 컨테이너 */
-.header .inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* 로고 컨테이너 스타일 */
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* 로고 자체를 가운데 정렬 */
-  height: 100%;
-  flex: 0 0 auto; /* 로고 영역 고정 크기 */
-}
-
-.logo a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-decoration: none;
-}
-
-/* 로고 이미지 기본 스타일 */
-.logo img {
-  max-height: 80px;           /* 최대 높이 제한 */
-  max-width: 280px;           /* 최대 너비 제한 */
-  width: auto;                /* 너비 자동 조절 (비율 유지) */
-  height: auto;               /* 높이 자동 조절 (비율 유지) */
-  object-fit: contain;        /* 비율 유지하면서 컨테이너에 맞춤 */
-  object-position: center;    /* 이미지 자체를 중앙 정렬 */
-  display: block;
-  margin: 0 auto;             /* 추가 중앙 정렬 */
-}
-
-/* 데스크톱/모바일 로고 전환 */
-.logo .w {
-  display: block;
-}
-
-.logo .m {
-  display: none;
-}
-
-/* 다양한 로고 크기 옵션 - 필요에 따라 클래스 추가 사용 */
-
-/* 옵션 1: 큰 로고 */
-.logo.large img {
-  max-height: 100px;
-  max-width: 320px;
-}
-
-/* 옵션 2: 중간 로고 */
-.logo.medium img {
-  max-height: 70px;
-  max-width: 250px;
-}
-
-/* 옵션 3: 작은 로고 */
-.logo.small img {
-  max-height: 60px;
-  max-width: 200px;
-}
-
-/* 옵션 4: 고정 크기 로고 (비율 무시) */
-.logo.fixed img {
-  width: 400px;
-  height: 80px;
-  object-fit: cover; /* 또는 fill */
-}
-
-/* 로고 위치 미세 조정 옵션들*/
-
-/* 위로 이동 */
-.logo.move-up img {
-  transform: translateY(-5px);
-}
-
-/* 아래로 이동 */
-.logo.move-down img {
-  transform: translateY(5px);
-}
-
-/* 왼쪽으로 이동 */
-.logo.move-left img {
-  transform: translateX(-10px);
-}
-
-/* 오른쪽으로 이동 */
-.logo.move-right img {
-  transform: translateX(10px);
-}
-
-/* 모바일 반응형 */
-@media (max-width: 768px) {
-  .header {
-    height: 80px; /* 모바일에서 헤더 높이 줄임 */
-  }
-  
-  .logo .w {
-    display: none;
-  }
-  
-  .logo .m {
-    display: block;
-  }
-  
-  .logo img {
-    max-height: 50px;
-    max-width: 180px;
-  }
-  
-  .logo.large img {
-    max-height: 60px;
-    max-width: 200px;
-  }
-  
-  .logo.medium img {
-    max-height: 45px;
-    max-width: 160px;
-  }
-  
-  .logo.small img {
-    max-height: 40px;
-    max-width: 140px;
-  }
-}
-
-/* 고객지원 메뉴 및 햄버거 메뉴 위치 조정 */
+/* 고객지원 메뉴 - 햄버거 메뉴와 동일한 스타일 적용 */
 .support_menu {
   position: absolute;
-  top: 120px; /* 헤더 높이와 동일 */
   left: 0;
+  top: 150px;  /* 햄버거 메뉴와 동일한 위치 */
   width: 100%;
-  background: white;
-  z-index: 1000;
-  padding: 40px 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  background: #fff;  /* 햄버거 메뉴와 동일한 배경색 */
+  z-index: 10;  /* 햄버거 메뉴와 동일한 z-index */
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;  /* 햄버거 메뉴와 동일한 애니메이션 */
+  transform-origin: top;
+}
+
+.support_menu::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: #ddd;  /* 햄버거 메뉴와 동일한 하단 테두리 */
 }
 
 .support_menu.closed {
+  transform: scaleY(0);  /* 햄버거 메뉴와 동일한 닫기 애니메이션 */
   opacity: 0;
-  transform: translateY(-20px);
-  pointer-events: none;
 }
 
 .support_menu.open {
+  transform: scaleY(1);  /* 햄버거 메뉴와 동일한 열기 애니메이션 */
   opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
 }
 
 .support_menu .inner.row {
   display: flex;
   gap: 40px;
   justify-content: space-between;
-  align-items: flex-start; /* 👈 추가: 상단 정렬 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 41px 50px 47px 50px;  /* 햄버거 메뉴와 동일한 패딩 */
+  display: flex;
+  gap: 0;  /* float 레이아웃과 일치하도록 gap 제거 */
+}
+
+.support_menu .inner.row::after {
+  content: "";
+  display: block;
+  clear: both;
 }
 
 .support_menu .col {
-  flex: 1;
-  min-width: 200px;
+  float: left;
+  width: 280px;  /* 햄버거 메뉴와 동일한 너비 */
+}
+
+.support_menu .col:last-child {
+  width: auto;  /* 햄버거 메뉴와 동일 */
 }
 
 .support_menu .col h3 {
-  font-size: 25px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #2c3e50;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
+  color: #222;  /* 햄버거 메뉴와 동일한 색상 */
+  font-size: 24px;  /* 햄버거 메뉴와 동일한 크기 */
+  font-weight: 700;  /* 햄버거 메뉴와 동일한 굵기 */
+  pointer-events: none;  /* 햄버거 메뉴와 동일 */
+  margin-bottom: 0;  /* 기본 마진 제거 */
+  border-bottom: none;  /* 기존 테두리 제거 */
+  padding-bottom: 0;  /* 기존 패딩 제거 */
+}
+
+.support_menu .col ul {
+  padding-top: 36px;  /* 햄버거 메뉴와 동일한 상단 패딩 */
+}
+
+.support_menu .col ul li + li {
+  margin-top: 17px;  /* 햄버거 메뉴와 동일한 간격 */
 }
 
 .support_menu .col ul li {
-  margin-bottom: 8px;
+  margin-bottom: 0;  /* 기존 마진 제거 */
 }
 
 .support_menu .col ul li a {
-  font-size: 17px;
-  color: #666;
+  color: #777;  /* 햄버거 메뉴와 동일한 색상 */
+  font-size: 18px;  /* 햄버거 메뉴와 동일한 크기 */
   text-decoration: none;
 }
 
 .support_menu .col ul li a:hover {
-  color: #000;
+  color: #222;  /* 햄버거 메뉴와 동일한 호버 색상 */
   text-decoration: underline;
 }
 
@@ -208,34 +94,20 @@
 .all_menu.WEB,
 .all_menu.Mobile {
   top: 120px !important; /* 헤더 높이와 동일 */
-  margin-top: 10px;
 }
-/* 전체 메뉴 정렬 */
-.all_menu.WEB .inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
+
 /* 버튼 스타일 */
 .btn,
 .btnAllMenu,
 .btnSupportClose {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 16px;
+  font-family: 'Noto Sans KR', sans-serif; /* ✅ 햄버거 버튼 글꼴 */
+  font-size: 16px;                         /* ✅ 햄버거 버튼 크기 */
   background: none;
   border: none;
   cursor: pointer;
   padding: 8px 12px;
   color: #333;
   transition: all 0.2s ease;
-}
-.btnAllMenu{
-  margin-top: 2px;
 }
 
 .btnSupportClose {
@@ -262,32 +134,4 @@
   .all_menu.Mobile {
     top: 80px !important;
   }
-}
-
-/* 햄버거 버튼 위치 조정용 커스텀 클래스 */
-.move-right-10 {
-  transform: translateX(10px);
-}
-.move-right-20 {
-  transform: translateX(20px);
-}
-.move-right-30 {
-  transform: translateX(30px);
-}
-.move-right-40 {
-  transform: translateX(40px);
-}
-.move-right-50 {
-  transform: translateX(100px);
-}
-
-/* 상단 메뉴들 위치 커스텀 클래스 */
-.gnb.shift-left-20 {
-  transform: translateX(-20px);
-}
-.gnb.shift-left-40 {
-  transform: translateX(-40px);
-}
-.gnb.shift-left-60 {
-  transform: translateX(-60px);
 }

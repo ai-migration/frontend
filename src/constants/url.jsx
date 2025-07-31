@@ -4,6 +4,7 @@ const URL = {
   // COMMON
   MAIN: `${BASE}`,
   LOGIN: `${BASE}/login`,
+  SIGNUP: `${BASE}/signup/*`,
   ERROR: `${BASE}/error`,
 
   // ABOUT

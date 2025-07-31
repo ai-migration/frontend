@@ -210,7 +210,7 @@ function EgovHeader() {
                 로그인
               </button>
               <NavLink
-                to={URL.MYPAGE_CREATE}
+                to={URL.SIGNUP}
                 className={({ isActive }) =>
                   isActive ? "btn login cur" : "btn login"
                 }
@@ -228,6 +228,7 @@ function EgovHeader() {
             type="button"
             className="btn btnAllMenu move-right-50"
             title="전체메뉴 닫힘"
+            onClick={toggleAllMenu}
           >
             전체메뉴
           </button>
@@ -235,6 +236,7 @@ function EgovHeader() {
             type="button"
             className="btn mobile btnAllMenuM"
             title="전체메뉴 닫힘"
+            onClick={toggleAllMenu}
           >
             전체메뉴
           </button>
@@ -439,7 +441,7 @@ function EgovHeader() {
                 로그인
               </button>
               <NavLink
-                to={URL.MYPAGE_CREATE}
+                to={URL.SIGNIN}
                 className={({ isActive }) =>
                   isActive ? "btn login cur" : "btn login"
                 }
