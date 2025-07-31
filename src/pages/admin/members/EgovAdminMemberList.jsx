@@ -91,7 +91,6 @@ function EgovAdminMemberList(props) {
                 <div>{item.mberId}</div>
                 <div>{item.mberNm}</div>
                 <div>{authNm}</div>
-                <div>{item.sbscrbDe}</div>
                 <div>{item.mberSttus === "P" ? "가능" : "불가능"}</div>
               </Link>
             );
@@ -222,8 +221,7 @@ function EgovAdminMemberList(props) {
                 <span>사용자ID</span>
                 <span>사용자명</span>
                 <span>권한그룹</span>
-                <span>생성일</span>
-                <span>로그인가능여부</span>
+                <span>토큰 발급 여부</span>
               </div>
               <div className="result">{listTag}</div>
             </div>

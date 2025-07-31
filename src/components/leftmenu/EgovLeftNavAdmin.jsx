@@ -17,7 +17,7 @@ function EgovLeftNavAdmin() {
           </li>
           <li>
             <NavLink
-              to={URL.ADMIN_FAQ}
+              to={URL.ADMIN_GALLERY}
               className={({ isActive }) => (isActive ? "cur" : "")}
             >
               FAQ관리
@@ -25,7 +25,7 @@ function EgovLeftNavAdmin() {
           </li>
           <li>
             <NavLink
-              to={URL.ADMIN_QNA}
+              to={URL.ADMIN_GALLERY}
               className={({ isActive }) => (isActive ? "cur" : "")}
             >
               Q&A관리
