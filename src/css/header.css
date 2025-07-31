@@ -1,65 +1,89 @@
+/* 고객지원 메뉴 - 햄버거 메뉴와 동일한 스타일 적용 */
 .support_menu {
   position: absolute;
-  top: 120px;  /* 기존보다 살짝 아래로 내림 */
   left: 0;
+  top: 150px;  /* 햄버거 메뉴와 동일한 위치 */
   width: 100%;
-  background: white;
-  z-index: 1000;
-  padding: 40px 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  background: #fff;  /* 햄버거 메뉴와 동일한 배경색 */
+  z-index: 10;  /* 햄버거 메뉴와 동일한 z-index */
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;  /* 햄버거 메뉴와 동일한 애니메이션 */
+  transform-origin: top;
 }
 
+.support_menu::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: #ddd;  /* 햄버거 메뉴와 동일한 하단 테두리 */
+}
 
 .support_menu.closed {
+  transform: scaleY(0);  /* 햄버거 메뉴와 동일한 닫기 애니메이션 */
   opacity: 0;
-  transform: translateY(-20px);
-  pointer-events: none;
 }
 
 .support_menu.open {
+  transform: scaleY(1);  /* 햄버거 메뉴와 동일한 열기 애니메이션 */
   opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
 }
 
 .support_menu .inner.row {
-  display: flex;
-  gap: 40px;
-  justify-content: space-between;
-  max-width: 1200px;
+  width: 1400px;  /* 햄버거 메뉴와 동일한 너비 */
   margin: 0 auto;
+  padding: 41px 50px 47px 50px;  /* 햄버거 메뉴와 동일한 패딩 */
+  display: flex;
+  gap: 0;  /* float 레이아웃과 일치하도록 gap 제거 */
+}
+
+.support_menu .inner.row::after {
+  content: "";
+  display: block;
+  clear: both;
 }
 
 .support_menu .col {
-  flex: 1;
-  min-width: 200px;
+  float: left;
+  width: 280px;  /* 햄버거 메뉴와 동일한 너비 */
+}
+
+.support_menu .col:last-child {
+  width: auto;  /* 햄버거 메뉴와 동일 */
 }
 
 .support_menu .col h3 {
-  font-size: 25px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #2c3e50;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
+  color: #222;  /* 햄버거 메뉴와 동일한 색상 */
+  font-size: 24px;  /* 햄버거 메뉴와 동일한 크기 */
+  font-weight: 700;  /* 햄버거 메뉴와 동일한 굵기 */
+  pointer-events: none;  /* 햄버거 메뉴와 동일 */
+  margin-bottom: 0;  /* 기본 마진 제거 */
+  border-bottom: none;  /* 기존 테두리 제거 */
+  padding-bottom: 0;  /* 기존 패딩 제거 */
+}
+
+.support_menu .col ul {
+  padding-top: 36px;  /* 햄버거 메뉴와 동일한 상단 패딩 */
+}
+
+.support_menu .col ul li + li {
+  margin-top: 17px;  /* 햄버거 메뉴와 동일한 간격 */
 }
 
 .support_menu .col ul li {
-  margin-bottom: 8px;
+  margin-bottom: 0;  /* 기존 마진 제거 */
 }
 
 .support_menu .col ul li a {
-  font-size: 17px;
-  color: #666;
+  color: #777;  /* 햄버거 메뉴와 동일한 색상 */
+  font-size: 18px;  /* 햄버거 메뉴와 동일한 크기 */
   text-decoration: none;
 }
 
 .support_menu .col ul li a:hover {
-  color: #000;
+  color: #222;  /* 햄버거 메뉴와 동일한 호버 색상 */
   text-decoration: underline;
 }
 

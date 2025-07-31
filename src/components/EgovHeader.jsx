@@ -228,6 +228,7 @@ function EgovHeader() {
             type="button"
             className="btn btnAllMenu"
             title="전체메뉴 닫힘"
+            onClick={toggleAllMenu}
           >
             전체메뉴
           </button>
@@ -235,6 +236,7 @@ function EgovHeader() {
             type="button"
             className="btn mobile btnAllMenuM"
             title="전체메뉴 닫힘"
+            onClick={toggleAllMenu}
           >
             전체메뉴
           </button>
