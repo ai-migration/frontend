@@ -210,7 +210,7 @@ function EgovHeader() {
                 로그인
               </button>
               <NavLink
-                to={URL.MYPAGE_CREATE}
+                to={URL.SIGNUP}
                 className={({ isActive }) =>
                   isActive ? "btn login cur" : "btn login"
                 }
@@ -441,7 +441,7 @@ function EgovHeader() {
                 로그인
               </button>
               <NavLink
-                to={URL.MYPAGE_CREATE}
+                to={URL.SIGNIN}
                 className={({ isActive }) =>
                   isActive ? "btn login cur" : "btn login"
                 }

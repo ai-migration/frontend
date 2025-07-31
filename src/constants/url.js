@@ -3,6 +3,7 @@ const URL = {
   MAIN: "/", //메인페이지
 
   LOGIN: "/login", //로그인
+  SIGNUP: "/signup", //회원가입
   SNS_NAVER_CB: "/login/naver/callback", //Sns Naver Callback
   SNS_KAKAO_CB: "/login/kakao/callback", //Sns Kakao Callback
   ERROR: "/error", //로그인

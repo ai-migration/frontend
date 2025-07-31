@@ -12,6 +12,9 @@ import EgovError from "@/components/EgovError";
 
 import EgovMain from "@/pages/main/EgovMain";
 import EgovLogin from "@/pages/login/EgovLogin";
+import EgovSignup from "@/pages/signup/EgovSignup";
+import EgovSignupAgree from "@/pages/signup/EgovSignupAgree";
+import EgovSignupForm from "@/pages/signup/EgovSignupForm";
 
 //SNS
 import SnsNaverCallback from "@/components/sns/SnsNaverCallback";
@@ -247,6 +250,15 @@ const SecondRoutes = () => {
           path={URL.LOGIN}
           element={<EgovLogin onChangeLogin={(user) => setLoginVO(user)} />}
         />
+
+        {/* SIGNUP */}
+        <Route 
+          path={URL.SIGNUP} 
+          element={<EgovSignup />} >
+          <Route index element={<Navigate to="agree" />} />
+          <Route path="agree" element={<EgovSignupAgree />} />
+          <Route path="form" element={<EgovSignupForm />} />
+        </Route>
 
         {/* Sns Naver Callback */}
         <Route
