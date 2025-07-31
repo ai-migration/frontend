@@ -130,7 +130,7 @@ function EgovHeader() {
           </Link>
         </h1>
 
-        <div className="gnb">
+        <div className="gnb shift-left-40">
           <h2 className="blind">주메뉴</h2>
           <ul>
             <li>
@@ -226,7 +226,7 @@ function EgovHeader() {
         <div className="right_a">
           <button
             type="button"
-            className="btn btnAllMenu"
+            className="btn btnAllMenu move-right-50"
             title="전체메뉴 닫힘"
           >
             전체메뉴
@@ -646,7 +646,7 @@ function EgovHeader() {
           <ul>
             <li><NavLink to="/support/transform/transformation">변환</NavLink></li>
             <li><NavLink to="/support/transform/view_transform">변환 이력 조회</NavLink></li>
-            <li><NavLink to="/support/trasnform/view_test">테스트 이력 조회</NavLink></li>
+            <li><NavLink to="/support/transform/view_test">테스트 이력 조회</NavLink></li>
             <li><NavLink to="/support/transform/download">다운로드</NavLink></li>
           </ul>
         </div>

@@ -208,8 +208,19 @@
 .all_menu.WEB,
 .all_menu.Mobile {
   top: 120px !important; /* 헤더 높이와 동일 */
+  margin-top: 10px;
 }
-
+/* 전체 메뉴 정렬 */
+.all_menu.WEB .inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
 /* 버튼 스타일 */
 .btn,
 .btnAllMenu,
@@ -222,6 +233,9 @@
   padding: 8px 12px;
   color: #333;
   transition: all 0.2s ease;
+}
+.btnAllMenu{
+  margin-top: 2px;
 }
 
 .btnSupportClose {
@@ -248,4 +262,32 @@
   .all_menu.Mobile {
     top: 80px !important;
   }
+}
+
+/* 햄버거 버튼 위치 조정용 커스텀 클래스 */
+.move-right-10 {
+  transform: translateX(10px);
+}
+.move-right-20 {
+  transform: translateX(20px);
+}
+.move-right-30 {
+  transform: translateX(30px);
+}
+.move-right-40 {
+  transform: translateX(40px);
+}
+.move-right-50 {
+  transform: translateX(100px);
+}
+
+/* 상단 메뉴들 위치 커스텀 클래스 */
+.gnb.shift-left-20 {
+  transform: translateX(-20px);
+}
+.gnb.shift-left-40 {
+  transform: translateX(-40px);
+}
+.gnb.shift-left-60 {
+  transform: translateX(-60px);
 }
