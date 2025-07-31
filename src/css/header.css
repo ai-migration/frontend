@@ -1,6 +1,146 @@
+/* 헤더 높이 설정 */
+.header {
+  height: 120px; /* 헤더 전체 높이 */
+  border-bottom: 1px solid #eee; /* 구분선 추가 (선택사항) */
+}
+
+/* 헤더 내부 컨테이너 */
+.header .inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 로고 컨테이너 스타일 */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 로고 자체를 가운데 정렬 */
+  height: 100%;
+  flex: 0 0 auto; /* 로고 영역 고정 크기 */
+}
+
+.logo a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-decoration: none;
+}
+
+/* 로고 이미지 기본 스타일 */
+.logo img {
+  max-height: 80px;           /* 최대 높이 제한 */
+  max-width: 280px;           /* 최대 너비 제한 */
+  width: auto;                /* 너비 자동 조절 (비율 유지) */
+  height: auto;               /* 높이 자동 조절 (비율 유지) */
+  object-fit: contain;        /* 비율 유지하면서 컨테이너에 맞춤 */
+  object-position: center;    /* 이미지 자체를 중앙 정렬 */
+  display: block;
+  margin: 0 auto;             /* 추가 중앙 정렬 */
+}
+
+/* 데스크톱/모바일 로고 전환 */
+.logo .w {
+  display: block;
+}
+
+.logo .m {
+  display: none;
+}
+
+/* 다양한 로고 크기 옵션 - 필요에 따라 클래스 추가 사용 */
+
+/* 옵션 1: 큰 로고 */
+.logo.large img {
+  max-height: 100px;
+  max-width: 320px;
+}
+
+/* 옵션 2: 중간 로고 */
+.logo.medium img {
+  max-height: 70px;
+  max-width: 250px;
+}
+
+/* 옵션 3: 작은 로고 */
+.logo.small img {
+  max-height: 60px;
+  max-width: 200px;
+}
+
+/* 옵션 4: 고정 크기 로고 (비율 무시) */
+.logo.fixed img {
+  width: 400px;
+  height: 80px;
+  object-fit: cover; /* 또는 fill */
+}
+
+/* 로고 위치 미세 조정 옵션들*/
+
+/* 위로 이동 */
+.logo.move-up img {
+  transform: translateY(-5px);
+}
+
+/* 아래로 이동 */
+.logo.move-down img {
+  transform: translateY(5px);
+}
+
+/* 왼쪽으로 이동 */
+.logo.move-left img {
+  transform: translateX(-10px);
+}
+
+/* 오른쪽으로 이동 */
+.logo.move-right img {
+  transform: translateX(10px);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .header {
+    height: 80px; /* 모바일에서 헤더 높이 줄임 */
+  }
+  
+  .logo .w {
+    display: none;
+  }
+  
+  .logo .m {
+    display: block;
+  }
+  
+  .logo img {
+    max-height: 50px;
+    max-width: 180px;
+  }
+  
+  .logo.large img {
+    max-height: 60px;
+    max-width: 200px;
+  }
+  
+  .logo.medium img {
+    max-height: 45px;
+    max-width: 160px;
+  }
+  
+  .logo.small img {
+    max-height: 40px;
+    max-width: 140px;
+  }
+}
+
+/* 고객지원 메뉴 및 햄버거 메뉴 위치 조정 */
 .support_menu {
   position: absolute;
-  top: 120px;  /* 기존보다 살짝 아래로 내림 */
+  top: 120px; /* 헤더 높이와 동일 */
   left: 0;
   width: 100%;
   background: white;
@@ -12,7 +152,6 @@
   pointer-events: auto;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-
 
 .support_menu.closed {
   opacity: 0;
@@ -32,6 +171,7 @@
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
 .support_menu .col {
@@ -63,12 +203,18 @@
   text-decoration: underline;
 }
 
-/* 햄버거 버튼과 동일한 스타일을 공유 */
+/* 햄버거 메뉴 위치 조정 */
+.all_menu.WEB,
+.all_menu.Mobile {
+  top: 120px !important; /* 헤더 높이와 동일 */
+}
+
+/* 버튼 스타일 */
 .btn,
 .btnAllMenu,
 .btnSupportClose {
-  font-family: 'Noto Sans KR', sans-serif; /* ✅ 햄버거 버튼 글꼴 */
-  font-size: 16px;                         /* ✅ 햄버거 버튼 크기 */
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
   background: none;
   border: none;
   cursor: pointer;
@@ -76,7 +222,6 @@
   color: #333;
   transition: all 0.2s ease;
 }
-
 
 .btnSupportClose {
   position: absolute;
@@ -89,4 +234,17 @@
 .btnSupportClose:hover {
   color: #007acc;
   transform: scale(1.1);
+}
+
+/* 모바일에서 고객지원 메뉴 조정 */
+@media (max-width: 768px) {
+  .support_menu {
+    top: 80px; /* 모바일 헤더 높이와 동일 */
+    padding: 20px 0;
+  }
+  
+  .all_menu.WEB,
+  .all_menu.Mobile {
+    top: 80px !important;
+  }
 }

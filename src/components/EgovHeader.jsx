@@ -8,8 +8,8 @@ import "@/css/header.css";
 
 
 
-import logoImg from "/assets/images/logo_w.png";
-import logoImgMobile from "/assets/images/logo_m.png";
+import logoImg from "/assets/images/logo_bigp.png";
+import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem, setSessionItem } from "@/utils/storage";
 
 function EgovHeader() {
