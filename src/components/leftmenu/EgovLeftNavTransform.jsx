@@ -24,7 +24,7 @@ function EgovLeftNavTransform() {
           </li>
           <li>
             <NavLink
-              to="/support/trasnform/view_test"
+              to="/support/transform/view_test"
               className={({ isActive }) => (isActive ? "cur" : "")}
             >
               테스트 이력 조회

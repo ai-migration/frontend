@@ -35,6 +35,16 @@ import EgovSupportDownloadCreate from "@/pages/support/download/EgovDownloadCrea
 import EgovSupportQnaList from "@/pages/support/qna/EgovQnaList";
 import EgovSupportQnaDetail from "@/pages/support/qna/EgovQnaDetail";
 import EgovSupportApply from "@/pages/support/apply/EgovSupportApply";
+// SUPPORT 빅프 추가 구현 
+import EgovSupportTransformation from "@/pages/support/transform/EgovSupportTransformation";
+import EgovSupportViewTransformation from "@/pages/support/transform/EgovSupportViewTransformation";
+import EgovSupportViewTest from "@/pages/support/transform/EgovSupportViewTest";
+import EgovSupportDownload from "@/pages/support/transform/EgovSupportDownload";
+import EgovSecurityScan from "@/pages/support/security/EgovSecurityScan";
+import EgovSecurityDownload from "@/pages/support/security/EgovSecurityDownload";
+import EgovSecurityReport from "@/pages/support/security/EgovSecurityReport";
+import EgovGuideEgovframework from "@/pages/support/guide/EgovGuideEgovframework";
+import EgovGuideChatbot from "@/pages/support/guide/EgovGuideChatbot";
 
 //INFORM
 import EgovDailyList from "@/pages/inform/daily/EgovDailyList";
@@ -285,7 +295,7 @@ const SecondRoutes = () => {
         {/* SUPPORT */}
         <Route
           path={URL.SUPPORT}
-          element={<Navigate to={URL.SUPPORT_DOWNLOAD} />}
+          element={<Navigate to={URL.SUPPORT_TRANSFORM_TRANSFORMATION} />}
         />
 
         <Route
@@ -306,6 +316,18 @@ const SecondRoutes = () => {
           path={URL.SUPPORT_QNA_DETAIL}
           element={<EgovSupportQnaDetail />}
         />
+
+        <Route path={URL.SUPPORT_TRANSFORM_TRANSFORMATION} element={<EgovSupportTransformation />} />
+        <Route path={URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON} element={<EgovSupportViewTransformation />} />
+        <Route path={URL.SUPPORT_TRANSFORM_VIEW_TEST} element={<EgovSupportViewTest />} />
+        <Route path={URL.SUPPORT_TRANSFORM_DOWNLOAD} element={<EgovSupportDownload />} />
+
+        <Route path={URL.SUPPORT_SECURITY_SCAN} element={<EgovSecurityScan />} />
+        <Route path={URL.SUPPORT_SECURITY_DOWNLOAD} element={<EgovSecurityDownload />} />
+        <Route path={URL.SUPPORT_SECURITY_REPORT} element={<EgovSecurityReport />} />
+
+        <Route path={URL.SUPPORT_GUIDE_EGOVFRAMEWORK} element={<EgovGuideEgovframework />} />
+        <Route path={URL.SUPPORT_GUIDE_CHATBOT} element={<EgovGuideChatbot />} />
 
         <Route path={URL.SUPPORT_APPLY} element={<EgovSupportApply />} />
 
