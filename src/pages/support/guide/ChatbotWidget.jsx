@@ -22,7 +22,7 @@ function ChatbotWidget() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer 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" // ✅ 데모 키. 정식 사용 시 개인 키 필요
+          "Authorization": "Bearer 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" // ✅ 데모 키. 정식 사용 시 개인 키 필요
         },
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
