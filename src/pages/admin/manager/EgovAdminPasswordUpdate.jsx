@@ -94,7 +94,7 @@ function EgovAdminPasswordUpdate(props) {
             <li>
               <Link to={URL.ADMIN}>사이트관리</Link>
             </li>
-            <li>사이트관리자 암호변경</li>
+            <li>관리자관리</li>
           </ul>
         </div>
         {/* <!--// Location --> */}

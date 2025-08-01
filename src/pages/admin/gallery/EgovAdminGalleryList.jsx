@@ -135,7 +135,7 @@ function EgovAdminGalleryList(props) {
             <li>
               <Link to={URL.ADMIN}>사이트관리</Link>
             </li>
-            <li>{masterBoard && masterBoard.bbsNm}</li>
+            <li>Q&A 관리</li>
           </ul>
         </div>
         {/* <!--// Location --> */}

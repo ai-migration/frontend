@@ -135,7 +135,7 @@ function EgovAdminNoticeList(props) {
             <li>
               <Link to={URL.INFORM}>사이트 관리</Link>
             </li>
-            <li>{masterBoard && masterBoard.bbsNm}</li>
+            <li>공지사항관리</li>
           </ul>
         </div>
         {/* <!--// Location --> */}

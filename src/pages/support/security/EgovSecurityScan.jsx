@@ -9,7 +9,7 @@ function EgovSecurityScan() {
           <ul>
             <li><Link to="/" className="home">Home</Link></li>
             <li><Link to="/support">고객지원</Link></li>
-            <li>보안 분석</li>
+            <li>보안 분석하기</li>
           </ul>
         </div>
         <div className="layout">

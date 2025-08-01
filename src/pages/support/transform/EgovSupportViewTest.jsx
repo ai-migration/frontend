@@ -9,7 +9,7 @@ function EgovSupportViewTest() {
           <ul>
             <li><Link to="/" className="home">Home</Link></li>
             <li><Link to="/support">고객지원</Link></li>
-            <li>테스트 이력</li>
+            <li>테스트 이력 조회</li>
           </ul>
         </div>
         <div className="layout">
