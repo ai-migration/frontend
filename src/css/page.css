@@ -1281,3 +1281,21 @@
   font-size: 16px;
   font-weight: 300;
 }
+
+.signup_inner {
+  width: 720px;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.agree_form {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  height: 400px; 
+  margin: 10px;
+  overflow: auto;
+}
+.agree_article {
+  margin: 4px;
+}

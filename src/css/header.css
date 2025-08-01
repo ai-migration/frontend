@@ -135,3 +135,54 @@
     top: 80px !important;
   }
 }
+
+
+
+
+/* 로고 이미지 기본 스타일 */
+.logo img {
+  max-height: 80px;           /* 최대 높이 제한 */
+  max-width: 280px;           /* 최대 너비 제한 */
+  width: auto;                /* 너비 자동 조절 (비율 유지) */
+  height: auto;               /* 높이 자동 조절 (비율 유지) */
+  object-fit: contain;        /* 비율 유지하면서 컨테이너에 맞춤 */
+  object-position: center;    /* 이미지 자체를 중앙 정렬 */
+  display: block;
+  margin: 0 auto;             /* 추가 중앙 정렬 */
+}
+
+/* 데스크톱/모바일 로고 전환 */
+.logo .w {
+  display: block;
+}
+
+.logo .m {
+  display: none;
+}
+
+/* 다양한 로고 크기 옵션 - 필요에 따라 클래스 추가 사용 */
+
+/* 옵션 1: 큰 로고 */
+.logo.large img {
+  max-height: 100px;
+  max-width: 320px;
+}
+
+/* 옵션 2: 중간 로고 */
+.logo.medium img {
+  max-height: 70px;
+  max-width: 250px;
+}
+
+/* 옵션 3: 작은 로고 */
+.logo.small img {
+  max-height: 60px;
+  max-width: 200px;
+}
+
+/* 옵션 4: 고정 크기 로고 (비율 무시) */
+.logo.fixed img {
+  width: 400px;
+  height: 80px;
+  object-fit: cover; /* 또는 fill */
+}

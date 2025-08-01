@@ -34,6 +34,15 @@ function EgovLoginContent(props) {
   const KEY_ID = "KEY_ID";
   const KEY_SAVE_ID_FLAG = "KEY_SAVE_ID_FLAG";
 
+  // Email 유효성 체크
+  function getEmailValidationMessage(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    const isValid = emailRegex.test(email);
+
+    return isValid ? "✅ 올바른 Email 형식입니다." : "❌ Email 형식을 확인해 주세요.";
+  }
+
   const handleSaveIDFlag = () => {
     setLocalItem(KEY_SAVE_ID_FLAG, !saveIDFlag);
     setSaveIDFlag(!saveIDFlag);
@@ -59,7 +68,7 @@ function EgovLoginContent(props) {
   useEffect(() => {
     let data = getLocalItem(KEY_ID);
     if (data !== null) {
-      setUserInfo({ id: data, password: "default", userSe: "USR" });
+      setUserInfo({ email: data, password: "default", userSe: "USR" });
     }
   }, []);
 
@@ -78,7 +87,7 @@ function EgovLoginContent(props) {
   const submitFormHandler = () => {
     console.log("EgovLoginContent submitFormHandler()");
 
-    const loginUrl = "/auth/login-jwt";
+    const loginUrl = "/users/login";
 
     const requestOptions = {
       method: "POST",
@@ -94,7 +103,7 @@ function EgovLoginContent(props) {
 
       setSessionItem("jToken", jToken);
 
-      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) { // 로그인 성공
         //setLoginVO(resultVO);
         setSessionItem("loginUser", resultVO);
         props.onChangeLogin(resultVO);
@@ -119,11 +128,11 @@ function EgovLoginContent(props) {
       {/* <!-- 본문 --> */}
       <div className="Plogin">
         <h1>로그인</h1>
-        <p className="txt">
+        {/* <p className="txt">
           전자정부표준프레임워크 경량환경 홈페이지 로그인 페이지입니다.
           <br />
           로그인을 하시면 모든 서비스를 제한없이 이용하실 수 있습니다.
-        </p>
+        </p> */}
 
         <div className="login_box">
           <form name="" method="" action="">
@@ -135,9 +144,9 @@ function EgovLoginContent(props) {
                   name=""
                   title="아이디"
                   placeholder="아이디"
-                  value={userInfo?.id}
+                  value={userInfo?.email}
                   onChange={(e) =>
-                    setUserInfo({ ...userInfo, id: e.target.value })
+                    setUserInfo({ ...userInfo, email: e.target.value })
                   }
                   ref={idRef}
                   onKeyDown={activeEnter}
@@ -184,8 +193,8 @@ function EgovLoginContent(props) {
           </li>
         </ul>
         <div className="btn_social">
-          <SnsNaverBt />
-          <SnsKakaoBt />
+          {/* <SnsNaverBt />
+          <SnsKakaoBt /> */}
         </div>
       </div>
       {/* <!--// 본문 --> */}

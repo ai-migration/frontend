@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; //Link, 제거
 
@@ -18,15 +19,61 @@ function EgovSignupForm({ onBack }) {
 
   console.log("EgovSignupForm [location] : ", location);
   //const uniqId = location.state?.uniqId || "";
-  const [userDetail, setUserDetail] = useState({});
+  const [userDetail, setUserDetail] = useState({email: "", password:""});
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
-  
+  const [passwordValid, setPasswordValid] = useState(false);
+  const [passwordMatch, setPasswordMatch] = useState(false);
+
+  // Email 유효성 체크
+  function getEmailValidationMessage(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    const isValid = emailRegex.test(email);
+
+    return isValid ? "✅ 올바른 Email 형식입니다." : "❌ Email 형식을 확인해 주세요.";
+  }
+
+  // Password 유효성 체크
+  function isValidPassword(pw) {
+    const lengthValid = pw.length >= 8 && pw.length <= 16;
+
+    const hasLower = /[a-z]/.test(pw);
+    const hasUpper = /[A-Z]/.test(pw);
+    const hasDigit = /\d/.test(pw);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pw); // 특수문자
+
+    const typeCount = [hasLower, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
+
+    return lengthValid && typeCount >= 2;
+  }
+
+  // Password 유효성 체크 메시지
+  function getPasswordValidationMessage(pw) {
+    const messages = [];
+
+    if (pw.length < 8 || pw.length > 16) {
+      messages.push("❌ 8자 이상 16자 이하로 입력하세요.");
+    }
+
+    const hasLower = /[a-z]/.test(pw);
+    const hasUpper = /[A-Z]/.test(pw);
+    const hasDigit = /\d/.test(pw);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pw);
+    const typeCount = [hasLower, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
+
+    if (typeCount < 2) {
+      messages.push("❌ 대/소문자, 숫자, 특수문자 중 2가지 이상을 포함하세요.");
+    }
+
+    return messages.length === 0 ? "✅ 사용 가능한 비밀번호입니다." : messages.join(" ");
+  }
+    
+  // 회원가입 버튼 클릭
   const submitForm = () => {
-    // 회원가입 버튼 클릭
     console.log(userDetail)
     
-    const retrieveDetailURL = `localhost:8082/users`;
+    const retrieveDetailURL = `/users`;
 
     const requestOptions = {
       method: "POST",
@@ -42,24 +89,26 @@ function EgovSignupForm({ onBack }) {
     });
   }
 
-  const retrieveDetail = () => {
+  // const retrieveDetail = () => {
 
-    const retrieveDetailURL = `/signup`;
+  //   const retrieveDetailURL = `/signup`;
 
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(userDetail),
-    };
+  //   const requestOptions = {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-type": "application/json",
+  //     },
+  //     body: JSON.stringify(userDetail),
+  //   };
 
-    EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-      console.log("signup retrieveDetail response:", resp);
-      console.log("resp.result:", resp?.result);
-      console.log("resp.result.mberManageVO:", resp?.result?.mberManageVO);
-    });
-  };
+  //   EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+  //     console.log("signup retrieveDetail response:", resp);
+  //     console.log("resp.result:", resp?.result);
+  //     console.log("resp.result.mberManageVO:", resp?.result?.mberManageVO);
+  //   });
+  // };
+
+  // Email 중복 체크 확인
   const checkIdDplct = () => {
     return new Promise((resolve) => {
       let checkId = userDetail["email"];
@@ -97,31 +146,31 @@ function EgovSignupForm({ onBack }) {
     });
   };
 
-  const formValidator = (formData) => {
-    return new Promise((resolve) => {
-      if (formData.get("userEmail") === null || formData.get("userEmail") === "") {
-        alert("회원ID는 필수 값입니다.");
-        return false;
-      }
-      checkIdDplct().then((res) => {
-        if (res > 0) {
-          return false;
-        }
-        if (
-          formData.get("password") === null ||
-          formData.get("password") === ""
-        ) {
-          alert("암호는 필수 값입니다.");
-          return false;
-        }
-        if (formData.get("nickname") === null || formData.get("nickname") === "") {
-          alert("회원명은 필수 값입니다.");
-          return false;
-        }
-        resolve(true);
-      });
-    });
-  };
+  // const formValidator = (formData) => {
+  //   return new Promise((resolve) => {
+  //     if (formData.get("userEmail") === null || formData.get("userEmail") === "") {
+  //       alert("회원ID는 필수 값입니다.");
+  //       return false;
+  //     }
+  //     checkIdDplct().then((res) => {
+  //       if (res > 0) {
+  //         return false;
+  //       }
+  //       if (
+  //         formData.get("password") === null ||
+  //         formData.get("password") === ""
+  //       ) {
+  //         alert("암호는 필수 값입니다.");
+  //         return false;
+  //       }
+  //       if (formData.get("nickname") === null || formData.get("nickname") === "") {
+  //         alert("회원명은 필수 값입니다.");
+  //         return false;
+  //       }
+  //       resolve(true);
+  //     });
+  //   });
+  // };
 
   const formObjValidator = (checkRef) => {
     if (checkRef.current[0].value === "") {
@@ -166,6 +215,11 @@ function EgovSignupForm({ onBack }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 비밀번호 일치 여부 검사
+  useEffect(() => {
+    setPasswordMatch(userDetail.password !== "" && userDetail.password === passwordCheck);
+  }, [userDetail.password, passwordCheck]);
+
   console.log("------------------------------EgovSignupForm [End]");
   console.groupEnd("EgovSignupForm");
 
@@ -204,7 +258,7 @@ function EgovSignupForm({ onBack }) {
                     onChange={(e) =>
                       setUserDetail({
                         ...userDetail,
-                        userEmail: e.target.value,
+                        email: e.target.value,
                       })
                     }
                     ref={(el) => (checkRef.current[0] = el)}
@@ -212,12 +266,15 @@ function EgovSignupForm({ onBack }) {
                   />
                   <button
                     className="btn_skyblue_h46"
-                    onClick={() => {
-                      checkIdDplct();
-                    }}
+                    // onClick={() => {
+                    //   checkIdDplct();
+                    // }}
                   >
                     ID 중복확인
                   </button>
+                  <div>
+                    {getEmailValidationMessage(userDetail.email)}
+                  </div>
                 </dd>
               </dl>
               <dl>
@@ -232,7 +289,7 @@ function EgovSignupForm({ onBack }) {
                     name="password"
                     title=""
                     id="password"
-                    placeholder="비밀번호는 6~12자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다."
+                    placeholder="비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다."
                     onChange={(e) =>
                       setUserDetail({
                         ...userDetail,
@@ -242,7 +299,9 @@ function EgovSignupForm({ onBack }) {
                     ref={(el) => (checkRef.current[1] = el)}
                     required
                   />
-                  
+                  <div>
+                    {getPasswordValidationMessage(userDetail.password)}
+                  </div>
                 </dd>
               </dl>
               <dl>
@@ -258,16 +317,17 @@ function EgovSignupForm({ onBack }) {
                     title=""
                     id="passwordCheck"
                     placeholder="동일한 암호를 한 번 더 입력해 확인해 주세요."
-                    onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
-                        passwordCheck: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[1] = el)}
+                    onChange={(e) => setPasswordCheck(e.target.value)}
+                    ref={(el) => (checkRef.current[2] = el)}
                     required
                   />
-                  
+                  <div>
+                    {passwordCheck
+                      ? passwordMatch
+                        ? "✅ 비밀번호가 일치합니다."
+                        : "❌ 비밀번호가 일치하지 않습니다."
+                      : "비밀번호 확인을 입력하세요."}
+                  </div>
                 </dd>
               </dl>
               <dl>
@@ -289,7 +349,7 @@ function EgovSignupForm({ onBack }) {
                         nickname: e.target.value,
                       })
                     }
-                    ref={(el) => (checkRef.current[2] = el)}
+                    ref={(el) => (checkRef.current[3] = el)}
                     required
                   />
                 </dd>
