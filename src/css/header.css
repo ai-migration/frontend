@@ -135,10 +135,3 @@
     top: 80px !important;
   }
 }
-
-.logo img {
-  height: 80px; /* 또는 원하는 높이 (예: 32px, 36px 등) */
-  width: auto;  /* 비율 유지 */
-  max-width: 100%;
-  object-fit: contain;
-}
