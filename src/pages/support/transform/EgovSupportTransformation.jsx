@@ -4,51 +4,68 @@ import { useState, useRef } from "react";
 
 function EgovSupportTransformation() {
   const fileInputRef = useRef(null);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [files, setFiles] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const MAX_SIZE_MB = 20;
   const MAX_FILES = 10;
+  const MAX_SIZE_MB = 20;
 
-  const handleFiles = (files) => {
-    const validFiles = [];
-    let error = "";
+  const handleFileChange = (e) => {
+    const newFiles = Array.from(e.target.files);
+    const totalFiles = files.length + newFiles.length;
 
-    if (files.length > MAX_FILES) {
-      error = `❌ 최대 ${MAX_FILES}개까지 업로드할 수 있습니다.`;
+    if (totalFiles > MAX_FILES) {
+      setErrorMsg(`❌ 최대 ${MAX_FILES}개까지 업로드할 수 있습니다.`);
+      return;
     }
 
-    [...files].forEach((file) => {
-      const isZip = file.name.toLowerCase().endsWith(".zip");
-      if (!isZip) {
-        error = "❌ .zip 파일만 업로드할 수 있습니다.";
-      } else if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-        error = `❌ 파일당 최대 ${MAX_SIZE_MB}MB까지만 업로드 가능합니다.`;
-      } else {
-        validFiles.push(file);
+    const validated = newFiles.map((file) => {
+      if (!file.name.toLowerCase().endsWith(".zip")) {
+        setErrorMsg("❌ .zip 파일만 업로드할 수 있습니다.");
+        return null;
       }
-    });
+      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+        setErrorMsg(`❌ 파일당 최대 ${MAX_SIZE_MB}MB까지 업로드 가능합니다.`);
+        return null;
+      }
+      return {
+        id: crypto.randomUUID(),
+        file,
+        status: "uploading"
+      };
+    }).filter(Boolean);
 
-    if (error) {
-      setErrorMsg(error);
-      setSelectedFiles([]);
-    } else {
-      setSelectedFiles(validFiles);
+    if (validated.length > 0) {
       setErrorMsg("");
+      setFiles((prev) => [...prev, ...validated]);
+
+      validated.forEach((f) => {
+        setTimeout(() => {
+          setFiles((prev) =>
+            prev.map((item) =>
+              item.id === f.id ? { ...item, status: "done" } : item
+            )
+          );
+        }, 2000);
+      });
     }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    handleFiles(e.dataTransfer.files);
+    handleFileChange({ target: { files: e.dataTransfer.files } });
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  const handleFileChange = (e) => {
-    handleFiles(e.target.files);
+  const handleDelete = (id) => {
+    setFiles((prev) => prev.filter((file) => file.id !== id));
+  };
+
+  const handleDeleteAll = () => {
+    setFiles([]);
   };
 
   return (
@@ -61,17 +78,19 @@ function EgovSupportTransformation() {
             <li>변환</li>
           </ul>
         </div>
+
         <div className="layout">
           <EgovLeftNavTransform />
           <div className="contents SITE_GALLARY_VIEW" id="contents">
             <div className="top_tit"><h1 className="tit_1">고객지원</h1></div>
             <h2 className="tit_2">코드 변환</h2>
+
             <div className="board_view2">
               <p className="msg_1">
                 업로드된 코드를 전자정부프레임워크 구조에 맞춰 자동으로 변환합니다.
               </p>
 
-              {/* --- 파일 업로드 박스 추가 (기존 UI 유지) --- */}
+              {/* ✅ 추가: 업로드 UI (기존 UI 유지됨) */}
               <div
                 className="upload-box-wrapper"
                 style={{
@@ -82,19 +101,13 @@ function EgovSupportTransformation() {
                   marginTop: "20px"
                 }}
               >
-                <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "12px" }}>
-                  파일 업로드
-                </h3>
+                <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "12px" }}>파일 업로드</h3>
                 <ul style={{ fontSize: "14px", marginBottom: "16px", color: "#333" }}>
-                  <li>압축 형식(<strong>.zip</strong>) 파일만 등록할 수 있습니다.</li>
-                  <li>
-                    파일 1개 당 크기는 <strong>{MAX_SIZE_MB}MB</strong>를 초과할 수 없으며,
-                    최대 <strong>{MAX_FILES}개</strong>까지 등록할 수 있습니다.
-                  </li>
+                  <li><strong>.zip</strong> 파일만 등록할 수 있습니다.</li>
+                  <li>파일당 <strong>20MB</strong> 이하, 최대 <strong>10개</strong>까지 등록 가능</li>
                 </ul>
 
                 <div
-                  className="upload-dropzone"
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current.click()}
@@ -107,13 +120,12 @@ function EgovSupportTransformation() {
                     cursor: "pointer"
                   }}
                 >
-                  <p style={{ marginBottom: "12px", fontSize: "14px", color: "#555" }}>
-                    첨부할 파일을 여기에 끌어다 놓거나,<br />
-                    파일 선택 버튼을 눌러 파일을 직접 선택해 주세요.
+                  <p style={{ fontSize: "14px", color: "#555" }}>
+                    첨부할 파일을 끌어다 놓거나 <br />
+                    파일 선택 버튼을 눌러 주세요
                   </p>
                   <button
                     type="button"
-                    className="btn-file"
                     style={{
                       backgroundColor: "#246BEB",
                       color: "#fff",
@@ -137,19 +149,54 @@ function EgovSupportTransformation() {
                 </div>
 
                 {errorMsg && (
-                  <div style={{ color: "red", marginTop: "12px", fontSize: "13px" }}>
-                    {errorMsg}
+                  <p style={{ color: "red", marginTop: "10px", fontSize: "13px" }}>{errorMsg}</p>
+                )}
+
+                {files.length > 0 && (
+                  <div style={{ marginTop: "20px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", marginBottom: "10px" }}>
+                      <span style={{ color: "#246BEB", fontWeight: "bold" }}>{files.length}개</span> / {MAX_FILES}개
+                      <button onClick={handleDeleteAll} style={{ border: "none", background: "transparent", color: "#666", cursor: "pointer" }}>
+                        ❌ 전체 파일 삭제
+                      </button>
+                    </div>
+
+                    <ul style={{ listStyle: "none", padding: 0 }}>
+                      {files.map((item) => (
+                        <li key={item.id} style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          backgroundColor: "#fff",
+                          border: "1px solid #ddd",
+                          borderRadius: "6px",
+                          padding: "10px 16px",
+                          marginBottom: "8px",
+                          fontSize: "14px"
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            {item.file.name} [{Math.round(item.file.size / 1024)}KB]
+                          </div>
+                          <div style={{ marginLeft: "10px" }}>
+                            {item.status === "uploading" ? (
+                              <span style={{ color: "#888" }}>🔄 업로드 중</span>
+                            ) : (
+                              <span style={{ color: "green" }}>✅ 완료</span>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            style={{ marginLeft: "12px", background: "none", border: "none", color: "#cc0000", cursor: "pointer" }}
+                          >
+                            × 삭제
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
-                {selectedFiles.length > 0 && (
-                  <ul style={{ marginTop: "12px", fontSize: "13px", color: "#333" }}>
-                    {selectedFiles.map((file, index) => (
-                      <li key={index}>✅ {file.name}</li>
-                    ))}
-                  </ul>
-                )}
               </div>
-              {/* --- 업로드 박스 끝 --- */}
+              {/* ✅ 업로드 UI 끝 */}
             </div>
           </div>
         </div>
