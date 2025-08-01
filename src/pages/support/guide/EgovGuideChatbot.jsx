@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import EgovLeftNavGuide from "@/components/leftmenu/EgovLeftNavGuide";
+import ChatbotWidget from "@/pages/support/guide/ChatbotWidget"; 
 
 function EgovGuideChatbot() {
   return (
@@ -19,6 +20,9 @@ function EgovGuideChatbot() {
             <h2 className="tit_2">챗봇 가이드</h2>
             <div className="board_view2">
               <p className="msg_1">챗봇 서비스 연동 및 훈련 방법을 안내합니다.</p>
+
+              {/* ✅ 챗봇 위젯 삽입 */}
+              <ChatbotWidget />
             </div>
           </div>
         </div>
