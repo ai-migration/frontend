@@ -99,7 +99,8 @@ function EgovLoginContent(props) {
 
     EgovNet.requestFetch(loginUrl, requestOptions, (resp) => {
       // let resultVO = resp.resultVO;
-      let jToken = resp?.accessToken.split(' ')[1] || null;
+      let jToken = resp?.accessToken || null;
+      // let jToken = resp?.accessToken.split(' ')[1] || null;
 
       const obj = {
         id: resp?.nickname,
@@ -107,7 +108,7 @@ function EgovLoginContent(props) {
         userSe: resp?.role,
       };
 
-      setSessionItem("jToken", resp.accessToken.split(' ')[1]);
+      setSessionItem("jToken", jToken);
       setSessionItem("loginUser", obj);
 
       alert('로그인 성공!');

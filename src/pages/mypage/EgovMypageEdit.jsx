@@ -19,23 +19,37 @@ function EgovMypageEdit() {
 
   console.log("EgovMypageEdit [location] : ", location);
   //const uniqId = location.state?.uniqId || "";
-  // const [modeInfo, setModeInfo] = useState({ mode: props.mode });
-  const [userDetail, setUserDetail] = useState({});
+  const [userDetail, setUserDetail] = useState({email:"", password:"", nickname:"", tokenIssued:false});
+  const [passwordCheck, setPasswordCheck] = useState("");
+  const [passwordMatch, setPasswordMatch] = useState(false);
 
-  // const initMode = () => {
-  //   switch (props.mode) {
-  //     case CODE.MODE_MODIFY:
-  //       setModeInfo({
-  //         ...modeInfo,
-  //         modeTitle: "수정",
-  //         editURL: `/mypage/update`,
-  //       });
-  //       break;
-  //     default:
-  //       navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
-  //   }
-  //   retrieveDetail();
-  // };
+  // Password 유효성 체크 메시지
+  function getPasswordValidationMessage(pw) {
+    const messages = [];
+    if (pw.length < 8 || pw.length > 16) {
+      messages.push("❌ 8자 이상 16자 이하로 입력하세요.");
+    }
+
+    if (!/[0-9]/.test(pw)) {
+      messages.push("❌ 숫자를 1개 이상 포함하세요.");
+    }
+
+    if (!/[a-zA-Z]/.test(pw)) {
+      messages.push("❌ 영문자를 1개 이상 포함하세요.");
+    }
+
+    if (!/\W/.test(pw)) {
+      messages.push("❌ 특수문자를 1개 이상 포함하세요.");
+    }
+
+    if (/\s/.test(pw)) {
+      messages.push("❌ 공백은 사용할 수 없습니다.");
+    }
+
+    return messages.length === 0
+      ? ["✅ 사용 가능한 비밀번호입니다."]
+      : messages;
+  }
 
   const retrieveDetail = () => {
 
@@ -51,39 +65,13 @@ function EgovMypageEdit() {
 
     EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
       console.log("mypage retrieveDetail response:", resp);
-      // console.log("resp.result:", resp?.result);
-      // console.log("resp.result.mberManageVO:", resp?.result?.mberManageVO);
-      // const userInfo = {
-      //   email : 
-      // }
-
-      // if (resp && resp.resultCode === "403") {
-      //   console.error("Permission denied for mypage:", resp);
-      //   // 백엔드에서 반환한 에러 메시지가 있으면 사용
-      //   const errorMessage =
-      //     resp && resp.resultMessage
-      //       ? resp.resultMessage
-      //       : "로그인이 필요합니다.";
-      //   alert(errorMessage);
-      //   window.location.href = URL.LOGIN;
-      // } else if (resp && resp.resultCode === "401") {
-      //   console.error("Authentication required for mypage:", resp);
-      //   alert("로그인이 필요합니다.");
-      //   window.location.href = URL.LOGIN;
-      // } else if (resp && resp.resultCode === "900") {
-      //   console.error("Data error for mypage:", resp);
-      //   alert(resp.resultMessage || "회원 정보를 불러올 수 없습니다.");
-      //   window.location.href = URL.LOGIN;
-      // } else {
-      //   console.error("mberManageVO not found in response:", resp);
-      //   // 백엔드에서 반환한 에러 메시지가 있으면 사용
-      //   const errorMessage =
-      //     resp && resp.resultMessage
-      //       ? resp.resultMessage
-      //       : "회원 정보를 불러올 수 없습니다. 다시 로그인해주세요.";
-      //   alert(errorMessage);
-      //   window.location.href = URL.LOGIN;
-      // }
+      
+      setUserDetail((prev) => ({
+        ...prev,
+        email: resp.email,
+        nickname: resp.nickname,
+        tokenIssued: resp.tokenIssued,
+      }));
     });
   };
   
@@ -115,61 +103,33 @@ function EgovMypageEdit() {
   const updateUser = () => {
     // let modeStr = "PUT";
 
-  let requestOptions = {};
+    const requestUpdateUserURL = `/users/update`; // 임시URL
 
-    if (formObjValidator(checkRef)) {
-      requestOptions = {
-        method: modeStr,
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({ ...userDetail }),
-      };
-
-      // EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-      //   if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-      //     alert("회원 정보가 수정되었습니다.");
-      //     navigate({ pathname: URL.MAIN });
-      //   } else {
-      //     navigate(
-      //       { pathname: URL.ERROR },
-      //       { state: { msg: resp.resultMessage } }
-      //     );
-      //   }
-      // });
-    }
+    const requestOptions = {
+      method: "PATCH",
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": sessionToken
+      },
+      body: JSON.stringify({ ...userDetail }),
+    };
     
+    EgovNet.requestFetch(requestUpdateUserURL, requestOptions, (resp) => {
+      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+        alert("회원 정보가 수정되었습니다.");
+        navigate({ pathname: URL.MAIN });
+      } else {
+        navigate(
+          { pathname: URL.ERROR },
+          { state: { msg: resp.resultMessage } }
+        );
+      }
+    });
   };
-
-  // const deleteUser = () => {
-  //   if (formObjValidator(checkRef)) {
-  //     const deleteMypageURL = `/mypage/delete`; // /${uniqId} 제거 서버단에서 토큰 값 사용.
-  //     const requestOptions = {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-type": "application/json",
-  //       },
-  //       body: JSON.stringify({ ...userDetail }),
-  //     };
-
-  //     EgovNet.requestFetch(deleteMypageURL, requestOptions, (resp) => {
-  //       console.log("====>>> member delete= ", resp);
-  //       if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-  //         setSessionItem("loginUser", { id: "" });
-  //         setSessionItem("jToken", null);
-  //         // PC와 Mobile 열린메뉴 닫기
-  //         document.querySelector(".all_menu.WEB").classList.add("closed");
-  //         document.querySelector(".btnAllMenu").classList.remove("active");
-  //         document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-  //         document.querySelector(".all_menu.Mobile").classList.add("closed");
-  //         alert("회원이 탈퇴되었습니다. 로그아웃 됩니다.");
-  //         navigate(URL.MAIN, { replace: true });
-  //       } else {
-  //         alert("ERR : " + resp.resultMessage);
-  //       }
-  //     });
-  //   }
-  // };
+  
+  useEffect(() => {
+    setPasswordMatch(userDetail.password !== "" && userDetail.password === passwordCheck);
+  }, [userDetail.password, passwordCheck]);
 
   useEffect(() => {
     // initMode();
@@ -208,33 +168,31 @@ function EgovMypageEdit() {
               <h1 className="tit_1">마이페이지</h1>
             </div>
 
-            <h2 className="tit_2">회원 수정</h2>
+            <h2 className="tit_2">회원 정보 수정</h2>
             <div className="board_view2">
               <dl>
                 <dt>
                   <label htmlFor="mberId">Email</label>
-                  <span className="req">필수</span>
                 </dt>
                 <dd>
-                  {/* 수정/조회 일때 변경 불가 */}
-                  <input
+                  {userDetail.email}
+                  {/* <input
                     className="f_input2 w_full"
                     type="text"
                     name="mberId"
                     title=""
                     id="mberId"
                     placeholder=""
-                    defaultValue={userDetail.mberId}
+                    defaultValue={userDetail.email}
                     ref={(el) => (checkRef.current[0] = el)}
                     readOnly
                     required
-                  />
+                  /> */}
                 </dd>
               </dl>
               <dl>
                 <dt>
-                  <label htmlFor="password">회원암호</label>
-                  <span className="req">필수</span>
+                  <label htmlFor="password">암호변경</label>
                 </dt>
                 <dd>
                   <input
@@ -243,8 +201,7 @@ function EgovMypageEdit() {
                     name="password"
                     title=""
                     id="password"
-                    placeholder="빈값이면 기존 암호가 변경되지 않고 그대로 유지됩니다."
-                    defaultValue=""
+                    placeholder="변경할 암호를 입력해 주세요. 비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다."
                     onChange={(e) =>
                       setUserDetail({
                         ...userDetail,
@@ -252,16 +209,44 @@ function EgovMypageEdit() {
                       })
                     }
                     ref={(el) => (checkRef.current[1] = el)}
+                    required
                   />
+                  <div>
+                    {getPasswordValidationMessage(userDetail.password)}
+                  </div>
+                </dd>
+              </dl><dl>
+                <dt>
+                  <label htmlFor="password">암호확인</label>
+                </dt>
+                <dd>
+                  <input
+                    className="f_input2 w_full"
+                    type="password"
+                    name="passwordCheck"
+                    title=""
+                    id="passwordCheck"
+                    placeholder="동일한 암호를 한 번 더 입력해 확인해 주세요."
+                    onChange={(e) => setPasswordCheck(e.target.value)}
+                    ref={(el) => (checkRef.current[2] = el)}
+                    required
+                  />
+                  <div>
+                    {passwordCheck
+                      ? passwordMatch
+                        ? "✅ 비밀번호가 일치합니다."
+                        : "❌ 비밀번호가 일치하지 않습니다."
+                      : ""}
+                  </div>
                 </dd>
               </dl>
               <dl>
                 <dt>
                   <label htmlFor="bbsNm">회원명</label>
-                  <span className="req">필수</span>
                 </dt>
                 <dd>
-                  <input
+                  {userDetail.nickname}
+                  {/* <input
                     className="f_input2 w_full"
                     type="text"
                     name="mberNm"
@@ -277,7 +262,7 @@ function EgovMypageEdit() {
                     }
                     ref={(el) => (checkRef.current[2] = el)}
                     required
-                  />
+                  /> */}
                 </dd>
               </dl>
               
@@ -287,7 +272,18 @@ function EgovMypageEdit() {
                   {/* <span className="req">필수</span> */}
                 </dt>
                 <dd>
-                  <input
+                  {userDetail.tokenIssued && (
+                    <p>토큰 발급이 완료되었습니다.</p>
+                  )}
+                  {!userDetail.tokenIssued && (
+                    <button
+                      className="btn_skyblue_h46 w_100"
+                      onClick={() => requestToken()}
+                    >
+                      토큰요청
+                    </button>
+                  )}
+                  {/* <input
                     className="f_input2 w_full"
                     type="text"
                     name="mberToken"
@@ -303,19 +299,13 @@ function EgovMypageEdit() {
                     // }
                     ref={(el) => (checkRef.current[2] = el)}
                     required
-                  />
+                  /> */}
                 </dd>
               </dl>
 
               {/* <!-- 버튼영역 --> */}
               <div className="board_btn_area">
                 <div className="left_col btn1">
-                  <button
-                    className="btn_skyblue_h46 w_100"
-                    onClick={() => requestToken()}
-                  >
-                    토큰요청
-                  </button>
 
                   <button
                     className="btn_skyblue_h46 w_100"

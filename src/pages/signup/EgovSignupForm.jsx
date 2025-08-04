@@ -19,19 +19,22 @@ function EgovSignupForm({ onBack }) {
 
   console.log("EgovSignupForm [location] : ", location);
   //const uniqId = location.state?.uniqId || "";
-  const [userDetail, setUserDetail] = useState({email: "", password:""});
-  const [password, setPassword] = useState("");
-  const [passwordCheck, setPasswordCheck] = useState("");
-  const [passwordValid, setPasswordValid] = useState(false);
+  const [userDetail, setUserDetail] = useState({email: "", password:"", passwordCheck: "", nickname: ""});
   const [passwordMatch, setPasswordMatch] = useState(false);
 
   // Email 유효성 체크
-  function getEmailValidationMessage(email) {
+  function isValidEmail(email) {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     const isValid = emailRegex.test(email);
 
-    return isValid ? "✅ 올바른 Email 형식입니다." : "❌ Email 형식을 확인해 주세요.";
+    return isValid;
+  }
+
+  // Email 유효성 체크 메시지
+  function getEmailValidationMessage(email) {
+
+    return isValidEmail(email) ? "✅ 올바른 Email 형식입니다." : "❌ Email 형식을 확인해 주세요.";
   }
 
   // Password 유효성 체크
@@ -78,8 +81,32 @@ function EgovSignupForm({ onBack }) {
     
   // 회원가입 버튼 클릭
   const submitForm = () => {
-    console.log(userDetail)
-    
+    const { email, password, passwordCheck, nickname } = userDetail;
+
+    // 필수항목
+    if(!formObjValidator()) {
+      // alert("모든 필수 항목을 입력하세요.");
+      return;
+    }
+
+    // 이메일
+    if(!isValidEmail(email)) {
+      alert("이메일 형식을 확인해주세요.");
+      return;
+    }
+
+    // 비밀번호 유효성
+    if(!isValidPassword(password)) {
+      alert("비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다.");
+      return;
+    }
+
+    // 비밀번호 일치
+    if (password !== passwordCheck) {
+      alert("비밀번호와 확인이 일치하지 않습니다.");
+      return;
+    }
+
     const retrieveDetailURL = `/users/register`;
 
     const requestOptions = {
@@ -99,10 +126,22 @@ function EgovSignupForm({ onBack }) {
   }
 
   const formObjValidator = () => {
-    if (!userDetail.email) return alert("이메일은 필수입니다.");
-    if (!userDetail.password) return alert("비밀번호는 필수입니다.");
-    if (!userDetail.passwordCheck) return alert("암호확인은 필수입니다.");
-    if (!userDetail.nickname) return alert("닉네임은 필수입니다.");
+    if (!userDetail.email)  {
+      alert("이메일은 필수입니다.");
+      return false;
+    }      
+    else if (!userDetail.password) {
+      alert("비밀번호는 필수입니다.");
+      return false;
+    } 
+    else if (!userDetail.passwordCheck) {
+      alert("암호확인은 필수입니다.");
+      return false;
+    }
+    else if (!userDetail.nickname) {
+      alert("닉네임은 필수입니다.");
+      return false;
+    }
     return true;
   };
 
@@ -112,8 +151,8 @@ function EgovSignupForm({ onBack }) {
 
   // 비밀번호 일치 여부 검사
   useEffect(() => {
-    setPasswordMatch(userDetail.password !== "" && userDetail.password === passwordCheck);
-  }, [userDetail.password, passwordCheck]);
+    setPasswordMatch(userDetail.password !== "" && userDetail.password === userDetail.passwordCheck);
+  }, [userDetail.password, userDetail.passwordCheck]);
 
   console.log("------------------------------EgovSignupForm [End]");
   console.groupEnd("EgovSignupForm");
@@ -202,16 +241,21 @@ function EgovSignupForm({ onBack }) {
                     title=""
                     id="passwordCheck"
                     placeholder="동일한 암호를 한 번 더 입력해 확인해 주세요."
-                    onChange={(e) => setPasswordCheck(e.target.value)}
+                    onChange={(e) =>
+                      setUserDetail({
+                        ...userDetail,
+                        passwordCheck: e.target.value,
+                      })
+                    }
                     ref={(el) => (checkRef.current[2] = el)}
                     required
                   />
                   <div>
-                    {passwordCheck
+                    {userDetail.passwordCheck
                       ? passwordMatch
                         ? "✅ 비밀번호가 일치합니다."
                         : "❌ 비밀번호가 일치하지 않습니다."
-                      : "비밀번호 확인을 입력하세요."}
+                      : ""}
                   </div>
                 </dd>
               </dl>
