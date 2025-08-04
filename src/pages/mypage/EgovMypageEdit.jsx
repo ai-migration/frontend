@@ -6,189 +6,100 @@ import URL from "@/constants/url";
 import CODE from "@/constants/code";
 
 import { setSessionItem } from "@/utils/storage";
+import { getSessionItem } from "@/utils/storage";
 
-function EgovMypageEdit(props) {
+function EgovMypageEdit() {
   console.group("EgovMypageEdit");
   console.log("[Start] EgovMypageEdit ------------------------------");
-  console.log("EgovMypageEdit [props] : ", props);
 
   const navigate = useNavigate();
   const location = useLocation();
   const checkRef = useRef([]);
+  const sessionToken = getSessionItem("jToken");
 
   console.log("EgovMypageEdit [location] : ", location);
   //const uniqId = location.state?.uniqId || "";
-  const [modeInfo, setModeInfo] = useState({ mode: props.mode });
-  const [memberDetail, setMemberDetail] = useState({});
+  // const [modeInfo, setModeInfo] = useState({ mode: props.mode });
+  const [userDetail, setUserDetail] = useState({});
 
-  const initMode = () => {
-    switch (props.mode) {
-      case CODE.MODE_CREATE:
-        setModeInfo({
-          ...modeInfo,
-          modeTitle: "등록",
-          editURL: "/etc/member_insert",
-        });
-        break;
-
-      case CODE.MODE_MODIFY:
-        setModeInfo({
-          ...modeInfo,
-          modeTitle: "수정",
-          editURL: `/mypage/update`,
-        });
-        break;
-      default:
-        navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
-    }
-    retrieveDetail();
-  };
+  // const initMode = () => {
+  //   switch (props.mode) {
+  //     case CODE.MODE_MODIFY:
+  //       setModeInfo({
+  //         ...modeInfo,
+  //         modeTitle: "수정",
+  //         editURL: `/mypage/update`,
+  //       });
+  //       break;
+  //     default:
+  //       navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
+  //   }
+  //   retrieveDetail();
+  // };
 
   const retrieveDetail = () => {
-    if (modeInfo.mode === CODE.MODE_CREATE) {
-      // 조회/등록이면 조회 안함
-      setMemberDetail({
-        tmplatId: "TMPLAT_MYPAGE_DEFAULT", //Template 고정
-        groupId: "GROUP_00000000000001", //그룹ID 초기값
-        mberSttus: "P", //로그인가능여부 초기값
-        checkIdResult: "중복ID를 체크해 주세요.",
-      });
-      return;
-    }
 
-    const retrieveDetailURL = `/mypage`;
+    const retrieveDetailURL = `/users/mypage`;
 
     const requestOptions = {
       method: "GET",
       headers: {
         "Content-type": "application/json",
+        "Authorization": sessionToken
       },
     };
 
     EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
       console.log("mypage retrieveDetail response:", resp);
-      console.log("resp.result:", resp?.result);
-      console.log("resp.result.mberManageVO:", resp?.result?.mberManageVO);
+      // console.log("resp.result:", resp?.result);
+      // console.log("resp.result.mberManageVO:", resp?.result?.mberManageVO);
+      // const userInfo = {
+      //   email : 
+      // }
 
-      // 수정모드일 경우 조회값 세팅
-      if (modeInfo.mode === CODE.MODE_MODIFY) {
-        if (resp && resp.result && resp.result.mberManageVO) {
-          console.log("Setting member detail:", resp.result.mberManageVO);
-          setMemberDetail(resp.result.mberManageVO);
-        } else if (resp && resp.resultCode === "403") {
-          console.error("Permission denied for mypage:", resp);
-          // 백엔드에서 반환한 에러 메시지가 있으면 사용
-          const errorMessage =
-            resp && resp.resultMessage
-              ? resp.resultMessage
-              : "로그인이 필요합니다.";
-          alert(errorMessage);
-          window.location.href = URL.LOGIN;
-        } else if (resp && resp.resultCode === "401") {
-          console.error("Authentication required for mypage:", resp);
-          alert("로그인이 필요합니다.");
-          window.location.href = URL.LOGIN;
-        } else if (resp && resp.resultCode === "900") {
-          console.error("Data error for mypage:", resp);
-          alert(resp.resultMessage || "회원 정보를 불러올 수 없습니다.");
-          window.location.href = URL.LOGIN;
-        } else {
-          console.error("mberManageVO not found in response:", resp);
-          // 백엔드에서 반환한 에러 메시지가 있으면 사용
-          const errorMessage =
-            resp && resp.resultMessage
-              ? resp.resultMessage
-              : "회원 정보를 불러올 수 없습니다. 다시 로그인해주세요.";
-          alert(errorMessage);
-          window.location.href = URL.LOGIN;
-        }
-      }
+      // if (resp && resp.resultCode === "403") {
+      //   console.error("Permission denied for mypage:", resp);
+      //   // 백엔드에서 반환한 에러 메시지가 있으면 사용
+      //   const errorMessage =
+      //     resp && resp.resultMessage
+      //       ? resp.resultMessage
+      //       : "로그인이 필요합니다.";
+      //   alert(errorMessage);
+      //   window.location.href = URL.LOGIN;
+      // } else if (resp && resp.resultCode === "401") {
+      //   console.error("Authentication required for mypage:", resp);
+      //   alert("로그인이 필요합니다.");
+      //   window.location.href = URL.LOGIN;
+      // } else if (resp && resp.resultCode === "900") {
+      //   console.error("Data error for mypage:", resp);
+      //   alert(resp.resultMessage || "회원 정보를 불러올 수 없습니다.");
+      //   window.location.href = URL.LOGIN;
+      // } else {
+      //   console.error("mberManageVO not found in response:", resp);
+      //   // 백엔드에서 반환한 에러 메시지가 있으면 사용
+      //   const errorMessage =
+      //     resp && resp.resultMessage
+      //       ? resp.resultMessage
+      //       : "회원 정보를 불러올 수 없습니다. 다시 로그인해주세요.";
+      //   alert(errorMessage);
+      //   window.location.href = URL.LOGIN;
+      // }
     });
-  };
-  const checkIdDplct = () => {
-    return new Promise((resolve) => {
-      let checkId = memberDetail["mberId"];
-      if (checkId === null || checkId === undefined) {
-        alert("회원ID를 입력해 주세요");
-        return false;
-      }
-      const checkIdURL = `/etc/member_checkid/${checkId}`;
-      const reqOptions = {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-      EgovNet.requestFetch(checkIdURL, reqOptions, function (resp) {
-        if (
-          Number(resp.resultCode) === Number(CODE.RCV_SUCCESS) &&
-          resp.result.usedCnt > 0
-        ) {
-          setMemberDetail({
-            ...memberDetail,
-            checkIdResult: "이미 사용중인 아이디입니다. [ID체크]",
-            mberId: checkId,
-          });
-          resolve(resp.result.usedCnt);
-        } else {
-          setMemberDetail({
-            ...memberDetail,
-            checkIdResult: "사용 가능한 아이디입니다.",
-            mberId: checkId,
-          });
-          resolve(0);
-        }
-      });
-    });
-  };
-
-  const formValidator = (formData) => {
-    return new Promise((resolve) => {
-      if (formData.get("mberId") === null || formData.get("mberId") === "") {
-        alert("회원ID는 필수 값입니다.");
-        return false;
-      }
-      checkIdDplct().then((res) => {
-        if (res > 0) {
-          return false;
-        }
-        if (
-          formData.get("password") === null ||
-          formData.get("password") === ""
-        ) {
-          alert("암호는 필수 값입니다.");
-          return false;
-        }
-        if (formData.get("mberNm") === null || formData.get("mberNm") === "") {
-          alert("회원명은 필수 값입니다.");
-          return false;
-        }
-        resolve(true);
-      });
-    });
-  };
-
-  const formObjValidator = (checkRef) => {
-    if (checkRef.current[0].value === "") {
-      alert("회원ID는 필수 값입니다.");
-      return false;
-    }
-    if (checkRef.current[1].value === "") {
-      memberDetail.password = ""; //수정 시 암호값을 입력하지 않으면 공백으로처리
-    }
-    if (checkRef.current[2].value === "") {
-      alert("회원명은 필수 값입니다.");
-      return false;
-    }
-    return true;
   };
   
   const requestToken = () => {
     
-    let requestOptions = {};
-    
+    const requestTokenURL = `/users/token`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": sessionToken
+      },
+    };
     alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
-    EgovNet.requestFetch('/users/token', 'POST', (resp) => {
+    EgovNet.requestFetch(requestTokenURL, requestOptions, (resp) => {
       if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
         alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
         // navigate({ pathname: URL.MAIN });
@@ -201,97 +112,69 @@ function EgovMypageEdit(props) {
     });
   }
 
-  const updateMember = () => {
-    let modeStr = modeInfo.mode === CODE.MODE_CREATE ? "POST" : "PUT";
+  const updateUser = () => {
+    // let modeStr = "PUT";
 
-    let requestOptions = {};
+  let requestOptions = {};
 
-    if (modeStr === "POST") {
-      const formData = new FormData();
-      for (let key in memberDetail) {
-        formData.append(key, memberDetail[key]);
-        //console.log("boardDetail [%s] ", key, boardDetail[key]);
-      }
-
-      formValidator(formData).then((res) => {
-        if (res) {
-          requestOptions = {
-            method: modeStr,
-            headers: {},
-            body: formData,
-          };
-
-          EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-            if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-              alert("회원 정보가 등록되었습니다. 로그인 후 이용해 주세요.");
-              navigate({ pathname: URL.MAIN });
-            } else {
-              navigate(
-                { pathname: URL.ERROR },
-                { state: { msg: resp.resultMessage } }
-              );
-            }
-          });
-        }
-      });
-    } else {
-      if (formObjValidator(checkRef)) {
-        requestOptions = {
-          method: modeStr,
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({ ...memberDetail }),
-        };
-
-        EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-          if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-            alert("회원 정보가 수정되었습니다.");
-            navigate({ pathname: URL.MAIN });
-          } else {
-            navigate(
-              { pathname: URL.ERROR },
-              { state: { msg: resp.resultMessage } }
-            );
-          }
-        });
-      }
-    }
-  };
-
-  const deleteMember = () => {
     if (formObjValidator(checkRef)) {
-      const deleteMypageURL = `/mypage/delete`; // /${uniqId} 제거 서버단에서 토큰 값 사용.
-      const requestOptions = {
-        method: "PUT",
+      requestOptions = {
+        method: modeStr,
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify({ ...memberDetail }),
+        body: JSON.stringify({ ...userDetail }),
       };
 
-      EgovNet.requestFetch(deleteMypageURL, requestOptions, (resp) => {
-        console.log("====>>> member delete= ", resp);
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          setSessionItem("loginUser", { id: "" });
-          setSessionItem("jToken", null);
-          // PC와 Mobile 열린메뉴 닫기
-          document.querySelector(".all_menu.WEB").classList.add("closed");
-          document.querySelector(".btnAllMenu").classList.remove("active");
-          document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-          document.querySelector(".all_menu.Mobile").classList.add("closed");
-          alert("회원이 탈퇴되었습니다. 로그아웃 됩니다.");
-          navigate(URL.MAIN, { replace: true });
-        } else {
-          alert("ERR : " + resp.resultMessage);
-        }
-      });
+      // EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
+      //   if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+      //     alert("회원 정보가 수정되었습니다.");
+      //     navigate({ pathname: URL.MAIN });
+      //   } else {
+      //     navigate(
+      //       { pathname: URL.ERROR },
+      //       { state: { msg: resp.resultMessage } }
+      //     );
+      //   }
+      // });
     }
+    
   };
 
+  // const deleteUser = () => {
+  //   if (formObjValidator(checkRef)) {
+  //     const deleteMypageURL = `/mypage/delete`; // /${uniqId} 제거 서버단에서 토큰 값 사용.
+  //     const requestOptions = {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-type": "application/json",
+  //       },
+  //       body: JSON.stringify({ ...userDetail }),
+  //     };
+
+  //     EgovNet.requestFetch(deleteMypageURL, requestOptions, (resp) => {
+  //       console.log("====>>> member delete= ", resp);
+  //       if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+  //         setSessionItem("loginUser", { id: "" });
+  //         setSessionItem("jToken", null);
+  //         // PC와 Mobile 열린메뉴 닫기
+  //         document.querySelector(".all_menu.WEB").classList.add("closed");
+  //         document.querySelector(".btnAllMenu").classList.remove("active");
+  //         document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
+  //         document.querySelector(".all_menu.Mobile").classList.add("closed");
+  //         alert("회원이 탈퇴되었습니다. 로그아웃 됩니다.");
+  //         navigate(URL.MAIN, { replace: true });
+  //       } else {
+  //         alert("ERR : " + resp.resultMessage);
+  //       }
+  //     });
+  //   }
+  // };
+
   useEffect(() => {
-    initMode();
+    // initMode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    retrieveDetail();
   }, []);
 
   console.log("------------------------------EgovMypageEdit [End]");
@@ -325,14 +208,7 @@ function EgovMypageEdit(props) {
               <h1 className="tit_1">마이페이지</h1>
             </div>
 
-            {modeInfo.mode === CODE.MODE_CREATE && (
-              <h2 className="tit_2">회원 생성</h2>
-            )}
-
-            {modeInfo.mode === CODE.MODE_MODIFY && (
-              <h2 className="tit_2">회원 수정</h2>
-            )}
-
+            <h2 className="tit_2">회원 수정</h2>
             <div className="board_view2">
               <dl>
                 <dt>
@@ -340,51 +216,19 @@ function EgovMypageEdit(props) {
                   <span className="req">필수</span>
                 </dt>
                 <dd>
-                  {/* 등록 일때 변경 가능 */}
-                  {modeInfo.mode === CODE.MODE_CREATE && (
-                    <>
-                      <input
-                        className="f_input2 w_full"
-                        type="text"
-                        name="mberId"
-                        title=""
-                        id="mberId"
-                        placeholder=""
-                        defaultValue={memberDetail.mberId}
-                        onChange={(e) =>
-                          setMemberDetail({
-                            ...memberDetail,
-                            mberId: e.target.value,
-                          })
-                        }
-                        ref={(el) => (checkRef.current[0] = el)}
-                        required
-                      />
-                      <button
-                        className="btn btn_skyblue_h46"
-                        onClick={() => {
-                          checkIdDplct();
-                        }}
-                      >
-                        {memberDetail.checkIdResult}
-                      </button>
-                    </>
-                  )}
                   {/* 수정/조회 일때 변경 불가 */}
-                  {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <input
-                      className="f_input2 w_full"
-                      type="text"
-                      name="mberId"
-                      title=""
-                      id="mberId"
-                      placeholder=""
-                      defaultValue={memberDetail.mberId}
-                      ref={(el) => (checkRef.current[0] = el)}
-                      readOnly
-                      required
-                    />
-                  )}
+                  <input
+                    className="f_input2 w_full"
+                    type="text"
+                    name="mberId"
+                    title=""
+                    id="mberId"
+                    placeholder=""
+                    defaultValue={userDetail.mberId}
+                    ref={(el) => (checkRef.current[0] = el)}
+                    readOnly
+                    required
+                  />
                 </dd>
               </dl>
               <dl>
@@ -393,45 +237,22 @@ function EgovMypageEdit(props) {
                   <span className="req">필수</span>
                 </dt>
                 <dd>
-                  {/* 등록 일때 변경 가능 */}
-                  {modeInfo.mode === CODE.MODE_CREATE && (
-                    <input
-                      className="f_input2 w_full"
-                      type="password"
-                      name="password"
-                      title=""
-                      id="password"
-                      placeholder=""
-                      defaultValue={memberDetail.password}
-                      onChange={(e) =>
-                        setMemberDetail({
-                          ...memberDetail,
-                          password: e.target.value,
-                        })
-                      }
-                      ref={(el) => (checkRef.current[1] = el)}
-                      required
-                    />
-                  )}
-                  {/* 수정/조회 일때 */}
-                  {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <input
-                      className="f_input2 w_full"
-                      type="password"
-                      name="password"
-                      title=""
-                      id="password"
-                      placeholder="빈값이면 기존 암호가 변경되지 않고 그대로 유지됩니다."
-                      defaultValue=""
-                      onChange={(e) =>
-                        setMemberDetail({
-                          ...memberDetail,
-                          password: e.target.value,
-                        })
-                      }
-                      ref={(el) => (checkRef.current[1] = el)}
-                    />
-                  )}
+                  <input
+                    className="f_input2 w_full"
+                    type="password"
+                    name="password"
+                    title=""
+                    id="password"
+                    placeholder="빈값이면 기존 암호가 변경되지 않고 그대로 유지됩니다."
+                    defaultValue=""
+                    onChange={(e) =>
+                      setUserDetail({
+                        ...userDetail,
+                        password: e.target.value,
+                      })
+                    }
+                    ref={(el) => (checkRef.current[1] = el)}
+                  />
                 </dd>
               </dl>
               <dl>
@@ -447,11 +268,11 @@ function EgovMypageEdit(props) {
                     title=""
                     id="mberNm"
                     placeholder=""
-                    defaultValue={memberDetail.mberNm}
+                    defaultValue={userDetail.nickname}
                     onChange={(e) =>
-                      setMemberDetail({
-                        ...memberDetail,
-                        mberNm: e.target.value,
+                      setUserDetail({
+                        ...userDetail,
+                        nickname: e.target.value,
                       })
                     }
                     ref={(el) => (checkRef.current[2] = el)}
@@ -460,8 +281,6 @@ function EgovMypageEdit(props) {
                 </dd>
               </dl>
               
-              {/* 수정/조회 일때 */}
-              {modeInfo.mode === CODE.MODE_MODIFY && (
               <dl>
                 <dt>
                   <label htmlFor="bbsNm">토큰</label>
@@ -487,26 +306,25 @@ function EgovMypageEdit(props) {
                   />
                 </dd>
               </dl>
-              )}
 
               {/* <!-- 버튼영역 --> */}
               <div className="board_btn_area">
                 <div className="left_col btn1">
                   <button
-                    className="btn btn_skyblue_h46 w_100"
+                    className="btn_skyblue_h46 w_100"
                     onClick={() => requestToken()}
                   >
                     토큰요청
                   </button>
 
                   <button
-                    className="btn btn_skyblue_h46 w_100"
-                    onClick={() => updateMember()}
+                    className="btn_skyblue_h46 w_100"
+                    onClick={() => updateUser()}
                   >
                     저장
                   </button>
 
-                  {modeInfo.mode === CODE.MODE_MODIFY && (
+                  {/* {modeInfo.mode === CODE.MODE_MODIFY && (
                     <button
                       className="btn btn_skyblue_h46 w_100"
                       onClick={() => {
@@ -515,7 +333,7 @@ function EgovMypageEdit(props) {
                     >
                       탈퇴
                     </button>
-                  )}
+                  )} */}
                   {/* memberDetail.uniqId 제거 서버단에서 토큰값 사용 */}
                 </div>
               </div>

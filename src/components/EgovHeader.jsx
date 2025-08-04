@@ -190,9 +190,9 @@ function EgovHeader() {
             <>
               <span className="person">{sessionUserName} </span> 님,{" "}
               {sessionUserSe} 반갑습니다!.
-              {sessionUserSe === "USR" && (
+              {sessionUserSe === "USER" && (
                 <NavLink
-                  to={URL.MYPAGE_MODIFY}
+                  to={URL.MYPAGE}
                   className={({ isActive }) =>
                     isActive ? "btn login cur" : "btn login"
                   }

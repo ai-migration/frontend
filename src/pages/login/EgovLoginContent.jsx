@@ -113,7 +113,7 @@ function EgovLoginContent(props) {
       alert('로그인 성공!');
       if (saveIDFlag) setLocalItem(KEY_ID, userInfo.email);
       navigate(URL.MAIN);
-
+      
       document.querySelector(".all_menu.WEB").classList.add("closed");
       document.querySelector(".btnAllMenu").classList.remove("active");
       document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";

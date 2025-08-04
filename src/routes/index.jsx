@@ -503,12 +503,8 @@ const SecondRoutes = () => {
         />
         {/* MYPAGE */}
         <Route
-          path={URL.MYPAGE_CREATE}
-          element={<EgovMypageEdit mode={CODE.MODE_CREATE} />}
-        />
-        <Route
-          path={URL.MYPAGE_MODIFY}
-          element={<EgovMypageEdit mode={CODE.MODE_MODIFY} />}
+          path={URL.MYPAGE}
+          element={<EgovMypageEdit />}
         />
       </Routes>
 

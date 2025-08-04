@@ -81,8 +81,7 @@ const URL = {
   ADMIN_MANAGER: `${BASE}/admin/manager`,
 
   // MYPAGE
-  MYPAGE_MODIFY: `${BASE}/mypage/modify`,
-  MYPAGE_CREATE: `${BASE}/mypage/create`,
+  MYPAGE: `${BASE}/mypage`,
 };
 
 export default URL;

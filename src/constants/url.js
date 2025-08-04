@@ -104,8 +104,7 @@ const URL = {
   ADMIN_MEMBERS_MODIFY: "/admin/members/modify", // 사이트관리/회원관리 상세/수정
 
   //MYPAGE
-  MYPAGE_MODIFY: "/mypage/modify", // 고객지원/마이페이지/회원 수정
-  MYPAGE_CREATE: "/mypage/create", // 고객지원/마이페이지/회원 등록
+  MYPAGE: "/mypage", // 고객지원/마이페이지/회원 수정
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
