@@ -147,98 +147,37 @@ function EgovSignupAgree() {
               <p><br/></p>
             </div>
           </div>
-          <div style={{display:"flex"}}>
-            <label style={{
-              justifyContent: "space-between",
+          <div
+            style={{
+              display: "flex",
               alignItems: "center",
-              padding: "10px 15px",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              backgroundColor: "#f9f9f9",
-              cursor: "pointer",
-              width: "100%", // 너비 조절 가능
-              maxWidth: "400px", // optional
-              marginTop: "15px"
-            }}>
-              <span style={{ fontSize: "16px", color: "#333" }}>동의합니다</span>
+              justifyContent: "space-between",
+              marginTop: "20px",
+              gap: "12px", // 버튼 간 간격
+              flexWrap: "wrap", // 작은 화면에서 줄바꿈
+            }}
+          >
+            <label className="agree_checkbox">
               <input
+                className="agree_checkbtn"
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                style={{
-                  width: "18px",
-                  height: "18px",
-                  accentColor: "#4CAF50", // 체크 색상
-                  cursor: "pointer"
-                }}
               />
+              <span style={{ fontSize: "16px", color: "#333" }}>동의합니다</span>
             </label>
-            <button className="btn_skyblue_h46 w_100" type="button" onClick={handleNextClick}>
+
+            <button
+              className="btn_skyblue_h46 w_100"
+              style={{ marginRight:"10px" }}
+              type="button"
+              onClick={handleNextClick}
+            >
               <span>다음</span>
             </button>
           </div>
         </div>
-
-        {/* <div className="login_box">
-          <form name="" method="" action="">
-            <fieldset>
-              <legend>로그인</legend>
-              <span className="group">
-                <input
-                  type="text"
-                  name=""
-                  title="아이디"
-                  placeholder="아이디"
-                  value={userInfo?.id}
-                  onChange={(e) =>
-                    setUserInfo({ ...userInfo, id: e.target.value })
-                  }
-                  ref={idRef}
-                  onKeyDown={activeEnter}
-                />
-                <input
-                  type="password"
-                  name=""
-                  title="비밀번호"
-                  placeholder="비밀번호"
-                  onChange={(e) =>
-                    setUserInfo({ ...userInfo, password: e.target.value })
-                  }
-                  ref={passwordRef}
-                  onKeyDown={activeEnter}
-                />
-              </span>
-              <div className="chk">
-                <label className="f_chk" htmlFor="saveid" ref={checkRef}>
-                  <input
-                    type="checkbox"
-                    name=""
-                    id="saveid"
-                    onChange={handleSaveIDFlag}
-                    checked={saveIDFlag}
-                  />{" "}
-                  <em>ID저장</em>
-                </label>
-              </div>
-              <button type="button" onClick={submitFormHandler}>
-                <span>LOGIN</span>
-              </button>
-            </fieldset>
-          </form>
-        </div> */}
-
-        {/* <ul className="list">
-          <li>
-            비밀번호는 6~12자의 영문 대/소문자, 숫자, 특수문자를 혼합해서
-            사용하실 수 있습니다.
-          </li>
-          <li>
-            쉬운 비밀번호나 자주 쓰는 사이트의 비밀번호가 같을 경우, 도용되기
-            쉬우므로 주기적으로 변경하셔서 사용하는 것이 좋습니다.
-          </li>
-        </ul> */}
       </div>
-      {/* <!--// 본문 --> */}
     </div>
   );
 }

@@ -1299,3 +1299,18 @@
 .agree_article {
   margin: 4px;
 }
+
+.agree_checkbox {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  gap: 8px;
+}
+
+.agree_checkbtn {
+  width: 18px;
+  height: 18px;
+  accent-color: #4CAF50;
+  cursor: pointer;
+}

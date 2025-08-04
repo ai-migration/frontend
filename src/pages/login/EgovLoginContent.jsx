@@ -98,25 +98,41 @@ function EgovLoginContent(props) {
     };
 
     EgovNet.requestFetch(loginUrl, requestOptions, (resp) => {
-      let resultVO = resp.resultVO;
-      let jToken = resp?.jToken || null;
+      // let resultVO = resp.resultVO;
+      let jToken = resp?.accessToken.split(' ')[1] || null;
 
-      setSessionItem("jToken", jToken);
+      const obj = {
+        id: resp?.nickname,
+        name: resp?.nickname,
+        userSe: resp?.role,
+      };
 
-      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) { // 로그인 성공
-        //setLoginVO(resultVO);
-        setSessionItem("loginUser", resultVO);
-        props.onChangeLogin(resultVO);
-        if (saveIDFlag) setLocalItem(KEY_ID, resultVO?.id);
-        navigate(URL.MAIN);
-        // PC와 Mobile 열린메뉴 닫기
-        document.querySelector(".all_menu.WEB").classList.add("closed");
-        document.querySelector(".btnAllMenu").classList.remove("active");
-        document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-        document.querySelector(".all_menu.Mobile").classList.add("closed");
-      } else {
-        alert(resp.resultMessage);
-      }
+      setSessionItem("jToken", resp.accessToken.split(' ')[1]);
+      setSessionItem("loginUser", obj);
+
+      alert('로그인 성공!');
+      if (saveIDFlag) setLocalItem(KEY_ID, userInfo.email);
+      navigate(URL.MAIN);
+
+      document.querySelector(".all_menu.WEB").classList.add("closed");
+      document.querySelector(".btnAllMenu").classList.remove("active");
+      document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
+      document.querySelector(".all_menu.Mobile").classList.add("closed");
+
+      // if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) { // 로그인 성공
+      //   //setLoginVO(resultVO);
+      //   // setSessionItem("loginUser", resultVO);
+      //   props.onChangeLogin(resultVO);
+      //   if (saveIDFlag) setLocalItem(KEY_ID, resultVO?.id);
+      //   navigate(URL.MAIN);
+      //   // PC와 Mobile 열린메뉴 닫기
+      //   document.querySelector(".all_menu.WEB").classList.add("closed");
+      //   document.querySelector(".btnAllMenu").classList.remove("active");
+      //   document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
+      //   document.querySelector(".all_menu.Mobile").classList.add("closed");
+      // } else {
+      //   alert(resp.resultMessage);
+      // }
     });
   };
 
@@ -185,7 +201,7 @@ function EgovLoginContent(props) {
 
         <ul className="list">
           <li>
-            비밀번호는 6~12자의 영문 대/소문자, 숫자, 특수문자를 혼합해서
+            비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서
             사용하실 수 있습니다.
           </li>
           <li>

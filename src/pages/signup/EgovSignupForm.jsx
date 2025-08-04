@@ -93,6 +93,7 @@ function EgovSignupForm({ onBack }) {
     EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
       console.log("signup retrieveDetail response:", resp);
       console.log("resp.result:", resp?.result);
+      alert("회원가입 성공!");
       navigate("/login"); // 또는 원하는 페이지로 이동
     });
   }

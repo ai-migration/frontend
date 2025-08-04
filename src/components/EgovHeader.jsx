@@ -16,6 +16,7 @@ function EgovHeader() {
   console.group("EgovHeader");
   console.log("[Start] EgovHeader ------------------------------");
 
+  const sessionToken = getSessionItem("jToken");
   const sessionUser = getSessionItem("loginUser");
   const sessionUserId = sessionUser?.id;
   const sessionUserName = sessionUser?.name;
@@ -80,16 +81,17 @@ function EgovHeader() {
 
   const logOutHandler = () => {
     // 로그인 정보 존재할 때
-    const logOutUrl = "/auth/logout";
+    const logOutUrl = "/users/logout";
     const requestOptions = {
       headers: {
         "Content-type": "application/json",
+        "Authorization": sessionToken
       },
       credentials: "include",
     };
     EgovNet.requestFetch(logOutUrl, requestOptions, function (resp) {
       console.log("===>>> logout resp= ", resp);
-      if (parseInt(resp.resultCode) === parseInt(CODE.RCV_SUCCESS)) {
+      // if (parseInt(resp.resultCode) === parseInt(CODE.RCV_SUCCESS)) {
         //onChangeLogin({ loginVO: {} });
         setSessionItem("loginUser", { id: "" });
         setSessionItem("jToken", null);
@@ -100,7 +102,7 @@ function EgovHeader() {
         document.querySelector(".btnAllMenu").classList.remove("active");
         document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
         document.querySelector(".all_menu.Mobile").classList.add("closed");
-      }
+      // }
     });
   };
 
