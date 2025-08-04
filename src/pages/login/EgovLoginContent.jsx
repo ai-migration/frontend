@@ -42,7 +42,7 @@ function EgovLoginContent(props) {
 
     return isValid ? "✅ 올바른 Email 형식입니다." : "❌ Email 형식을 확인해 주세요.";
   }
-
+  
   const handleSaveIDFlag = () => {
     setLocalItem(KEY_SAVE_ID_FLAG, !saveIDFlag);
     setSaveIDFlag(!saveIDFlag);
@@ -174,6 +174,7 @@ function EgovLoginContent(props) {
                   />{" "}
                   <em>ID저장</em>
                 </label>
+                
               </div>
               <button type="button" onClick={submitFormHandler}>
                 <span>LOGIN</span>
