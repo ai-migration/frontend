@@ -25,17 +25,11 @@ function EgovNoticeEdit() {
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
-  const bbsId = location.state?.bbsId || NOTICE_BBS_ID;
-  const nttId = location.state?.nttId || "";
-
   // const [modeInfo, setModeInfo] = useState({ mode: props.mode });
   // const [masterBoard, setMasterBoard] = useState({});
-  const [boardDetail, setBoardDetail] = useState({ nttSj: "", nttCn: "" });
-  const [boardAttachFiles, setBoardAttachFiles] = useState();
+  const [boardDetail, setBoardDetail] = useState({ title: "", content: "" });
 
-  const handleInputChange = useDebouncedInput(setBoardDetail, 300);
-
-  // const initMode = () => {
+  const initMode = () => {
   //   switch (props.mode) {
   //     case CODE.MODE_CREATE:
   //       setModeInfo({
@@ -65,7 +59,7 @@ function EgovNoticeEdit() {
   //       navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
   //   }
   //   retrieveDetail();
-  // };
+  };
 
   const retrieveDetail = () => {
     // 등록, 수정, 삭제
@@ -115,49 +109,31 @@ function EgovNoticeEdit() {
   };
 
   const updateBoard = () => {
-    const formData = new FormData();
-    for (let key in boardDetail) {
-      formData.append(key, boardDetail[key]);
-      //console.log("boardDetail [%s] ", key, boardDetail[key]);
-    }
+    // const formData = new FormData();
+    // for (let key in boardDetail) {
+    //   formData.append(key, boardDetail[key]);
+    //   //console.log("boardDetail [%s] ", key, boardDetail[key]);
+    // }
 
-    if (bbsFormVaildator(formData)) {
-      const requestOptions = {
-        method: modeInfo.method,
-        body: formData,
-      };
+    // if (bbsFormVaildator(formData)) {
+    //   const requestOptions = {
+    //     method: modeInfo.method,
+    //     body: formData,
+    //   };
 
-      EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-        if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-          navigate(URL.INFORM_NOTICE, { state: { bbsId: bbsId } });
-        } else {
-          // alert("ERR : " + resp.message);
-          navigate(
-            { pathname: URL.ERROR },
-            { state: { msg: resp.resultMessage } }
-          );
-        }
-      });
-    }
+    //   EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
+    //     if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+    //       navigate(URL.INFORM_NOTICE, { state: { bbsId: bbsId } });
+    //     } else {
+    //       // alert("ERR : " + resp.message);
+    //       navigate(
+    //         { pathname: URL.ERROR },
+    //         { state: { msg: resp.resultMessage } }
+    //       );
+    //     }
+    //   });
+    // }
   };
-
-  const Location = React.memo(function Location(masterBoard) {
-    return (
-      <div className="location">
-        <ul>
-          <li>
-            <Link to={URL.MAIN} className="home">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link to={URL.ADMIN}>사이트관리</Link>
-          </li>
-          <li>공지사항</li>
-        </ul>
-      </div>
-    );
-  });
 
   useEffect(function () {
     // initMode();
@@ -170,7 +146,19 @@ function EgovNoticeEdit() {
     <div className="container">
       <div className="c_wrap">
         {/* <!-- Location --> */}
-        <Location />
+        <div className="location">
+        <ul>
+          <li>
+            <Link to={URL.MAIN} className="home">
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to={URL.ADMIN}>사이트관리</Link>
+          </li>
+          <li>공지사항</li>
+        </ul>
+      </div>
         {/* <!--// Location --> */}
 
         <div className="layout">
@@ -202,9 +190,8 @@ function EgovNoticeEdit() {
                     id="nttSj"
                     name="nttSj"
                     type="text"
-                    defaultValue={boardDetail.nttSj}
                     onChange={(e) =>
-                      setBoardDetail({ ...boardDetail, nttSj: e.target.value })
+                      setBoardDetail({ ...boardDetail, title: e.target.value })
                     }
                     maxLength="60"
                   />
@@ -224,8 +211,9 @@ function EgovNoticeEdit() {
                     cols="30"
                     rows="10"
                     placeholder=""
-                    defaultValue={boardDetail.nttCn}
-                    onChange={(e) => handleInputChange("nttCn", e.target.value)}
+                    onChange={(e) =>
+                      setBoardDetail({ ...boardDetail, content: e.target.value })
+                    }
                   ></textarea>
                 </dd>
               </dl>

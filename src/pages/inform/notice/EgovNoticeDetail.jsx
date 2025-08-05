@@ -23,17 +23,17 @@ function EgovNoticeDetail(props) {
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
-  const bbsId = location.state.bbsId || NOTICE_BBS_ID;
-  const nttId = location.state.nttId;
+  // const bbsId = location.state.bbsId || NOTICE_BBS_ID;
+  // const nttId = location.state.nttId;
   const searchCondition = location.state.searchCondition;
 
-  const [masterBoard, setMasterBoard] = useState({});
+  // const [masterBoard, setMasterBoard] = useState({});
   const [user, setUser] = useState({});
   const [boardDetail, setBoardDetail] = useState({});
-  const [boardAttachFiles, setBoardAttachFiles] = useState();
+  // const [boardAttachFiles, setBoardAttachFiles] = useState();
 
   const retrieveDetail = () => {
-    const retrieveDetailURL = `/board/${bbsId}/${nttId}`;
+    const retrieveDetailURL = `/posts/${location.state.postId}?type=NOTICE`;
     const requestOptions = {
       method: "GET",
       headers: {
@@ -41,10 +41,10 @@ function EgovNoticeDetail(props) {
       },
     };
     EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-      setMasterBoard(resp.result.brdMstrVO);
-      setBoardDetail(resp.result.boardVO);
-      setUser(resp.result.user);
-      setBoardAttachFiles(resp.result.resultFiles);
+      // setMasterBoard(resp.result.brdMstrVO);
+      setBoardDetail(resp);
+      // setUser(resp.result.user);
+      // setBoardAttachFiles(resp.result.resultFiles);
     });
   };
 
@@ -94,7 +94,7 @@ function EgovNoticeDetail(props) {
             <li>
               <Link to={URL.INFORM}>알림마당</Link>
             </li>
-            <li>{masterBoard && masterBoard.bbsNm}</li>
+            <li>공지사항</li>
           </ul>
         </div>
         {/* <!--// Location --> */}
@@ -111,24 +111,24 @@ function EgovNoticeDetail(props) {
               <h1 className="tit_1">알림마당</h1>
             </div>
 
-            <h2 className="tit_2">{masterBoard && masterBoard.bbsNm}</h2>
+            <h2 className="tit_2">공지사항</h2>
 
             {/* <!-- 게시판 상세보기 --> */}
             <div className="board_view">
               <div className="board_view_top">
-                <div className="tit">{boardDetail && boardDetail.nttSj}</div>
+                <div className="tit">{boardDetail && boardDetail.title}</div>
                 <div className="info">
                   <dl>
                     <dt>작성자</dt>
-                    <dd>{boardDetail && boardDetail.frstRegisterNm}</dd>
+                    <dd>관리자</dd>
                   </dl>
                   <dl>
                     <dt>작성일</dt>
-                    <dd>{boardDetail && boardDetail.frstRegisterPnttm}</dd>
+                    <dd>{boardDetail && boardDetail.createdAt}</dd>
                   </dl>
                   <dl>
                     <dt>조회수</dt>
-                    <dd>{boardDetail && boardDetail.inqireCo}</dd>
+                    <dd>{boardDetail && boardDetail.viewCount}</dd>
                   </dl>
                 </div>
               </div>
@@ -139,27 +139,25 @@ function EgovNoticeDetail(props) {
                   cols="30"
                   rows="10"
                   readOnly="readonly"
-                  defaultValue={boardDetail && boardDetail.nttCn}
+                  defaultValue={boardDetail && boardDetail.content}
                 ></textarea>
               </div>
               <div className="board_attach">
                 {/* 답글이 아니고 게시판 파일 첨부 가능 상태에서만 첨부파일 컴포넌트 노출 */}
-                {boardDetail.parnts === "0" &&
-                  masterBoard.fileAtchPosblAt === "Y" && (
+                {/* {boardDetail.parnts === "0" && (
                     <EgovAttachFile boardFiles={boardAttachFiles} />
-                  )}
+                  )} */}
               </div>
 
               <div className="board_btn_area">
                 {user &&
-                  sessionUserSe === "ADM" &&
-                  masterBoard.bbsUseFlag === "Y" && (
+                  sessionUserSe === "ADM" &&(
                     <div className="left_col btn3">
                       <Link
                         to={{ pathname: URL.INFORM_NOTICE_MODIFY }}
                         state={{
-                          nttId: nttId,
-                          bbsId: bbsId,
+                          postId: location.state.postId,
+                          
                         }}
                         className="btn btn_skyblue_h46 w_100"
                       >
@@ -178,7 +176,7 @@ function EgovNoticeDetail(props) {
                       >
                         삭제
                       </button>
-                      {masterBoard.replyPosblAt === "Y" && (
+                      {/* {masterBoard.replyPosblAt === "Y" && (
                         <Link
                           to={{ pathname: URL.INFORM_NOTICE_REPLY }}
                           state={{
@@ -189,7 +187,7 @@ function EgovNoticeDetail(props) {
                         >
                           답글작성
                         </Link>
-                      )}
+                      )} */}
                     </div>
                   )}
 
@@ -197,8 +195,8 @@ function EgovNoticeDetail(props) {
                   <Link
                     to={{ pathname: URL.INFORM_NOTICE }}
                     state={{
-                      nttId: nttId,
-                      bbsId: bbsId,
+                      // nttId: nttId,
+                      // bbsId: bbsId,
                       searchCondition: searchCondition,
                     }}
                     className="btn btn_blue_h46 w_100"

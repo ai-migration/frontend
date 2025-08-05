@@ -37,7 +37,7 @@ function EgovNoticeList(props) {
       searchWrd: "",
     }
   ); // 기존 조회에서 접근 했을 시 || 신규로 접근 했을 시
-  const [masterBoard, setMasterBoard] = useState({});
+  // const [masterBoard, setMasterBoard] = useState({});
   const [user, setUser] = useState({});
   const [paginationInfo, setPaginationInfo] = useState({});
 
@@ -46,7 +46,7 @@ function EgovNoticeList(props) {
 
   // 초기 목록 불러오기
   const initLoad = () => {
-    const retrieveListURL = "/posts?type=notice";
+    const retrieveListURL = "/posts?type=NOTICE";
     const requestOptions = {
       method: "GET",
       headers: {
@@ -70,14 +70,15 @@ function EgovNoticeList(props) {
         // const currentPageNo = resp.result.paginationInfo.currentPageNo;
         // const pageSize = resp.result.paginationInfo.pageSize;
 
-        // const resultList = resp.result.resultList;
-        const resultList = [
-          {postId : 1, title: "공지제목1", type:"notice", createdAt:"2025-08-05", viewCount:0},
-          {postId : 2, title: "공지제목2", type:"notice", createdAt:"2025-08-05", viewCount:0},
-          {postId : 3, title: "공지제목3", type:"notice", createdAt:"2025-08-05", viewCount:0},
-          {postId : 4, title: "공지제목4", type:"notice", createdAt:"2025-08-05", viewCount:0},
-          {postId : 5, title: "공지제목5", type:"notice", createdAt:"2025-08-05", viewCount:0},
-        ];
+        console.log(resp);
+        const resultList = resp;
+        // const resultList = [
+        //   {postId : 1, title: "공지제목1", type:"notice", createdAt:"2025-08-05", viewCount:0},
+        //   {postId : 2, title: "공지제목2", type:"notice", createdAt:"2025-08-05", viewCount:0},
+        //   {postId : 3, title: "공지제목3", type:"notice", createdAt:"2025-08-05", viewCount:0},
+        //   {postId : 4, title: "공지제목4", type:"notice", createdAt:"2025-08-05", viewCount:0},
+        //   {postId : 5, title: "공지제목5", type:"notice", createdAt:"2025-08-05", viewCount:0},
+        // ];
 
         // 리스트 항목 구성
         resultList.forEach(function (item, index) {
@@ -93,16 +94,15 @@ function EgovNoticeList(props) {
             <Link
               to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
               state={{
-                nttId: item.postId,
-                // bbsId: item.bbsId,
+                postId: item.postId,
                 searchCondition: searchCondition,
               }}
-              key={listIdx}
+              key={item.postId}
               className="list_item"
             >
               <div>{item.postId}</div>
               <div className="al">{item.title}</div>
-              <div>{item.frstRegisterNm}</div> 
+              <div>관리자</div> 
               <div>{item.createdAt}</div>
               <div>{item.viewCount}</div>
             </Link>
@@ -188,7 +188,8 @@ function EgovNoticeList(props) {
   }, []);
 
   useEffect(() => {
-    retrieveList(searchCondition);
+    initLoad();
+    // retrieveList(searchCondition);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
