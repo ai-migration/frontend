@@ -26,12 +26,12 @@ function EgovNoticeList(props) {
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
-  const bbsId = location.state?.bbsId || NOTICE_BBS_ID;
+  // const bbsId = location.state?.bbsId || NOTICE_BBS_ID;
 
   // eslint-disable-next-line no-unused-vars
   const [searchCondition, setSearchCondition] = useState(
     location.state?.searchCondition || {
-      bbsId: bbsId,
+      // bbsId: bbsId,
       pageIndex: 1,
       searchCnd: "0",
       searchWrd: "",
@@ -43,10 +43,10 @@ function EgovNoticeList(props) {
 
   const [listTag, setListTag] = useState([]);
 
-  const retrieveList = useCallback((searchCondition) => {
-    console.groupCollapsed("EgovNoticeList.retrieveList()");
 
-    const retrieveListURL = "/board" + EgovNet.getQueryString(searchCondition);
+  // 초기 목록 불러오기
+  const initLoad = () => {
+    const retrieveListURL = "/posts?type=notice";
     const requestOptions = {
       method: "GET",
       headers: {
@@ -58,7 +58,82 @@ function EgovNoticeList(props) {
       retrieveListURL,
       requestOptions,
       (resp) => {
-        setMasterBoard(resp.result.brdMstrVO);
+
+        let mutListTag = [];
+        mutListTag.push(
+          <p className="no_data" key="0">
+            검색된 결과가 없습니다.
+          </p>
+        ); // 게시판 목록 초기값
+
+        // const resultCnt = parseInt(resp.result.resultCnt);
+        // const currentPageNo = resp.result.paginationInfo.currentPageNo;
+        // const pageSize = resp.result.paginationInfo.pageSize;
+
+        // const resultList = resp.result.resultList;
+        const resultList = [
+          {postId : 1, title: "공지제목1", type:"notice", createdAt:"2025-08-05", viewCount:0},
+          {postId : 2, title: "공지제목2", type:"notice", createdAt:"2025-08-05", viewCount:0},
+          {postId : 3, title: "공지제목3", type:"notice", createdAt:"2025-08-05", viewCount:0},
+          {postId : 4, title: "공지제목4", type:"notice", createdAt:"2025-08-05", viewCount:0},
+          {postId : 5, title: "공지제목5", type:"notice", createdAt:"2025-08-05", viewCount:0},
+        ];
+
+        // 리스트 항목 구성
+        resultList.forEach(function (item, index) {
+          if (index === 0) mutListTag = []; // 목록 초기화
+          // const listIdx = itemIdxByPage(
+          //   resultCnt,
+          //   currentPageNo,
+          //   pageSize,
+          //   index
+          // );
+
+          mutListTag.push(
+            <Link
+              to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
+              state={{
+                nttId: item.postId,
+                // bbsId: item.bbsId,
+                searchCondition: searchCondition,
+              }}
+              key={listIdx}
+              className="list_item"
+            >
+              <div>{item.postId}</div>
+              <div className="al">{item.title}</div>
+              <div>{item.frstRegisterNm}</div> 
+              <div>{item.createdAt}</div>
+              <div>{item.viewCount}</div>
+            </Link>
+          );
+        });
+        setListTag(mutListTag);
+      },
+      function (resp) {
+        console.log("err response : ", resp);
+      }
+    );
+    console.groupEnd("EgovNoticeList.retrieveList()");
+  }
+
+
+  const retrieveList = useCallback((searchCondition) => {
+    console.groupCollapsed("EgovNoticeList.retrieveList()");
+
+    const retrieveListURL = "/posts?type=notice";
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+
+    EgovNet.requestFetch(
+      retrieveListURL,
+      requestOptions,
+      (resp) => {
+
         setPaginationInfo(resp.result.paginationInfo);
         setUser(resp.result.user);
 
@@ -72,9 +147,10 @@ function EgovNoticeList(props) {
         const resultCnt = parseInt(resp.result.resultCnt);
         const currentPageNo = resp.result.paginationInfo.currentPageNo;
         const pageSize = resp.result.paginationInfo.pageSize;
+        const resultList = resp.result.resultList;
 
         // 리스트 항목 구성
-        resp.result.resultList.forEach(function (item, index) {
+        resultList.forEach(function (item, index) {
           if (index === 0) mutListTag = []; // 목록 초기화
           const listIdx = itemIdxByPage(
             resultCnt,
@@ -87,23 +163,18 @@ function EgovNoticeList(props) {
             <Link
               to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
               state={{
-                nttId: item.nttId,
-                bbsId: item.bbsId,
+                nttId: item.postId,
+                // bbsId: item.bbsId,
                 searchCondition: searchCondition,
               }}
               key={listIdx}
               className="list_item"
             >
-              <div>{listIdx}</div>
-              {(item.replyLc * 1 ? true : false) && (
-                <div className="al reply">{item.nttSj}</div>
-              )}
-              {(item.replyLc * 1 ? false : true) && (
-                <div className="al">{item.nttSj}</div>
-              )}
-              <div>{item.frstRegisterNm}</div>
-              <div>{item.frstRegisterPnttm}</div>
-              <div>{item.inqireCo}</div>
+              <div>{item.postId}</div>
+              <div className="al">{item.title}</div>
+              <div>{item.frstRegisterNm}</div> 
+              <div>{item.createdAt}</div>
+              <div>{item.viewCount}</div>
             </Link>
           );
         });
@@ -137,7 +208,7 @@ function EgovNoticeList(props) {
             <li>
               <Link to={URL.INFORM}>알림마당</Link>
             </li>
-            <li>{masterBoard && masterBoard.bbsNm}</li>
+            <li> 공지사항 </li>
           </ul>
         </div>
         {/* <!--// Location --> */}
@@ -154,7 +225,7 @@ function EgovNoticeList(props) {
               <h1 className="tit_1">알림마당</h1>
             </div>
 
-            <h2 className="tit_2">{masterBoard && masterBoard.bbsNm}</h2>
+            <h2 className="tit_2">공지사항</h2>
 
             {/* <!-- 검색조건 --> */}
             <div className="condition">
@@ -205,12 +276,11 @@ function EgovNoticeList(props) {
                 </li>
                 {/* user.id 대신 권한그룹 세션값 사용 */}
                 {user &&
-                  sessionUserSe === "ADM" &&
-                  masterBoard.bbsUseFlag === "Y" && (
+                  sessionUserSe === "ADM" && (
                     <li>
                       <Link
                         to={URL.INFORM_NOTICE_CREATE}
-                        state={{ bbsId: bbsId }}
+                        // state={{ bbsId: bbsId }}
                         className="btn btn_blue_h46 pd35"
                       >
                         등록

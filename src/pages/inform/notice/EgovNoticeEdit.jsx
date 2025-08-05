@@ -13,10 +13,10 @@ import bbsFormVaildator from "@/utils/bbsFormVaildator";
 import { getSessionItem } from "@/utils/storage";
 import { useDebouncedInput } from "@/hooks/useDebounce";
 
-function EgovNoticeEdit(props) {
+function EgovNoticeEdit() {
   console.group("EgovNoticeEdit");
   console.log("------------------------------");
-  console.log("EgovNoticeEdit [props] : ", props);
+  // console.log("EgovNoticeEdit [props] : ", props);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,89 +28,90 @@ function EgovNoticeEdit(props) {
   const bbsId = location.state?.bbsId || NOTICE_BBS_ID;
   const nttId = location.state?.nttId || "";
 
-  const [modeInfo, setModeInfo] = useState({ mode: props.mode });
-  const [masterBoard, setMasterBoard] = useState({});
+  // const [modeInfo, setModeInfo] = useState({ mode: props.mode });
+  // const [masterBoard, setMasterBoard] = useState({});
   const [boardDetail, setBoardDetail] = useState({ nttSj: "", nttCn: "" });
   const [boardAttachFiles, setBoardAttachFiles] = useState();
 
   const handleInputChange = useDebouncedInput(setBoardDetail, 300);
 
-  const initMode = () => {
-    switch (props.mode) {
-      case CODE.MODE_CREATE:
-        setModeInfo({
-          ...modeInfo,
-          modeTitle: "등록",
-          method: "POST",
-          editURL: "/board",
-        });
-        break;
-      case CODE.MODE_MODIFY:
-        setModeInfo({
-          ...modeInfo,
-          modeTitle: "수정",
-          method: "PUT",
-          editURL: `/board/${nttId}`,
-        });
-        break;
-      case CODE.MODE_REPLY:
-        setModeInfo({
-          ...modeInfo,
-          modeTitle: "답글쓰기",
-          method: "POST",
-          editURL: "/boardReply",
-        });
-        break;
-      default:
-        navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
-    }
-    retrieveDetail();
-  };
+  // const initMode = () => {
+  //   switch (props.mode) {
+  //     case CODE.MODE_CREATE:
+  //       setModeInfo({
+  //         ...modeInfo,
+  //         modeTitle: "등록",
+  //         method: "POST",
+  //         editURL: "/board",
+  //       });
+  //       break;
+  //     case CODE.MODE_MODIFY:
+  //       setModeInfo({
+  //         ...modeInfo,
+  //         modeTitle: "수정",
+  //         method: "PUT",
+  //         editURL: `/board/${nttId}`,
+  //       });
+  //       break;
+  //     case CODE.MODE_REPLY:
+  //       setModeInfo({
+  //         ...modeInfo,
+  //         modeTitle: "답글쓰기",
+  //         method: "POST",
+  //         editURL: "/boardReply",
+  //       });
+  //       break;
+  //     default:
+  //       navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
+  //   }
+  //   retrieveDetail();
+  // };
 
   const retrieveDetail = () => {
-    if (modeInfo.mode === CODE.MODE_CREATE) {
-      // 등록이면 마스터 정보에서 파일 첨부 가능 여부 조회함
-      const retrieveDetailURL = `/boardFileAtch/${bbsId}`;
-      const requestOptions = {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
+    // 등록, 수정, 삭제
+    // if (modeInfo.mode === CODE.MODE_CREATE) {
+    //   // 등록이면 마스터 정보에서 파일 첨부 가능 여부 조회함
+    //   const retrieveDetailURL = `/boardFileAtch/${bbsId}`;
+    //   const requestOptions = {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-type": "application/json",
+    //     },
+    //   };
 
-      EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-        setMasterBoard(resp.result);
-      });
+    //   EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+    //     // setMasterBoard(resp.result);
+    //   });
 
-      setBoardDetail({ bbsId: bbsId, nttSj: "", nttCn: "" });
-      return;
-    }
+    //   setBoardDetail({ bbsId: bbsId, nttSj: "", nttCn: "" });
+    //   return;
+    // }
 
-    const retrieveDetailURL = `/board/${bbsId}/${nttId}`;
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-      },
-    };
-    EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-      setMasterBoard(resp.result.brdMstrVO);
+    // const retrieveDetailURL = `/board/${bbsId}/${nttId}`;
+    // const requestOptions = {
+    //   method: "GET",
+    //   headers: {
+    //     "Content-type": "application/json",
+    //   },
+    // };
+    // EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+    //   // setMasterBoard(resp.result.brdMstrVO);
 
-      // 초기 boardDetail 설정 => ( 답글 / 수정 ) 모드일때...
-      if (modeInfo.mode === CODE.MODE_REPLY) {
-        // 답글모드이면 RE: 붙여줌
-        setBoardDetail({
-          ...resp.result.boardVO,
-          nttSj: "RE: " + resp.result.boardVO.nttSj,
-          nttCn: "",
-          inqireCo: 0,
-          atchFileId: "",
-        });
-      } else if (modeInfo.mode === CODE.MODE_MODIFY) {
-        setBoardDetail(resp.result.boardVO);
-        setBoardAttachFiles(resp.result.resultFiles);
-      }
-    });
+    //   // 초기 boardDetail 설정 => ( 답글 / 수정 ) 모드일때...
+    //   if (modeInfo.mode === CODE.MODE_REPLY) {
+    //     // 답글모드이면 RE: 붙여줌
+    //     setBoardDetail({
+    //       ...resp.result.boardVO,
+    //       nttSj: "RE: " + resp.result.boardVO.nttSj,
+    //       nttCn: "",
+    //       inqireCo: 0,
+    //       atchFileId: "",
+    //     });
+    //   } else if (modeInfo.mode === CODE.MODE_MODIFY) {
+    //     setBoardDetail(resp.result.boardVO);
+    //     setBoardAttachFiles(resp.result.resultFiles);
+    //   }
+    // });
   };
 
   const updateBoard = () => {
@@ -152,14 +153,14 @@ function EgovNoticeEdit(props) {
           <li>
             <Link to={URL.ADMIN}>사이트관리</Link>
           </li>
-          <li>{masterBoard && masterBoard.bbsNm}</li>
+          <li>공지사항</li>
         </ul>
       </div>
     );
   });
 
   useEffect(function () {
-    initMode();
+    // initMode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -185,7 +186,7 @@ function EgovNoticeEdit(props) {
             </div>
 
             <h2 className="tit_2">
-              {masterBoard && masterBoard.bbsNm} {modeInfo.modeTitle}
+              공지사항
             </h2>
 
             <div className="board_view2">
@@ -229,8 +230,7 @@ function EgovNoticeEdit(props) {
                 </dd>
               </dl>
               {/* 답글이 아니고 게시판 파일 첨부 가능 상태에서만 첨부파일 컴포넌트 노출 */}
-              {modeInfo?.mode !== CODE.MODE_REPLY &&
-                masterBoard.fileAtchPosblAt === "Y" && (
+              {/* {modeInfo?.mode !== CODE.MODE_REPLY && (
                   <EgovAttachFile
                     fnChangeFile={(attachfile) => {
                       console.log(
@@ -251,13 +251,13 @@ function EgovNoticeEdit(props) {
                     mode={props.mode}
                     posblAtchFileNumber={masterBoard.posblAtchFileNumber}
                   />
-                )}
+                )} */}
               {/* <!-- 버튼영역 --> */}
               <div className="board_btn_area">
                 {sessionUserSe === "ADM" && (
                   <div className="left_col btn1">
                     <button
-                      className="btn btn_skyblue_h46 w_100"
+                      className="btn_skyblue_h46 w_100"
                       onClick={() => updateBoard()}
                     >
                       저장

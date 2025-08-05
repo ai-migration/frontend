@@ -90,6 +90,10 @@ function EgovMypageEdit() {
     EgovNet.requestFetch(requestTokenURL, requestOptions, (resp) => {
       if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
         alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
+        setUserDetail({
+            ...userDetail,
+            tokenIssued: true,
+          })
         // navigate({ pathname: URL.MAIN });
       } else {
         navigate(

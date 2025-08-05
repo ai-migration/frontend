@@ -119,7 +119,7 @@ const RootRoutes = () => {
         const tokenParts = token.split(".");
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
-          const role = payload.groupNm || "";
+          const role = payload.role || "";
           console.log("User role from token:", role);
           setUserRole(role);
           return role;
@@ -171,7 +171,7 @@ const RootRoutes = () => {
 
     // 관리자 페이지 접근 처리
     if (adminRegex.test(currentPath)) {
-      if (role !== "ROLE_ADMIN") {
+      if (role !== "ADM") {
         console.log("관리자 권한이 없어 접근이 불가합니다.");
         setMounted(false);
         alert("관리자 권한이 필요한 페이지입니다.");
