@@ -90,48 +90,6 @@ function EgovNoticeEdit(props) {
 
   };
 
-  // const deleteBoard = () => {
-  //   const retrieveDetailURL = `/admin/posts/${location.state.postId}`;
-  //   const requestOptions = {
-  //     method: "DELETE",
-  //     headers: {
-  //       "Content-type": "application/json; charset=UTF-8",
-  //     }
-  //   };
-
-  //   EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-  //     // console.log(resp);
-  //     alert('공지 삭제!');
-  //     navigate('/inform/notice');
-  //   });
-  // }
-  const updateBoard = () => {
-    // const formData = new FormData();
-    // for (let key in boardDetail) {
-    //   formData.append(key, boardDetail[key]);
-    //   //console.log("boardDetail [%s] ", key, boardDetail[key]);
-    // }
-
-    // if (bbsFormVaildator(formData)) {
-    //   const requestOptions = {
-    //     method: modeInfo.method,
-    //     body: formData,
-    //   };
-
-    //   EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-    //     if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-    //       navigate(URL.INFORM_NOTICE, { state: { bbsId: bbsId } });
-    //     } else {
-    //       // alert("ERR : " + resp.message);
-    //       navigate(
-    //         { pathname: URL.ERROR },
-    //         { state: { msg: resp.resultMessage } }
-    //       );
-    //     }
-    //   });
-    // }
-  };
-
   useEffect(function () {
     initMode();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -23,8 +23,6 @@ function EgovNoticeDetail(props) {
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
-  // const bbsId = location.state.bbsId || NOTICE_BBS_ID;
-  // const nttId = location.state.nttId;
   const searchCondition = location.state.searchCondition;
 
   // const [masterBoard, setMasterBoard] = useState({});
@@ -64,31 +62,6 @@ function EgovNoticeDetail(props) {
       navigate('/inform/notice');
     });
   }
-
-  const onClickDeleteBoardArticle = (bbsId, nttId, atchFileId) => {
-    const deleteBoardURL = `/board/${bbsId}/${nttId}`;
-
-    const requestOptions = {
-      method: "PATCH",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({ atchFileId: atchFileId })
-    };
-
-    EgovNet.requestFetch(deleteBoardURL, requestOptions, (resp) => {
-      console.log("====>>> board delete= ", resp);
-      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-        alert("게시글이 삭제되었습니다.");
-        navigate(URL.INFORM_NOTICE, { replace: true });
-      } else {
-        navigate(
-          { pathname: URL.ERROR },
-          { state: { msg: resp.resultMessage } }
-        );
-      }
-    });
-  };
 
   useEffect(function () {
     retrieveDetail();
@@ -156,7 +129,9 @@ function EgovNoticeDetail(props) {
                   cols="30"
                   rows="10"
                   readOnly="readonly"
+                  style={{ backgroundColor: "#ffffff" }}
                   defaultValue={boardDetail && boardDetail.content}
+                  disabled
                 ></textarea>
               </div>
               <div className="board_attach">
