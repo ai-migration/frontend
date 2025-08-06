@@ -23,8 +23,6 @@ function EgovNoticeDetail(props) {
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
-  // const bbsId = location.state.bbsId || NOTICE_BBS_ID;
-  // const nttId = location.state.nttId;
   const searchCondition = location.state.searchCondition;
 
   // const [masterBoard, setMasterBoard] = useState({});
@@ -41,37 +39,30 @@ function EgovNoticeDetail(props) {
       },
     };
     EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-      // setMasterBoard(resp.result.brdMstrVO);
+      
+      resp.createdAt = resp.createdAt ? resp.createdAt.substring(0, 10) : "";
+      resp.updatedAt = resp.updatedAt ? resp.updatedAt.substring(0, 10) : "";
       setBoardDetail(resp);
-      // setUser(resp.result.user);
-      // setBoardAttachFiles(resp.result.resultFiles);
+      
     });
   };
 
-  const onClickDeleteBoardArticle = (bbsId, nttId, atchFileId) => {
-    const deleteBoardURL = `/board/${bbsId}/${nttId}`;
-
+  const deleteBoard = () => {
+    const retrieveDetailURL = `/admin/posts/${location.state.postId}`;
     const requestOptions = {
-      method: "PATCH",
+      method: "DELETE",
       headers: {
-        "Content-type": "application/json",
+        "Content-type": "application/json; charset=UTF-8",
       },
-      body: JSON.stringify({ atchFileId: atchFileId })
+      body: JSON.stringify({ postId: location.state.postId })
     };
 
-    EgovNet.requestFetch(deleteBoardURL, requestOptions, (resp) => {
-      console.log("====>>> board delete= ", resp);
-      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-        alert("게시글이 삭제되었습니다.");
-        navigate(URL.INFORM_NOTICE, { replace: true });
-      } else {
-        navigate(
-          { pathname: URL.ERROR },
-          { state: { msg: resp.resultMessage } }
-        );
-      }
+    EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+      // console.log(resp);
+      alert('공지 삭제!');
+      navigate('/inform/notice');
     });
-  };
+  }
 
   useEffect(function () {
     retrieveDetail();
@@ -127,6 +118,10 @@ function EgovNoticeDetail(props) {
                     <dd>{boardDetail && boardDetail.createdAt}</dd>
                   </dl>
                   <dl>
+                    <dt>수정일</dt>
+                    <dd>{boardDetail && boardDetail.updatedAt}</dd>
+                  </dl>
+                  <dl>
                     <dt>조회수</dt>
                     <dd>{boardDetail && boardDetail.viewCount}</dd>
                   </dl>
@@ -139,7 +134,9 @@ function EgovNoticeDetail(props) {
                   cols="30"
                   rows="10"
                   readOnly="readonly"
+                  style={{ backgroundColor: "#ffffff" }}
                   defaultValue={boardDetail && boardDetail.content}
+                  disabled
                 ></textarea>
               </div>
               <div className="board_attach">
@@ -155,24 +152,14 @@ function EgovNoticeDetail(props) {
                     <div className="left_col btn3">
                       <Link
                         to={{ pathname: URL.INFORM_NOTICE_MODIFY }}
-                        state={{
-                          postId: location.state.postId,
-                          
-                        }}
+                        state={{ postId: location.state.postId, mode:CODE.MODE_MODIFY }}
                         className="btn btn_skyblue_h46 w_100"
                       >
                         수정
                       </Link>
                       <button
-                        className="btn btn_skyblue_h46 w_100"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onClickDeleteBoardArticle(
-                            boardDetail.bbsId,
-                            boardDetail.nttId,
-                            boardDetail.atchFileId
-                          );
-                        }}
+                        className="btn_skyblue_h46 w_100"
+                        onClick={() => deleteBoard()}
                       >
                         삭제
                       </button>

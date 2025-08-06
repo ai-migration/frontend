@@ -13,7 +13,7 @@ import bbsFormVaildator from "@/utils/bbsFormVaildator";
 import { getSessionItem } from "@/utils/storage";
 import { useDebouncedInput } from "@/hooks/useDebounce";
 
-function EgovNoticeEdit() {
+function EgovNoticeEdit(props) {
   console.group("EgovNoticeEdit");
   console.log("------------------------------");
   // console.log("EgovNoticeEdit [props] : ", props);
@@ -25,118 +25,73 @@ function EgovNoticeEdit() {
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
-  // const [modeInfo, setModeInfo] = useState({ mode: props.mode });
+  const [modeInfo, setModeInfo] = useState({ mode: props.mode });
   // const [masterBoard, setMasterBoard] = useState({});
-  const [boardDetail, setBoardDetail] = useState({ title: "", content: "" });
+  const [boardDetail, setBoardDetail] = useState({ postId:location.state.postId, title: "", content: "", type:"NOTICE" });
 
   const initMode = () => {
-  //   switch (props.mode) {
-  //     case CODE.MODE_CREATE:
-  //       setModeInfo({
-  //         ...modeInfo,
-  //         modeTitle: "등록",
-  //         method: "POST",
-  //         editURL: "/board",
-  //       });
-  //       break;
-  //     case CODE.MODE_MODIFY:
-  //       setModeInfo({
-  //         ...modeInfo,
-  //         modeTitle: "수정",
-  //         method: "PUT",
-  //         editURL: `/board/${nttId}`,
-  //       });
-  //       break;
-  //     case CODE.MODE_REPLY:
-  //       setModeInfo({
-  //         ...modeInfo,
-  //         modeTitle: "답글쓰기",
-  //         method: "POST",
-  //         editURL: "/boardReply",
-  //       });
-  //       break;
-  //     default:
-  //       navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
-  //   }
-  //   retrieveDetail();
+    // Edit 데이터
+    console.log(modeInfo.mode)
+    if(modeInfo.mode === CODE.MODE_MODIFY) {
+      const retrieveDetailURL = `/posts/${location.state.postId}?type=NOTICE`;
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      };
+
+      EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+        // console.log(resp);
+        setBoardDetail(resp);
+        // alert('불러오기!');
+      });
+    }
   };
 
   const retrieveDetail = () => {
-    // 등록, 수정, 삭제
-    // if (modeInfo.mode === CODE.MODE_CREATE) {
-    //   // 등록이면 마스터 정보에서 파일 첨부 가능 여부 조회함
-    //   const retrieveDetailURL = `/boardFileAtch/${bbsId}`;
-    //   const requestOptions = {
-    //     method: "GET",
-    //     headers: {
-    //       "Content-type": "application/json",
-    //     },
-    //   };
+    // 등록
+    if(modeInfo.mode === CODE.MODE_CREATE) {
+      const retrieveDetailURL = `/admin/posts`;
+      const { postId, ...boardWithoutPostId } = boardDetail;
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify(boardWithoutPostId)
+      };
 
-    //   EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-    //     // setMasterBoard(resp.result);
-    //   });
+      EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+        // console.log(resp);
+        alert('공지 등록!');
+        navigate('/inform/notice');
+      });
+    }
+    // 수정
+    else if(modeInfo.mode === CODE.MODE_MODIFY) {
+      const retrieveDetailURL = `/admin/posts/${location.state.postId}`;
+      const requestOptions = {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify(boardDetail)
+      };
 
-    //   setBoardDetail({ bbsId: bbsId, nttSj: "", nttCn: "" });
-    //   return;
-    // }
+      EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+        // console.log(resp);
+        alert('공지 수정!');
+        navigate('/inform/notice');
+      });
 
-    // const retrieveDetailURL = `/board/${bbsId}/${nttId}`;
-    // const requestOptions = {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //   },
-    // };
-    // EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-    //   // setMasterBoard(resp.result.brdMstrVO);
+    }
 
-    //   // 초기 boardDetail 설정 => ( 답글 / 수정 ) 모드일때...
-    //   if (modeInfo.mode === CODE.MODE_REPLY) {
-    //     // 답글모드이면 RE: 붙여줌
-    //     setBoardDetail({
-    //       ...resp.result.boardVO,
-    //       nttSj: "RE: " + resp.result.boardVO.nttSj,
-    //       nttCn: "",
-    //       inqireCo: 0,
-    //       atchFileId: "",
-    //     });
-    //   } else if (modeInfo.mode === CODE.MODE_MODIFY) {
-    //     setBoardDetail(resp.result.boardVO);
-    //     setBoardAttachFiles(resp.result.resultFiles);
-    //   }
-    // });
-  };
 
-  const updateBoard = () => {
-    // const formData = new FormData();
-    // for (let key in boardDetail) {
-    //   formData.append(key, boardDetail[key]);
-    //   //console.log("boardDetail [%s] ", key, boardDetail[key]);
-    // }
-
-    // if (bbsFormVaildator(formData)) {
-    //   const requestOptions = {
-    //     method: modeInfo.method,
-    //     body: formData,
-    //   };
-
-    //   EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-    //     if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-    //       navigate(URL.INFORM_NOTICE, { state: { bbsId: bbsId } });
-    //     } else {
-    //       // alert("ERR : " + resp.message);
-    //       navigate(
-    //         { pathname: URL.ERROR },
-    //         { state: { msg: resp.resultMessage } }
-    //       );
-    //     }
-    //   });
-    // }
   };
 
   useEffect(function () {
-    // initMode();
+    initMode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -190,6 +145,7 @@ function EgovNoticeEdit() {
                     id="nttSj"
                     name="nttSj"
                     type="text"
+                    defaultValue={boardDetail.title}
                     onChange={(e) =>
                       setBoardDetail({ ...boardDetail, title: e.target.value })
                     }
@@ -211,6 +167,7 @@ function EgovNoticeEdit() {
                     cols="30"
                     rows="10"
                     placeholder=""
+                    defaultValue={boardDetail.content}
                     onChange={(e) =>
                       setBoardDetail({ ...boardDetail, content: e.target.value })
                     }
@@ -242,11 +199,23 @@ function EgovNoticeEdit() {
                 )} */}
               {/* <!-- 버튼영역 --> */}
               <div className="board_btn_area">
-                {sessionUserSe === "ADM" && (
+                {sessionUserSe === "ADM" && 
+                  modeInfo.mode === CODE.MODE_CREATE &&(
                   <div className="left_col btn1">
                     <button
                       className="btn_skyblue_h46 w_100"
-                      onClick={() => updateBoard()}
+                      onClick={() => retrieveDetail()}
+                    >
+                      등록
+                    </button>
+                  </div>
+                )}
+                {sessionUserSe === "ADM" && 
+                  modeInfo.mode === CODE.MODE_MODIFY &&(
+                  <div className="left_col btn1">
+                    <button
+                      className="btn_skyblue_h46 w_100"
+                      onClick={() => retrieveDetail()}
                     >
                       저장
                     </button>

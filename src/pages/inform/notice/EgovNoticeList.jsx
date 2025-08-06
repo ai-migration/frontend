@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
+import CODE from "@/constants/code";
 import { NOTICE_BBS_ID } from "@/config";
 
 import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavInform";
@@ -39,86 +40,17 @@ function EgovNoticeList(props) {
   ); // 기존 조회에서 접근 했을 시 || 신규로 접근 했을 시
   // const [masterBoard, setMasterBoard] = useState({});
   const [user, setUser] = useState({});
-  const [paginationInfo, setPaginationInfo] = useState({});
-
-  const [listTag, setListTag] = useState([]);
-
-
-  // 초기 목록 불러오기
-  const initLoad = () => {
-    const retrieveListURL = "/posts?type=NOTICE";
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-      },
-    };
-
-    EgovNet.requestFetch(
-      retrieveListURL,
-      requestOptions,
-      (resp) => {
-
-        let mutListTag = [];
-        mutListTag.push(
-          <p className="no_data" key="0">
-            검색된 결과가 없습니다.
-          </p>
-        ); // 게시판 목록 초기값
-
-        // const resultCnt = parseInt(resp.result.resultCnt);
-        // const currentPageNo = resp.result.paginationInfo.currentPageNo;
-        // const pageSize = resp.result.paginationInfo.pageSize;
-
-        console.log(resp);
-        const resultList = resp;
-        // const resultList = [
-        //   {postId : 1, title: "공지제목1", type:"notice", createdAt:"2025-08-05", viewCount:0},
-        //   {postId : 2, title: "공지제목2", type:"notice", createdAt:"2025-08-05", viewCount:0},
-        //   {postId : 3, title: "공지제목3", type:"notice", createdAt:"2025-08-05", viewCount:0},
-        //   {postId : 4, title: "공지제목4", type:"notice", createdAt:"2025-08-05", viewCount:0},
-        //   {postId : 5, title: "공지제목5", type:"notice", createdAt:"2025-08-05", viewCount:0},
-        // ];
-
-        // 리스트 항목 구성
-        resultList.forEach(function (item, index) {
-          if (index === 0) mutListTag = []; // 목록 초기화
-          // const listIdx = itemIdxByPage(
-          //   resultCnt,
-          //   currentPageNo,
-          //   pageSize,
-          //   index
-          // );
-
-          mutListTag.push(
-            <Link
-              to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
-              state={{
-                postId: item.postId,
-                searchCondition: searchCondition,
-              }}
-              key={item.postId}
-              className="list_item"
-            >
-              <div>{item.postId}</div>
-              <div className="al">{item.title}</div>
-              <div>관리자</div> 
-              <div>{item.createdAt}</div>
-              <div>{item.viewCount}</div>
-            </Link>
-          );
-        });
-        setListTag(mutListTag);
-      },
-      function (resp) {
-        console.log("err response : ", resp);
-      }
-    );
-    console.groupEnd("EgovNoticeList.retrieveList()");
-  }
+  const [allList, setAllList] = useState([]);             // 전체 리스트 원본
+  const [listTag, setListTag] = useState([]);             // 현재 페이지에 보여줄 리스트
+  const [paginationInfo, setPaginationInfo] = useState({  // 페이징 정보 직접 구성
+    currentPageNo: 1,
+    pageSize: 10,
+    recordCountPerPage: 10,
+    totalRecordCount: 0,
+  });
 
 
-  const retrieveList = useCallback((searchCondition) => {
+  const retrieveList = useCallback((pageIndex = 1) => {
     console.groupCollapsed("EgovNoticeList.retrieveList()");
 
     const retrieveListURL = "/posts?type=notice";
@@ -133,63 +65,67 @@ function EgovNoticeList(props) {
       retrieveListURL,
       requestOptions,
       (resp) => {
+        const resultList = resp; // 전체 리스트가 반환됨
 
-        setPaginationInfo(resp.result.paginationInfo);
-        setUser(resp.result.user);
+        const totalRecordCount = resultList.length;
+        const pageSize = 10;
+        const recordCountPerPage = 10;
+        const currentPageNo = pageIndex;
 
-        let mutListTag = [];
-        mutListTag.push(
-          <p className="no_data" key="0">
-            검색된 결과가 없습니다.
-          </p>
-        ); // 게시판 목록 초기값
+        // 인덱스 계산
+        const startIndex = (currentPageNo - 1) * recordCountPerPage;
+        const endIndex = startIndex + recordCountPerPage;
+        const slicedList = resultList.slice(startIndex, endIndex);
 
-        const resultCnt = parseInt(resp.result.resultCnt);
-        const currentPageNo = resp.result.paginationInfo.currentPageNo;
-        const pageSize = resp.result.paginationInfo.pageSize;
-        const resultList = resp.result.resultList;
-
-        // 리스트 항목 구성
-        resultList.forEach(function (item, index) {
-          if (index === 0) mutListTag = []; // 목록 초기화
-          const listIdx = itemIdxByPage(
-            resultCnt,
-            currentPageNo,
-            pageSize,
-            index
-          );
-
-          mutListTag.push(
-            <Link
-              to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
-              state={{
-                nttId: item.postId,
-                // bbsId: item.bbsId,
-                searchCondition: searchCondition,
-              }}
-              key={listIdx}
-              className="list_item"
-            >
-              <div>{item.postId}</div>
-              <div className="al">{item.title}</div>
-              <div>{item.frstRegisterNm}</div> 
-              <div>{item.createdAt}</div>
-              <div>{item.viewCount}</div>
-            </Link>
-          );
+        // 페이징 정보 구성
+        setPaginationInfo({
+          currentPageNo,
+          pageSize,
+          recordCountPerPage,
+          totalRecordCount,
         });
+
+        // 리스트 렌더링
+        let mutListTag = [];
+        if (slicedList.length === 0) {
+          mutListTag.push(
+            <p className="no_data" key="0">검색된 결과가 없습니다.</p>
+          );
+        } else {
+          slicedList.forEach((item, index) => {
+            mutListTag.push(
+              <Link
+                to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
+                state={{
+                  postId: item.postId,
+                  searchCondition: searchCondition,
+                }}
+                key={item.postId}
+                className="list_item"
+              >
+                <div>{item.postId}</div>
+                <div className="al">{item.title}</div>
+                <div>{item.frstRegisterNm || "관리자"}</div>
+                <div>{item.createdAt.substring(0, 10)}</div>
+                <div>{item.viewCount}</div>
+              </Link>
+            );
+          });
+        }
+
+        setAllList(resultList); // 전체 리스트 저장
         setListTag(mutListTag);
       },
-      function (resp) {
-        console.log("err response : ", resp);
+      function (errResp) {
+        console.error("Error fetching data:", errResp);
       }
     );
+
     console.groupEnd("EgovNoticeList.retrieveList()");
-  }, []);
+  }, [searchCondition]);
 
   useEffect(() => {
-    initLoad();
-    // retrieveList(searchCondition);
+    retrieveList(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -281,7 +217,7 @@ function EgovNoticeList(props) {
                     <li>
                       <Link
                         to={URL.INFORM_NOTICE_CREATE}
-                        // state={{ bbsId: bbsId }}
+                        state={{ postId: null, mode:CODE.MODE_CREATE }}
                         className="btn btn_blue_h46 pd35"
                       >
                         등록
@@ -309,13 +245,8 @@ function EgovNoticeList(props) {
               {/* <!-- Paging --> */}
               <EgovPaging
                 pagination={paginationInfo}
-                moveToPage={(passedPage) => {
-                  retrieveList({
-                    ...searchCondition,
-                    pageIndex: passedPage,
-                    searchCnd: cndRef.current.value,
-                    searchWrd: wrdRef.current.value,
-                  });
+                moveToPage={(pageNum) => {
+                  retrieveList(pageNum); // 페이지 이동 시 리스트 다시 자르기
                 }}
               />
               {/* <!--/ Paging --> */}
