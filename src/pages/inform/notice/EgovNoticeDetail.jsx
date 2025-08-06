@@ -117,6 +117,10 @@ function EgovNoticeDetail(props) {
                     <dd>{boardDetail && boardDetail.createdAt}</dd>
                   </dl>
                   <dl>
+                    <dt>수정일</dt>
+                    <dd>{boardDetail && boardDetail.updateAt}</dd>
+                  </dl>
+                  <dl>
                     <dt>조회수</dt>
                     <dd>{boardDetail && boardDetail.viewCount}</dd>
                   </dl>

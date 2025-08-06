@@ -318,10 +318,13 @@ a.google:before {
   padding: 22px 0;
 }
 .board_view_top .info dl:nth-child(1) {
-  margin-right: 185px;
+  margin-right: 100px;
 }
 .board_view_top .info dl:nth-child(2) {
-  margin-right: 145px;
+  margin-right: 100px;
+}
+.board_view_top .info dl:nth-child(3) {
+  margin-right: 100px;
 }
 .board_view_top .info dt {
   width: 100px;
