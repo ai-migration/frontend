@@ -1,681 +1,213 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-
 import * as EgovNet from "@/api/egovFetch";
-
 import URL from "@/constants/url";
 import CODE from "@/constants/code";
 import "@/css/header.css";
-
-
-
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem, setSessionItem } from "@/utils/storage";
+import { useState } from "react";
 
 function EgovHeader() {
-  console.group("EgovHeader");
-  console.log("[Start] EgovHeader ------------------------------");
-
   const sessionToken = getSessionItem("jToken");
   const sessionUser = getSessionItem("loginUser");
   const sessionUserId = sessionUser?.id;
   const sessionUserName = sessionUser?.name;
   const sessionUserSe = sessionUser?.userSe;
-
   const navigate = useNavigate();
-
+  const [isHovering, setIsHovering] = useState(false);
 
   const logInHandler = () => {
-    // 로그인 정보 없을 시
     navigate(URL.LOGIN);
-    // PC와 Mobile 열린메뉴 닫기
-    document.querySelector(".all_menu.WEB").classList.add("closed");
-    document.querySelector(".btnAllMenu").classList.remove("active");
-    document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-    document.querySelector(".all_menu.Mobile").classList.add("closed");
-  };
-
-  /* 햄버거 버튼 method */
-  const toggleAllMenu = () => {
-    const isClosed = document.querySelector(".all_menu.WEB")?.classList.contains("closed");
-    const btn = document.querySelector(".btnAllMenu");
-
-    if (isClosed) {
-      btn?.classList.add("active");
-      btn.title = "전체메뉴 열림";
-      document.querySelector(".all_menu.WEB")?.classList.remove("closed");
-      document.querySelector(".all_menu.Mobile")?.classList.remove("closed");
-      document.querySelector(".support_menu")?.classList.add("closed"); // 고객지원 메뉴 닫기
-    } else {
-      btn?.classList.remove("active");
-      btn.title = "전체메뉴 닫힘";
-      document.querySelector(".all_menu.WEB")?.classList.add("closed");
-      document.querySelector(".all_menu.Mobile")?.classList.add("closed");
-      document.querySelector(".support_menu")?.classList.add("open"); // 고객지원 메뉴 닫기
-    }
-  };
-  const closeSupportMenu = () => {
-    document.querySelector(".support_menu")?.classList.remove("open");
-    document.querySelector(".support_menu")?.classList.add("closed");
-  };
-
-  const toggleSupportMenuOnly = () => {
-    const supportMenu = document.querySelector(".support_menu");
-    const isOpen = supportMenu?.classList.contains("open");
-
-    if (isOpen) {
-      supportMenu?.classList.remove("open");
-    } else {
-      supportMenu?.classList.add("open");
-      document.querySelector(".all_menu.WEB")?.classList.remove("open");
-      document.querySelector(".all_menu.WEB")?.classList.add("closed");
-      document.querySelector(".all_menu.Mobile")?.classList.add("closed");
-      
-    }
-
-    // 햄버거 버튼 active 상태도 해제
-    const btn = document.querySelector(".btnAllMenu");
-    btn?.classList.remove("active");
-    btn.title = "전체메뉴 닫힘";
+    closeAllMenus();
   };
 
   const logOutHandler = () => {
-    // 로그인 정보 존재할 때
-    const logOutUrl = "/users/logout";
     const requestOptions = {
       headers: {
         "Content-type": "application/json",
-        "Authorization": sessionToken
+        "Authorization": sessionToken,
       },
       credentials: "include",
     };
-    EgovNet.requestFetch(logOutUrl, requestOptions, function (resp) {
-      console.log("===>>> logout resp= ", resp);
-      // if (parseInt(resp.resultCode) === parseInt(CODE.RCV_SUCCESS)) {
-        //onChangeLogin({ loginVO: {} });
-        setSessionItem("loginUser", { id: "" });
-        setSessionItem("jToken", null);
-        window.alert("로그아웃되었습니다!");
-        navigate(URL.MAIN);
-        // PC와 Mobile 열린메뉴 닫기
-        document.querySelector(".all_menu.WEB").classList.add("closed");
-        document.querySelector(".btnAllMenu").classList.remove("active");
-        document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-        document.querySelector(".all_menu.Mobile").classList.add("closed");
-      // }
+    EgovNet.requestFetch("/users/logout", requestOptions, () => {
+      setSessionItem("loginUser", { id: "" });
+      setSessionItem("jToken", null);
+      alert("로그아웃되었습니다!");
+      navigate(URL.MAIN);
+      closeAllMenus();
     });
   };
 
-  console.log("------------------------------EgovHeader [End]");
-  console.groupEnd("EgovHeader");
+  const toggleAllMenu = () => {
+    const webMenu = document.querySelector(".all_menu.WEB");
+    const btn = document.querySelector(".btnAllMenu");
+    const isClosed = webMenu?.classList.contains("closed");
+    webMenu?.classList.toggle("closed", !isClosed);
+    btn?.classList.toggle("active", isClosed);
+    if (btn) btn.title = isClosed ? "전체메뉴 열림" : "전체메뉴 닫힘";
+  };
+
+  const openAllMenuByHover = () => {
+    setIsHovering(true);
+    const menu = document.querySelector(".all_menu.WEB");
+    if (menu) menu.classList.remove("closed");
+  };
+
+  const closeAllMenuByHover = () => {
+    setTimeout(() => {
+      if (!isHovering) {
+        const menu = document.querySelector(".all_menu.WEB");
+        if (menu) menu.classList.add("closed");
+      }
+    }, 200);
+  };
+
+  const handleMenuMouseEnter = () => {
+    setIsHovering(true);
+  };
+
+  const handleMenuMouseLeave = () => {
+    setIsHovering(false);
+    const menu = document.querySelector(".all_menu.WEB");
+    if (menu) menu.classList.add("closed");
+  };
+
+  const closeAllMenus = () => {
+    const webMenu = document.querySelector(".all_menu.WEB");
+    if (webMenu) webMenu.classList.add("closed");
+    const btn = document.querySelector(".btnAllMenu");
+    if (btn) {
+      btn.classList.remove("active");
+      btn.title = "전체메뉴 닫힘";
+    }
+    document.querySelector(".all_menu.Mobile")?.classList.add("closed");
+  };
 
   return (
-    // <!-- header -->
     <div className="header">
       <div className="inner">
         <Link to={URL.MAIN} className="ico lnk_go_template" target="_blank">
           홈페이지 템플릿 소개 페이지로 이동
         </Link>
-
         <h1 className="logo">
           <Link to={URL.MAIN} className="w">
-            <img
-              src={logoImg}
-              alt="표준프레임워크포털 eGovFrame 심플홈페이지"
-            />
+            <img src={logoImg} alt="eGovFrame 심플홈페이지" />
           </Link>
           <Link to={URL.MAIN} className="m">
-            <img
-              src={logoImgMobile}
-              alt="표준프레임워크포털 eGovFrame 심플홈페이지"
-            />
+            <img src={logoImgMobile} alt="eGovFrame 심플홈페이지" />
           </Link>
         </h1>
 
-        <div className="gnb shift-left-40">
-          <h2 className="blind">주메뉴</h2>
+        <div
+          className="gnb shift-left-40"
+          onMouseEnter={openAllMenuByHover}
+          onMouseLeave={closeAllMenuByHover}
+        >
           <ul>
-            <li>
-              <NavLink
-                to={URL.ABOUT}
-                className={({ isActive }) => (isActive ? "cur" : "")}
-              >
-                사이트소개
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to={URL.INTRO}
-                className={({ isActive }) => (isActive ? "cur" : "")}
-              >
-                정보마당
-              </NavLink>
-            </li>
-            <li>
-            <NavLink
-              to={URL.SUPPORT}
-              className={({ isActive }) => (isActive ? "cur" : "")}
-              onClick={toggleSupportMenuOnly}
-            >
-              고객지원
-            </NavLink>
-
-            </li>
-
-            <li>
-              <NavLink
-                to={URL.INFORM}
-                className={({ isActive }) => (isActive ? "cur" : "")}
-              >
-                알림마당
-              </NavLink>
-            </li>
+            <li><NavLink to={URL.ABOUT}>사이트소개</NavLink></li>
+            <li><NavLink to={URL.SUPPORT_TRANSFORM_INTRO}>AI 변환기</NavLink></li>
+            <li><NavLink to={URL.SUPPORT_SECURITY_INTRO}>AI 보안기</NavLink></li>
+            <li><NavLink to={URL.SUPPORT_GUIDE_EGOVFRAMEWORK}>고객지원</NavLink></li>
             {sessionUserSe === "ADM" && (
-              <li>
-                <NavLink
-                  to={URL.ADMIN}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  사이트관리
-                </NavLink>
-              </li>
+              <li><NavLink to={URL.ADMIN}>사이트관리</NavLink></li>
             )}
           </ul>
         </div>
 
-        {/* <!-- PC web에서 보여지는 영역 --> */}
         <div className="user_info">
-          {/* 로그아웃 : 로그인 정보 있을때 */}
-          {sessionUserId && (
+          {sessionUserId ? (
             <>
-              <span className="person">{sessionUserName} </span> 님,{" "}
-              {sessionUserSe} 반갑습니다!.
+              <span className="person">{sessionUserName}</span> 님, {sessionUserSe} 반갑습니다!
               {sessionUserSe === "USER" && (
-                <NavLink
-                  to={URL.MYPAGE}
-                  className={({ isActive }) =>
-                    isActive ? "btn login cur" : "btn login"
-                  }
-                >
+                <NavLink to={URL.MYPAGE} className={({ isActive }) => isActive ? "btn login cur" : "btn login"}>
                   마이페이지
                 </NavLink>
               )}
-              <button onClick={logOutHandler} className="btn">
-                로그아웃
-              </button>
+              <button onClick={logOutHandler} className="btn">로그아웃</button>
             </>
-          )}
-          {/* 로그인 : 로그인 정보 없을 때 */}
-          {!sessionUserId && (
+          ) : (
             <>
-              <button onClick={logInHandler} className="btn login">
-                로그인
-              </button>
-              <NavLink
-                to={URL.SIGNUP}
-                className={({ isActive }) =>
-                  isActive ? "btn login cur" : "btn login"
-                }
-              >
+              <button onClick={logInHandler} className="btn login">로그인</button>
+              <NavLink to={URL.SIGNUP} className={({ isActive }) => isActive ? "btn login cur" : "btn login"}>
                 회원가입
               </NavLink>
             </>
           )}
         </div>
-        {/* <!--// PC web에서 보여지는 영역 --> */}
 
-        {/* <!-- right area --> */}
         <div className="right_a">
           <button
             type="button"
             className="btn btnAllMenu move-right-50"
             title="전체메뉴 닫힘"
             onClick={toggleAllMenu}
-          >
-            전체메뉴
-          </button>
-          <button
-            type="button"
-            className="btn mobile btnAllMenuM"
-            title="전체메뉴 닫힘"
-            onClick={toggleAllMenu}
-          >
-            전체메뉴
-          </button>
+          >전체메뉴</button>
         </div>
       </div>
 
-          
-      {/*햄버거 버튼 누르면 열리는 전체 메뉴바*/}
-      <div className="all_menu WEB closed">
-        <h2 className="blind">전체메뉴</h2>
+      <div
+        className="all_menu WEB closed"
+        onMouseEnter={handleMenuMouseEnter}
+        onMouseLeave={handleMenuMouseLeave}
+      >
         <div className="inner">
           <div className="col">
             <h3>사이트소개</h3>
             <ul>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_SITE}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  소개
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_HISTORY}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  연혁
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_ORGANIZATION}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  조직소개
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_LOCATION}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  찾아오시는 길
-                </NavLink>
-              </li>
+              <li><NavLink to={URL.ABOUT_SITE}>소개</NavLink></li>
+              <li><NavLink to={URL.ABOUT_HISTORY}>연혁</NavLink></li>
+              <li><NavLink to={URL.ABOUT_ORGANIZATION}>조직소개</NavLink></li>
+              <li><NavLink to={URL.ABOUT_LOCATION}>찾아오시는 길</NavLink></li>
             </ul>
           </div>
+
           <div className="col">
-            <h3>정보마당</h3>
+            <h3>AI 변환기</h3>
             <ul>
-              <li>
-                <NavLink
-                  to={URL.INTRO_TRANSFORM}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  변환 소개
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INTRO_SECURITY}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  보안 소개
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INTRO_CHATBOT}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  챗봇 소개
-                </NavLink>
-              </li>
+              <li><NavLink to="/support/transform/intro">기능 소개</NavLink></li>
+              <li><NavLink to="/support/transform/transformation">변환 하기</NavLink></li>
+              <li><NavLink to="/support/transform/view_transform">변환 이력 조회</NavLink></li>
+              <li><NavLink to="/support/transform/view_test">테스트 이력 조회</NavLink></li>
+              <li><NavLink to="/support/transform/download">다운로드</NavLink></li>
             </ul>
           </div>
+
+          <div className="col">
+            <h3>AI 보안기</h3>
+            <ul>
+              <li><NavLink to="/support/security/intro">기능 소개</NavLink></li>
+              <li><NavLink to="/support/security/scan">AI 보안 검사</NavLink></li>
+              <li><NavLink to="/support/security/vulnerability">보안 취약점탐지</NavLink></li>
+              <li><NavLink to="/support/security/report">보안 점검결과</NavLink></li>
+              <li><NavLink to="/support/security/report_detail">다운로드</NavLink></li>
+            </ul>
+          </div>
+
           <div className="col">
             <h3>고객지원</h3>
             <ul>
-              <li>
-                <NavLink
-                  to={URL.SUPPORT_DOWNLOAD}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  변환
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.SUPPORT_QNA}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  보안
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.SUPPORT_APPLY}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  가이드
-                </NavLink>
-              </li>
+              <li><NavLink to="/support/guide/egovframework">전자정부프레임워크 가이드</NavLink></li>
+              <li><NavLink to="/intro">정보마당</NavLink></li>
+              <li><NavLink to="/inform">알림마당</NavLink></li>
             </ul>
           </div>
-          <div className="col">
-            <h3>알림마당</h3>
-            <ul>
-              <li>
-                <NavLink to={URL.INFORM_NOTICE}>공지사항</NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INFORM_FAQ}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  FAQ
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INFORM_QNA}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  Q&A
-                </NavLink>
-              </li>
-            </ul>
-          </div>
-           {/* admin 전용 게시판 관리 부분 part */}
+
           {sessionUserSe === "ADM" && (
             <div className="col">
               <h3>사이트관리</h3>
               <ul>
-                <li>
-                  <NavLink
-                    to={URL.ADMIN_NOTICE}
-                    className={({ isActive }) => (isActive ? "cur" : "")}
-                  >
-                    공지사항 관리
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to={URL.ADMIN_FAQ}
-                    className={({ isActive }) => (isActive ? "cur" : "")}
-                  >
-                    FAQ 관리
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to={URL.ADMIN_QNA}
-                    className={({ isActive }) => (isActive ? "cur" : "")}
-                  >
-                    Q&A 관리
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to={URL.ADMIN_MEMBERS}
-                    className={({ isActive }) => (isActive ? "cur" : "")}
-                  >
-                    회원 관리
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to={URL.ADMIN_MANAGER}
-                    className={({ isActive }) => (isActive ? "cur" : "")}
-                  >
-                    관리자 관리
-                  </NavLink>
-                </li>
+                <li><NavLink to={URL.ADMIN_NOTICE}>공지사항 관리</NavLink></li>
+                <li><NavLink to={URL.ADMIN_FAQ}>FAQ 관리</NavLink></li>
+                <li><NavLink to={URL.ADMIN_QNA}>Q&A 관리</NavLink></li>
+                <li><NavLink to={URL.ADMIN_MEMBERS}>회원 관리</NavLink></li>
+                <li><NavLink to={URL.ADMIN_MANAGER}>관리자 관리</NavLink></li>
               </ul>
             </div>
           )}
-
-          
-        </div>
-      </div>
-
-      {/* 여기는 모바일이라서 신경 안써도됩니다 */}
-      <div className="all_menu Mobile closed">
-        <div className="user_info_m">
-          {/* 로그아웃 : 로그인 정보 있을때 */}
-          {sessionUserId && (
-            <>
-              <span className="person">{sessionUserName} </span>이
-              로그인하셨습니다.
-              <button onClick={logOutHandler} className="btn logout">
-                로그아웃
-              </button>
-            </>
-          )}
-
-          {/* 로그인 : 로그인 정보 없을 때 */}
-          {!sessionUserId && (
-            <>
-              <button onClick={logInHandler} className="btn login">
-                로그인
-              </button>
-              <NavLink
-                to={URL.SIGNIN}
-                className={({ isActive }) =>
-                  isActive ? "btn login cur" : "btn login"
-                }
-              >
-                회원가입
-              </NavLink>
-            </>
-          )}
-          <button className="btn noscript close" type="button">
-            전체메뉴 닫기
-          </button>
-        </div>
-        <div className="menu">
-          <h3>
-            <Link to={URL.ABOUT}>사이트소개</Link>
-          </h3>
-          <div className="submenu closed">
-            <ul>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_SITE}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  소개
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_HISTORY}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  연혁
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_ORGANIZATION}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  조직소개
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.ABOUT_LOCATION}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  찾아오시는 길
-                </NavLink>
-              </li>
-            </ul>
-          </div>
-          <h3>
-            <Link to={URL.INTRO}>정보마당</Link>
-          </h3>
-          <div className="submenu closed">
-            <ul>
-              <li>
-                <NavLink
-                  to={URL.INTRO_WORKS}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  주요사업 소개
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INTRO_SERVICE}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  대표서비스 소개
-                </NavLink>
-              </li>
-            </ul>
-          </div>
-          <h3>
-            <Link to={URL.SUPPORT}>고객지원</Link>
-          </h3>
-
-          
-          <h3>
-            <Link to={URL.INFORM}>알림마당</Link>
-          </h3>
-          <div className="submenu closed">
-            <ul>
-              <li>
-                <NavLink to={URL.INFORM_DAILY}>오늘의 행사</NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INFORM_WEEKLY}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  금주의 행사
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INFORM_NOTICE}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  공지사항
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to={URL.INFORM_GALLERY}
-                  className={({ isActive }) => (isActive ? "cur" : "")}
-                >
-                  사이트 갤러리
-                </NavLink>
-              </li>
-            </ul>
-          </div>
-          {sessionUserSe === "ADM" && (
-            <>
-              <h3>
-                <Link to={URL.ADMIN}>사이트관리</Link>
-              </h3>
-              <div className="submenu closed">
-                <ul>
-                  <li>
-                    <NavLink
-                      to={URL.ADMIN_SCHEDULE}
-                      className={({ isActive }) => (isActive ? "cur" : "")}
-                    >
-                      일정관리
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to={URL.ADMIN_BOARD}
-                      className={({ isActive }) => (isActive ? "cur" : "")}
-                    >
-                      게시판생성관리
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to={URL.ADMIN_USAGE}
-                      className={({ isActive }) => (isActive ? "cur" : "")}
-                    >
-                      게시판사용관리
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to={URL.ADMIN_NOTICE}
-                      className={({ isActive }) => (isActive ? "cur" : "")}
-                    >
-                      공지사항관리
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to={URL.ADMIN_GALLERY}
-                      className={({ isActive }) => (isActive ? "cur" : "")}
-                    >
-                      사이트갤러리관리
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to={URL.ADMIN_MANAGER}
-                      className={({ isActive }) => (isActive ? "cur" : "")}
-                    >
-                      사이트관리자 암호변경
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to={URL.ADMIN_MEMBERS}
-                      className={({ isActive }) => (isActive ? "cur" : "")}
-                    >
-                      회원관리
-                    </NavLink>
-                  </li>
-                </ul>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-      {/* <!--// All menu --> */}
-
-
-    {/* 고객지원 메뉴 (클릭 시 열림) */}
-    <div className="support_menu closed">
-
-        {/* ✨ 닫기 버튼 추가 */}
-        <button
-          type="button"
-          className="btn btnSupportClose"
-          title="고객지원 닫기"
-          onClick={closeSupportMenu}
-        >
-          ✕
-        </button>
-      <h2 className="blind">고객지원 전체메뉴</h2>
-      <div className="inner row"> 
-        {/* 메뉴 영역 */}
-        <div className="col">
-          <h3>변환</h3>
-          <ul>
-            <li><NavLink to="/support/transform/transformation">변환</NavLink></li>
-            <li><NavLink to="/support/transform/view_transform">변환 이력 조회</NavLink></li>
-            <li><NavLink to="/support/transform/view_test">테스트 이력 조회</NavLink></li>
-            <li><NavLink to="/support/transform/download">다운로드</NavLink></li>
-          </ul>
-        </div>
-        <div className="col">
-          <h3>보안</h3>
-          <ul>
-            <li><NavLink to="/support/security/scan">보안 분석하기</NavLink></li>
-            <li><NavLink to="/support/security/download">다운로드</NavLink></li>
-            <li><NavLink to="/support/security/report">분석 결과</NavLink></li>
-          </ul>
-        </div>
-        <div className="col">
-          <h3>가이드</h3>
-          <ul>
-            <li><NavLink to="/support/guide/egovframework">전자정부프레임워크</NavLink></li>
-            <li><NavLink to="/support/guide/chatbot">챗봇</NavLink></li>
-          </ul>
         </div>
       </div>
     </div>
-
-
-
-    </div>
-    // <!--// header -->
   );
 }
 
