@@ -50,17 +50,16 @@ function EgovNoticeEdit(props) {
   };
 
   const retrieveDetail = () => {
-    // 등록, 수정, 삭제
     // 등록
-    
     if(modeInfo.mode === CODE.MODE_CREATE) {
       const retrieveDetailURL = `/admin/posts`;
+      const { postId, ...boardWithoutPostId } = boardDetail;
       const requestOptions = {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
         },
-        body: JSON.stringify(boardDetail)
+        body: JSON.stringify(boardWithoutPostId)
       };
 
       EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
@@ -69,6 +68,7 @@ function EgovNoticeEdit(props) {
         navigate('/inform/notice');
       });
     }
+    // 수정
     else if(modeInfo.mode === CODE.MODE_MODIFY) {
       const retrieveDetailURL = `/admin/posts/${location.state.postId}`;
       const requestOptions = {
