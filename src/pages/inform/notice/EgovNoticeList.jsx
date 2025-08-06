@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
+import CODE from "@/constants/code";
 import { NOTICE_BBS_ID } from "@/config";
 
 import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavInform";
@@ -281,7 +282,7 @@ function EgovNoticeList(props) {
                     <li>
                       <Link
                         to={URL.INFORM_NOTICE_CREATE}
-                        // state={{ bbsId: bbsId }}
+                        state={{ postId: null, mode:CODE.MODE_CREATE }}
                         className="btn btn_blue_h46 pd35"
                       >
                         등록

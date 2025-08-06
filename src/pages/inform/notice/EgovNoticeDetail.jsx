@@ -48,6 +48,23 @@ function EgovNoticeDetail(props) {
     });
   };
 
+  const deleteBoard = () => {
+    const retrieveDetailURL = `/admin/posts/${location.state.postId}`;
+    const requestOptions = {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify({ postId: location.state.postId })
+    };
+
+    EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+      // console.log(resp);
+      alert('공지 삭제!');
+      navigate('/inform/notice');
+    });
+  }
+
   const onClickDeleteBoardArticle = (bbsId, nttId, atchFileId) => {
     const deleteBoardURL = `/board/${bbsId}/${nttId}`;
 
@@ -155,24 +172,14 @@ function EgovNoticeDetail(props) {
                     <div className="left_col btn3">
                       <Link
                         to={{ pathname: URL.INFORM_NOTICE_MODIFY }}
-                        state={{
-                          postId: location.state.postId,
-                          
-                        }}
+                        state={{ postId: location.state.postId, mode:CODE.MODE_MODIFY }}
                         className="btn btn_skyblue_h46 w_100"
                       >
                         수정
                       </Link>
                       <button
-                        className="btn btn_skyblue_h46 w_100"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onClickDeleteBoardArticle(
-                            boardDetail.bbsId,
-                            boardDetail.nttId,
-                            boardDetail.atchFileId
-                          );
-                        }}
+                        className="btn_skyblue_h46 w_100"
+                        onClick={() => deleteBoard()}
                       >
                         삭제
                       </button>
