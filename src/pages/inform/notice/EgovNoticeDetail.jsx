@@ -39,10 +39,11 @@ function EgovNoticeDetail(props) {
       },
     };
     EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-      // setMasterBoard(resp.result.brdMstrVO);
+      
+      resp.createdAt = resp.createdAt ? resp.createdAt.substring(0, 10) : "";
+      resp.updatedAt = resp.updatedAt ? resp.updatedAt.substring(0, 10) : "";
       setBoardDetail(resp);
-      // setUser(resp.result.user);
-      // setBoardAttachFiles(resp.result.resultFiles);
+      
     });
   };
 
@@ -118,7 +119,7 @@ function EgovNoticeDetail(props) {
                   </dl>
                   <dl>
                     <dt>수정일</dt>
-                    <dd>{boardDetail && boardDetail.updateAt}</dd>
+                    <dd>{boardDetail && boardDetail.updatedAt}</dd>
                   </dl>
                   <dl>
                     <dt>조회수</dt>

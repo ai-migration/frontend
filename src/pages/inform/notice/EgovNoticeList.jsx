@@ -106,7 +106,7 @@ function EgovNoticeList(props) {
                 <div>{item.postId}</div>
                 <div className="al">{item.title}</div>
                 <div>{item.frstRegisterNm || "관리자"}</div>
-                <div>{item.createdAt}</div>
+                <div>{item.createdAt.substring(0, 10)}</div>
                 <div>{item.viewCount}</div>
               </Link>
             );
