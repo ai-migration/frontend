@@ -31,7 +31,8 @@ function EgovSupportTransformation() {
       return {
         id: crypto.randomUUID(),
         file,
-        status: "uploading"
+        status: "uploading",
+        progress: 0,
       };
     }).filter(Boolean);
 
@@ -40,13 +41,23 @@ function EgovSupportTransformation() {
       setFiles((prev) => [...prev, ...validated]);
 
       validated.forEach((f) => {
-        setTimeout(() => {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 10;
           setFiles((prev) =>
             prev.map((item) =>
-              item.id === f.id ? { ...item, status: "done" } : item
+              item.id === f.id ? { ...item, progress } : item
             )
           );
-        }, 2000);
+          if (progress >= 100) {
+            clearInterval(interval);
+            setFiles((prev) =>
+              prev.map((item) =>
+                item.id === f.id ? { ...item, status: "done" } : item
+              )
+            );
+          }
+        }, 200);
       });
     }
   };
@@ -74,23 +85,23 @@ function EgovSupportTransformation() {
         <div className="location">
           <ul>
             <li><Link to="/" className="home">Home</Link></li>
-            <li><Link to="/support">고객지원</Link></li>
-            <li>변환</li>
+            <li><Link to="/support">AI 변환기</Link></li>
+            <li>프레임워크 변환</li>
           </ul>
         </div>
 
         <div className="layout">
           <EgovLeftNavTransform />
           <div className="contents SITE_GALLARY_VIEW" id="contents">
-            <div className="top_tit"><h1 className="tit_1">고객지원</h1></div>
-            <h2 className="tit_2">코드 변환</h2>
+            <div className="top_tit"><h1 className="tit_1">AI 변환기</h1></div>
+            <h2 className="tit_2">프레임워크 변환</h2>
 
             <div className="board_view2">
               <p className="msg_1">
                 업로드된 코드를 전자정부프레임워크 구조에 맞춰 자동으로 변환합니다.
               </p>
 
-              {/* ✅ 추가: 업로드 UI (기존 UI 유지됨) */}
+              {/* ✅ 업로드 박스 */}
               <div
                 className="upload-box-wrapper"
                 style={{
@@ -177,9 +188,25 @@ function EgovSupportTransformation() {
                           <div style={{ flex: 1 }}>
                             {item.file.name} [{Math.round(item.file.size / 1024)}KB]
                           </div>
-                          <div style={{ marginLeft: "10px" }}>
+                          <div style={{ marginLeft: "10px", minWidth: "120px" }}>
                             {item.status === "uploading" ? (
-                              <span style={{ color: "#888" }}>🔄 업로드 중</span>
+                              <>
+                                <span style={{ color: "#888" }}>🔄 업로드 중</span>
+                                <div style={{
+                                  height: "6px",
+                                  backgroundColor: "#e0e0e0",
+                                  borderRadius: "3px",
+                                  marginTop: "6px",
+                                  overflow: "hidden"
+                                }}>
+                                  <div style={{
+                                    width: `${item.progress}%`,
+                                    backgroundColor: "#4caf50",
+                                    height: "100%",
+                                    transition: "width 0.2s ease"
+                                  }} />
+                                </div>
+                              </>
                             ) : (
                               <span style={{ color: "green" }}>✅ 완료</span>
                             )}

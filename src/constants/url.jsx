@@ -26,11 +26,15 @@ const URL = {
   SUPPORT_SECURITY: `${BASE}/support/security`,
   SUPPORT_GUIDE: `${BASE}/support/guide`,
 
+  SUPPORT_TRASNFORM_INTRO: `${BASE}/support/transform/intro`,
   SUPPORT_TRANSFORM_TRANSFORMATION: `${BASE}/support/transform/transformation`,
   SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON: `${BASE}/support/transform/view_transform`,
   SUPPORT_TRANSFORM_VIEW_TEST: `${BASE}/support/transform/view_test`,
   SUPPORT_TRANSFORM_DOWNLOAD: `${BASE}/support/transform/download`,
 
+  SUPPORT_SECURITY_INTRO: `${BASE}/support/security/intro`,
+  SUPPORT_SECURITY_DETECT: `${BASE}/support/security/detect`,
+  SUPPORT_SECURITY_CHECK: `${BASE}/support/security/check`,
   SUPPORT_SECURITY_SCAN: `${BASE}/support/security/scan`,
   SUPPORT_SECURITY_DOWNLOAD: `${BASE}/support/security/download`,
   SUPPORT_SECURITY_REPORT: `${BASE}/support/security/report`,

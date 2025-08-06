@@ -27,11 +27,15 @@ const URL = {
   SUPPORT_SECURITY: "/support/security", // 고객지원/보안
   SUPPORT_GUIDE: "/support/guide", // 고객지원/가이드
 
+  SUPPORT_TRANSFORM_INTRO : "/support/transform/intro", // 고객지원/변환/기능 소개
   SUPPORT_TRANSFORM_TRANSFORMATION : "/support/transform/transformation", // 고객지원/변환/변환
   SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON : "/support/transform/view_transform", // 고객지원/변환/변환 이력 조회
   SUPPORT_TRANSFORM_VIEW_TEST : "/support/transform/view_test", // 고객지원/변환/테스트 이력 조회
   SUPPORT_TRANSFORM_DOWNLOAD : "/support/transform/download", // 고객지원/변환/다운로드
 
+  SUPPORT_SECURITY_INTRO : "/support/security/intro",
+  SUPPORT_SECURITY_DETECT : "/support/security/detect",
+  SUPPORT_SECURITY_CHECK : "/support/security/check",
   SUPPORT_SECURITY_SCAN : "/support/security/scan", // 고객지원/보안/보안 분석하기
   SUPPORT_SECURITY_DOWNLOAD : "/support/security/download", // 고객지원/보안/다운로드
   SUPPORT_SECURITY_REPORT : "/support/security/report", // 고객지원/보안/분석 결과

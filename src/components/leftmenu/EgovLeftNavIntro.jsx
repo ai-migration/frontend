@@ -23,14 +23,7 @@ function EgovLeftNavIntro() {
               보안 소개
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to={URL.INTRO_CHATBOT}
-              className={({ isActive }) => (isActive ? "cur" : "")}
-            >
-              챗봇 소개
-            </NavLink>
-          </li>
+
         </ul>
       </div>
     </div>

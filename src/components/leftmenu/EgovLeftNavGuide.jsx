@@ -11,15 +11,23 @@ function EgovLeftNavGuide() {
               to="/support/guide/egovframework"
               className={({ isActive }) => (isActive ? "cur" : "")}
             >
-              전자정부프레임워크
+              전자정부프레임워크 가이드
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="/support/guide/chatbot"
+              to="/intro"
               className={({ isActive }) => (isActive ? "cur" : "")}
             >
-              챗봇
+              정보마당
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/inform"
+              className={({ isActive }) => (isActive ? "cur" : "")}
+            >
+              알림마당
             </NavLink>
           </li>
         </ul>
