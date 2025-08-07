@@ -29,66 +29,46 @@ function EgovMain(props) {
   const retrieveList = useCallback(() => {
     console.groupCollapsed("EgovMain.retrieveList()");
 
-    const retrieveListURL = "/mainPage";
+
+    const retrieveListURL = "/posts?type=notice";
     const requestOptions = {
       method: "GET",
       headers: {
         "Content-type": "application/json",
       },
     };
-
+  
     EgovNet.requestFetch(
       retrieveListURL,
       requestOptions,
       (resp) => {
-        setNoticeBoard(resp.result.notiList);
-        setGallaryBoard(resp.result.galList);
+        resp = resp.slice(0,5);
+        setNoticeBoard(resp);
 
         let mutNotiListTag = [];
         mutNotiListTag.push(<li key="0">검색된 결과가 없습니다.</li>); // 게시판 목록 초기값
 
         // 리스트 항목 구성
-        resp.result.notiList.forEach(function (item, index) {
+        resp.forEach(function (item, index) {
           if (index === 0) mutNotiListTag = []; // 목록 초기화
+          item.createdAt = item.createdAt ? item.createdAt.substring(0, 10) : "";
           mutNotiListTag.push(
             <li key={item.nttId}>
               <Link
                 to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
                 state={{
-                  nttId: item.nttId,
-                  bbsId: item.bbsId,
+                  postId: item.postId,
                 }}
+                key={item.postId}
+                className="list_item"
               >
-                {item.nttSj}
-                <span>{item.frstRegisterPnttm}</span>
+                {item.title}
+                <span>{item.createdAt}</span>
               </Link>
             </li>
           );
         });
         setNoticeListTag(mutNotiListTag);
-
-        let mutGallaryListTag = [];
-        mutGallaryListTag.push(<li key="0">검색된 결과가 없습니다.</li>); // 게시판 목록 초기값
-
-        // 리스트 항목 구성
-        resp.result.galList.forEach(function (item, index) {
-          if (index === 0) mutGallaryListTag = []; // 목록 초기화
-          mutGallaryListTag.push(
-            <li key={item.nttId}>
-              <Link
-                to={{ pathname: URL.INFORM_GALLERY_DETAIL }}
-                state={{
-                  nttId: item.nttId,
-                  bbsId: item.bbsId,
-                }}
-              >
-                {item.nttSj}
-                <span>{item.frstRegisterPnttm}</span>
-              </Link>
-            </li>
-          );
-        });
-        setGallaryListTag(mutGallaryListTag);
       },
       function (resp) {
         console.log("err response : ", resp);
@@ -123,9 +103,9 @@ function EgovMain(props) {
                     공지사항
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a href="#갤러리">갤러리</a>
-                </li>
+                </li> */}
               </ul>
               <div className="list">
                 <div className="notice">
@@ -136,13 +116,13 @@ function EgovMain(props) {
                   </Link>
                 </div>
 
-                <div className="gallary">
+                {/* <div className="gallary">
                   <h2 className="blind">갤러리</h2>
                   <ul>{gallaryListTag}</ul>
                   <Link to={URL.INFORM_GALLERY} className="more">
                     더보기
                   </Link>
-                </div>
+                </div> */}
               </div>
             </div>
 
