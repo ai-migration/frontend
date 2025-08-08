@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
+import CODE from "@/constants/code";
 import { NOTICE_BBS_ID } from "@/config";
 
 import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavInform";
@@ -26,104 +27,84 @@ function EgovFaqList(props) {
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
-  const bbsId = location.state?.bbsId || NOTICE_BBS_ID;
-
   // eslint-disable-next-line no-unused-vars
   const [searchCondition, setSearchCondition] = useState(
     location.state?.searchCondition || {
-      bbsId: bbsId,
+      // bbsId: bbsId,
       pageIndex: 1,
       searchCnd: "0",
       searchWrd: "",
     }
   ); // 기존 조회에서 접근 했을 시 || 신규로 접근 했을 시
-  const [masterBoard, setMasterBoard] = useState({});
   const [user, setUser] = useState({});
-  const [paginationInfo, setPaginationInfo] = useState({});
+  const [allList, setAllList] = useState([]);             // 전체 리스트 원본
+  const [openSet, setOpenSet] = useState(new Set());
+  const [paginationInfo, setPaginationInfo] = useState({  // 페이징 정보 직접 구성
+    currentPageNo: 1,
+    pageSize: 10,
+    recordCountPerPage: 10,
+    totalRecordCount: 0,
+  });
 
-  const [listTag, setListTag] = useState([]);
-  const [openIndex, setOpenIndex] = useState({}); // 각 버튼 별 상태 저장
-
-  const items = [
-    { id: 1, title: "FAQ 1", content: "FAQ 1의 답변" },
-    { id: 2, title: "FAQ 2", content: "FAQ 2의 답변" },
-    { id: 3, title: "FAQ 3", content: "FAQ 3의 답변" },
-  ];
-  
-  const toggleContent = (index) => {
-    setOpenIndex((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+  const toggleContent = (postId) => {
+    setOpenSet((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
   };
 
-  const retrieveList = useCallback((searchCondition) => {
+  const retrieveList = useCallback((pageIndex = 1) => {
     console.groupCollapsed("EgovFaqList.retrieveList()");
 
-    const retrieveListURL = "/board" + EgovNet.getQueryString(searchCondition);
+    const retrieveListURL = "/posts?type=faq";
     const requestOptions = {
       method: "GET",
       headers: {
         "Content-type": "application/json",
       },
     };
-  
+
     EgovNet.requestFetch(
       retrieveListURL,
       requestOptions,
       (resp) => {
-        setMasterBoard(resp.result.brdMstrVO);
-        setPaginationInfo(resp.result.paginationInfo);
-        setUser(resp.result.user);
+        const resultList = resp; // 전체 리스트가 반환됨
 
-        // let mutListTag = [];
-        // mutListTag.push(
-        //   <p className="no_data" key="0">
-        //     검색된 결과가 없습니다.
-        //   </p>
-        // ); // 게시판 목록 초기값
+        const totalRecordCount = resultList.length;
+        const pageSize = 10;
+        const recordCountPerPage = 10;
+        const currentPageNo = pageIndex;
 
-        // const resultCnt = parseInt(resp.result.resultCnt);
-        // const currentPageNo = resp.result.paginationInfo.currentPageNo;
-        // const pageSize = resp.result.paginationInfo.pageSize;
+        // 인덱스 계산
+        const startIndex = (currentPageNo - 1) * recordCountPerPage;
+        const endIndex = startIndex + recordCountPerPage;
+        const slicedList = resultList.slice(startIndex, endIndex);
 
-        // 리스트 항목 구성
-        // resp.result.resultList.forEach(function (item, index) {
-        //   if (index === 0) mutListTag = []; // 목록 초기화
-        //   const listIdx = itemIdxByPage(
-        //     resultCnt,
-        //     currentPageNo,
-        //     pageSize,
-        //     index
-        //   );
+        // 페이징 정보 구성
+        setPaginationInfo({
+          currentPageNo,
+          pageSize,
+          recordCountPerPage,
+          totalRecordCount,
+        });
 
-        //   mutListTag.push(
-        //     <button
-        //       key={listIdx}
-        //       className="list_item"
-        //     >
-        //       <div>{listIdx}</div>
-        //       {(item.replyLc * 1 ? false : true) && (
-        //         <div className="al">{item.nttSj}</div>
-        //       )}
-        //       <div>{item.frstRegisterNm}</div>
-        //       <div>{item.frstRegisterPnttm}</div>
-        //       <div>{item.inqireCo}</div>
-        //     </button>
-        //   );
-        // });
-
-        // setListTag(mutListTag);
+        setAllList(resultList); // 전체 리스트 저장
       },
-      function (resp) {
-        console.log("err response : ", resp);
+      function (errResp) {
+        console.error("Error fetching data:", errResp);
       }
     );
+
     console.groupEnd("EgovFaqList.retrieveList()");
-  }, []);
+  }, [searchCondition]);
 
   useEffect(() => {
-    retrieveList(searchCondition);
+    retrieveList(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -144,7 +125,6 @@ function EgovFaqList(props) {
               <Link to={URL.INFORM}>알림마당</Link>
             </li>
             <li> FAQ </li>
-            {/* <li>{masterBoard && masterBoard.bbsNm}</li> */}
           </ul>
         </div>
         {/* <!--// Location --> */}
@@ -152,7 +132,6 @@ function EgovFaqList(props) {
         <div className="layout">
           {/* <!-- Navigation --> */}
           <EgovLeftNav></EgovLeftNav>
-          {/* <!--// Navigation --> */}
 
           <div className="contents NOTICE_LIST" id="contents">
             {/* <!-- 본문 --> */}
@@ -162,105 +141,40 @@ function EgovFaqList(props) {
             </div>
 
             <h2 className="tit_2"> FAQ </h2>
-            {/* <h2 className="tit_2">{masterBoard && masterBoard.bbsNm}</h2> */}
 
-            {/* <!-- 검색조건 --> */}
             <div className="condition">
-            {/*   <ul>
-                <li className="third_1 L">
-                  <label className="f_select" htmlFor="sel1">
-                    <select
-                      id="sel1"
-                      title="조건"
-                      defaultValue={searchCondition.searchCnd}
-                      ref={cndRef}
-                      onChange={(e) => {
-                        cndRef.current.value = e.target.value;
-                      }}
-                    >
-                      <option value="0">제목</option>
-                      <option value="1">내용</option>
-                      <option value="2">작성자</option>
-                    </select>
-                  </label>
-                </li>
-                <li className="third_2 R">
-                  <span className="f_search w_500">
-                    <input
-                      type="text"
-                      name=""
-                      defaultValue={searchCondition.searchWrd}
-                      placeholder=""
-                      ref={wrdRef}
-                      onChange={(e) => {
-                        wrdRef.current.value = e.target.value;
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        retrieveList({
-                          ...searchCondition,
-                          pageIndex: 1,
-                          searchCnd: cndRef.current.value,
-                          searchWrd: wrdRef.current.value,
-                        });
-                      }}
-                    >
-                      조회
-                    </button>
-                  </span>
-                </li> */}
-                {/* user.id 대신 권한그룹 세션값 사용 */}
-                {/* {user &&
-                  sessionUserSe === "ADM" &&
-                  masterBoard.bbsUseFlag === "Y" && (
-                    <li>
-                      <Link
-                        to={URL.INFORM_NOTICE_CREATE}
-                        state={{ bbsId: bbsId }}
-                        className="btn btn_blue_h46 pd35"
-                      >
-                        등록
-                      </Link>
-                    </li>
-                  )}
-              </ul>  */}
+           
             </div>
-            {/* <!--// 검색조건 --> */}
 
             {/* <!-- 게시판목록 --> */}
             <div className="board_list BRD002">
               <div className="head">
                 <span>번호</span>
                 <span>제목</span>
-                {/* <span>작성자</span>
-                <span>작성일</span>
-                <span>조회수</span> */}
               </div>
               <ul className="result">
-                {items.map((item, listIdx) => (
-                  <li key={listIdx} className="list_wrapper">
-                    <div
-                      className="list_item"
-                      onClick={() => toggleContent(listIdx)}
-                    >
-                      <div className="">{listIdx+1}</div>
-                      {!Number(item.replyLc) && (
-                        <div className="al">{item.title}</div>
-                      )}
-                    </div>
-
-                    {/* 토글 조건에 따라 content 표시 */}
-                    {openIndex[listIdx] && (
-                      <div className="list_item">
-                        <div className="al">{item.content}</div>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              {/* <div className="result">{listTag}</div> */}
-              {/* {listTag} */}
+                {allList
+                  .slice(
+                    (paginationInfo.currentPageNo - 1) * paginationInfo.recordCountPerPage,
+                    paginationInfo.currentPageNo * paginationInfo.recordCountPerPage
+                  )
+                  .map((item, index) => {
+                    const listIdx =
+                      index + 1 + (paginationInfo.currentPageNo - 1) * paginationInfo.pageSize;
+                    return (
+                      <li key={item.postId} className="list_wrapper">
+                        <div className="list_item" onClick={() => toggleContent(item.postId)}>
+                          <div>{listIdx}</div>
+                          <div className="al">{item.title}</div>
+                        </div>
+                        {openSet.has(item.postId) && (
+                          <div className="list_item">
+                            <div className="al">{item.content}</div>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
               </ul>
             </div>
             {/* <!--// 게시판목록 --> */}
@@ -269,16 +183,10 @@ function EgovFaqList(props) {
               {/* <!-- Paging --> */}
               <EgovPaging
                 pagination={paginationInfo}
-                moveToPage={(passedPage) => {
-                  retrieveList({
-                    ...searchCondition,
-                    pageIndex: passedPage,
-                    searchCnd: cndRef.current.value,
-                    searchWrd: wrdRef.current.value,
-                  });
+                moveToPage={(pageNum) => {
+                  retrieveList(pageNum); // 페이지 이동 시 리스트 다시 자르기
                 }}
               />
-              {/* <!--/ Paging --> */}
             </div>
 
             {/* <!--// 본문 --> */}

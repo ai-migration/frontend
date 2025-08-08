@@ -249,7 +249,6 @@ function EgovNoticeList(props) {
                   retrieveList(pageNum); // 페이지 이동 시 리스트 다시 자르기
                 }}
               />
-              {/* <!--/ Paging --> */}
             </div>
 
             {/* <!--// 본문 --> */}
