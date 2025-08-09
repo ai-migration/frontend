@@ -5,29 +5,29 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
 import CODE from "@/constants/code";
-import { NOTICE_BBS_ID } from "@/config";
-
-import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavInform";
-import EgovAttachFile from "@/components/EgovAttachFile";
-import bbsFormVaildator from "@/utils/bbsFormVaildator";
 import { getSessionItem } from "@/utils/storage";
+
+import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavAdmin";
+
 import { useDebouncedInput } from "@/hooks/useDebounce";
 
-function EgovNoticeEdit(props) {
-  console.group("EgovNoticeEdit");
+function EgovAdminFaqEdit(props) {
+  console.group("EgovAdminFaqEdit");
   console.log("------------------------------");
-  // console.log("EgovNoticeEdit [props] : ", props);
+  console.log("EgovAdminFaqEdit [props] : ", props);
 
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("EgovNoticeEdit [location] : ", location);
-  //관리자 권한 체크때문에 추가(아래)
+  console.log("EgovAdminFaqEdit [location] : ", location);
+
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
 
   const [modeInfo, setModeInfo] = useState({ mode: props.mode });
   // const [masterBoard, setMasterBoard] = useState({});
-  const [boardDetail, setBoardDetail] = useState({ postId:location.state.postId, title: "", content: "", type:"NOTICE" });
+  const [boardDetail, setBoardDetail] = useState({ postId:location.state.postId, title: "", content: "", type:"FAQ" });
+
+  // const handleInputChange = useDebouncedInput(setBoardDetail, 300);
 
   const initMode = () => {
     // Edit 데이터
@@ -87,30 +87,49 @@ function EgovNoticeEdit(props) {
     }
   };
 
+  const deleteFAQ = () => {
+    const retrieveDetailURL = `/admin/posts/${location.state.postId}`;
+    const requestOptions = {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify({ postId: location.state.postId })
+    };
+
+    EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+      // console.log(resp);
+      alert('FAQ 삭제!');
+      navigate('/admin/faq');
+    });
+  }
+
   useEffect(function () {
     initMode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.groupEnd("EgovNoticeEdit");
+
+  console.groupEnd("EgovAdminFaqEdit");
 
   return (
     <div className="container">
       <div className="c_wrap">
         {/* <!-- Location --> */}
-        <div className="location">
-        <ul>
-          <li>
-            <Link to={URL.MAIN} className="home">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link to={URL.ADMIN}>사이트관리</Link>
-          </li>
-          <li>공지사항</li>
-        </ul>
-      </div>
+          <div className="location">
+          <ul>
+            <li>
+              <Link to={URL.MAIN} className="home">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to={URL.ADMIN}>사이트관리</Link>
+            </li>
+            <li>FAQ관리</li>
+          </ul>
+        </div>
+
         <div className="layout">
           {/* <!-- Navigation --> */}
           <EgovLeftNav></EgovLeftNav>
@@ -120,11 +139,11 @@ function EgovNoticeEdit(props) {
             {/* <!-- 본문 --> */}
 
             <div className="top_tit">
-              <h1 className="tit_1">알림마당</h1>
+              <h1 className="tit_1">사이트관리</h1>
             </div>
 
             <h2 className="tit_2">
-              공지사항
+              FAQ관리
             </h2>
 
             <div className="board_view2">
@@ -151,7 +170,7 @@ function EgovNoticeEdit(props) {
               <dl>
                 <dt>
                   <label htmlFor="nttCn">
-                    내용<span className="req">필수</span>
+                    내용 <span className="req">필수</span>
                   </label>
                 </dt>
                 <dd>
@@ -170,28 +189,7 @@ function EgovNoticeEdit(props) {
                 </dd>
               </dl>
               {/* 답글이 아니고 게시판 파일 첨부 가능 상태에서만 첨부파일 컴포넌트 노출 */}
-              {/* {modeInfo?.mode !== CODE.MODE_REPLY && (
-                  <EgovAttachFile
-                    fnChangeFile={(attachfile) => {
-                      console.log(
-                        "====>>> Changed attachfile file = ",
-                        attachfile
-                      );
-                      const arrayConcat = { ...boardDetail }; // 기존 단일 파일 업로드에서 다중파일 객체 추가로 변환(아래 for문으로)
-                      for (let i = 0; i < attachfile.length; i++) {
-                        arrayConcat[`file_${i}`] = attachfile[i];
-                      }
-                      setBoardDetail(arrayConcat);
-                    }}
-                    fnDeleteFile={(deletedFile) => {
-                      console.log("====>>> Delete deletedFile = ", deletedFile);
-                      setBoardAttachFiles(deletedFile);
-                    }}
-                    boardFiles={boardAttachFiles}
-                    mode={props.mode}
-                    posblAtchFileNumber={masterBoard.posblAtchFileNumber}
-                  />
-                )} */}
+              
               {/* <!-- 버튼영역 --> */}
               <div className="board_btn_area">
                 {sessionUserSe === "ADM" && 
@@ -214,12 +212,18 @@ function EgovNoticeEdit(props) {
                     >
                       저장
                     </button>
+                    <button
+                      className="btn_skyblue_h46 w_100"
+                      onClick={() => deleteFAQ()}
+                    >
+                      삭제
+                    </button>
                   </div>
                 )}
 
                 <div className="right_col btn1">
                   <Link
-                    to={URL.INFORM_NOTICE}
+                    to={URL.ADMIN_FAQ}
                     className="btn btn_blue_h46 w_100"
                   >
                     목록
@@ -237,4 +241,4 @@ function EgovNoticeEdit(props) {
   );
 }
 
-export default EgovNoticeEdit;
+export default EgovAdminFaqEdit;

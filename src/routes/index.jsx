@@ -63,7 +63,6 @@ import EgovGalleryDetail from "@/pages/inform/gallery/EgovGalleryDetail";
 import EgovGalleryEdit from "@/pages/inform/gallery/EgovGalleryEdit";
 
 import EgovFaqList from "@/pages/inform/faq/EgovFaqList";
-import EgovFaqDetail from "@/pages/inform/faq/EgovFaqDetail";
 import EgovFaqEdit from "@/pages/inform/faq/EgovFaqEdit";
 
 import EgovQnaList from "@/pages/inform/qna/EgovQnaList";
@@ -84,6 +83,9 @@ import EgovAdminUsageEdit from "@/pages/admin/usage/EgovAdminUsageEdit";
 import EgovAdminNoticeList from "@/pages/admin/notice/EgovAdminNoticeList";
 import EgovAdminNoticeDetail from "@/pages/admin/notice/EgovAdminNoticeDetail";
 import EgovAdminNoticeEdit from "@/pages/admin/notice/EgovAdminNoticeEdit";
+
+import EgovAdminFaqList from "@/pages/admin/faq/EgovAdminFaqList";
+import EgovAdminFaqEdit from "@/pages/admin/faq/EgovAdminFaqEdit";
 
 import EgovAdminGalleryList from "@/pages/admin/gallery/EgovAdminGalleryList";
 import EgovAdminGalleryDetail from "@/pages/admin/gallery/EgovAdminGalleryDetail";
@@ -386,10 +388,6 @@ const SecondRoutes = () => {
         
         <Route path={URL.INFORM_FAQ} element={<EgovFaqList />} />
         <Route
-          path={URL.INFORM_FAQ_DETAIL}
-          element={<EgovFaqDetail />}
-        />
-        <Route
           path={URL.INFORM_FAQ_CREATE}
           element={<EgovFaqEdit mode={CODE.MODE_CREATE} />}
         />
@@ -472,6 +470,23 @@ const SecondRoutes = () => {
           path={URL.ADMIN_NOTICE_REPLY}
           element={<EgovAdminNoticeEdit mode={CODE.MODE_REPLY} />}
         />
+
+        {/* admin_faq */}
+        <Route path={URL.ADMIN_FAQ} element={<EgovAdminFaqList />} />
+        <Route
+          path={URL.ADMIN_FAQ_CREATE}
+          element={<EgovAdminFaqEdit mode={CODE.MODE_CREATE} />}
+        />
+        <Route
+          path={URL.ADMIN_FAQ_MODIFY}
+          element={<EgovAdminFaqEdit mode={CODE.MODE_MODIFY} />}
+        />
+        <Route
+          path={URL.ADMIN_FAQ_REPLY}
+          element={<EgovAdminFaqEdit mode={CODE.MODE_REPLY} />}
+        />
+
+
 
         <Route path={URL.ADMIN_GALLERY} element={<EgovAdminGalleryList />} />
         <Route
