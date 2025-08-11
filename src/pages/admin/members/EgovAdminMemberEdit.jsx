@@ -203,7 +203,18 @@ function EgovAdminMemberEdit(props) {
                   회원 권한
                 </dt>
                 <dd>
-                  <label className="f_select w_200" htmlFor="groupId">
+                  <EgovRadioButtonGroup
+                    name="groupId"
+                    radioGroup={groupCodeOptions} // [{ label: "USER", value: "USER" }, { label: "ADMIN", value: "ADMIN" }]
+                    setValue={userDetail.role}
+                    setter={(value) =>
+                      setUserDetail({
+                        ...userDetail,
+                        role: value,
+                      })
+                    }
+                  />
+                  {/* <label className="f_select w_200" htmlFor="groupId">
                     <select
                       id="groupId"
                       name="groupId"
@@ -224,7 +235,7 @@ function EgovAdminMemberEdit(props) {
                         );
                       })}
                     </select>
-                  </label>
+                  </label> */}
                 </dd>
               </dl>
               <dl>
@@ -238,14 +249,6 @@ function EgovAdminMemberEdit(props) {
                   {!userDetail.tokenIssued && (
                     <p>토큰이 발급되지 않았습니다.</p>
                   )}
-                  {/* {!userDetail.tokenIssued && (
-                    <button
-                      className="btn_skyblue_h46 w_100"
-                      onClick={() => requestToken()}
-                    >
-                      토큰요청
-                    </button>
-                  )} */}
                 </dd>
               </dl>
 
