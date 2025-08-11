@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
 import CODE from "@/constants/code";
-import { NOTICE_BBS_ID } from "@/config";
 
 import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavAdmin";
 import EgovPaging from "@/components/EgovPaging";
@@ -12,13 +11,14 @@ import EgovPaging from "@/components/EgovPaging";
 import { itemIdxByPage } from "@/utils/calc";
 import { getSessionItem } from "@/utils/storage";
 
-function EgovAdminNoticeList(props) {
-  console.group("EgovAdminNoticeList");
-  console.log("[Start] EgovAdminNoticeList ------------------------------");
-  console.log("EgovAdminNoticeList [props] : ", props);
+function EgovAdminFaqList(props) {
+  console.group("EgovAdminFaqList");
+  console.log("[Start] EgovAdminFaqList ------------------------------");
+  console.log("EgovAdminFaqList [props] : ", props);
 
+  const navigate = useNavigate();
   const location = useLocation();
-  console.log("EgovAdminNoticeList [location] : ", location);
+  console.log("EgovAdminFaqList [location] : ", location);
 
   const cndRef = useRef();
   const wrdRef = useRef();
@@ -26,8 +26,6 @@ function EgovAdminNoticeList(props) {
   //관리자 권한 체크때문에 추가(아래)
   const sessionUser = getSessionItem("loginUser");
   const sessionUserSe = sessionUser?.userSe;
-
-  // const bbsId = location.state?.bbsId || NOTICE_BBS_ID;
 
   // eslint-disable-next-line no-unused-vars
   const [searchCondition, setSearchCondition] = useState(
@@ -41,7 +39,7 @@ function EgovAdminNoticeList(props) {
   // const [masterBoard, setMasterBoard] = useState({});
   const [user, setUser] = useState({});
   const [allList, setAllList] = useState([]);             // 전체 리스트 원본
-  const [listTag, setListTag] = useState([]);             // 현재 페이지에 보여줄 리스트
+  const [openSet, setOpenSet] = useState(new Set());
   const [paginationInfo, setPaginationInfo] = useState({  // 페이징 정보 직접 구성
     currentPageNo: 1,
     pageSize: 10,
@@ -49,11 +47,22 @@ function EgovAdminNoticeList(props) {
     totalRecordCount: 0,
   });
 
+  const toggleContent = (postId) => {
+    setOpenSet((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
 
   const retrieveList = useCallback((pageIndex = 1) => {
-    console.groupCollapsed("EgovAdminNoticeList.retrieveList()");
+    console.groupCollapsed("EgovAdminFaqList.retrieveList()");
 
-    const retrieveListURL = "/posts?type=notice";
+    const retrieveListURL = "/posts?type=faq";
     const requestOptions = {
       method: "GET",
       headers: {
@@ -85,43 +94,14 @@ function EgovAdminNoticeList(props) {
           totalRecordCount,
         });
 
-        // 리스트 렌더링
-        let mutListTag = [];
-        if (slicedList.length === 0) {
-          mutListTag.push(
-            <p className="no_data" key="0">검색된 결과가 없습니다.</p>
-          );
-        } else {
-          slicedList.forEach((item, index) => {
-            mutListTag.push(
-              <Link
-                to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
-                state={{
-                  postId: item.postId,
-                  searchCondition: searchCondition,
-                }}
-                key={item.postId}
-                className="list_item"
-              >
-                <div>{item.postId}</div>
-                <div className="al">{item.title}</div>
-                <div>{item.frstRegisterNm || "관리자"}</div>
-                <div>{item.createdAt.substring(0, 10)}</div>
-                <div>{item.viewCount}</div>
-              </Link>
-            );
-          });
-        }
-
         setAllList(resultList); // 전체 리스트 저장
-        setListTag(mutListTag);
       },
       function (errResp) {
         console.error("Error fetching data:", errResp);
       }
     );
 
-    console.groupEnd("EgovAdminNoticeList.retrieveList()");
+    console.groupEnd("EgovAdminFaqList.retrieveList()");
   }, [searchCondition]);
 
   useEffect(() => {
@@ -129,8 +109,8 @@ function EgovAdminNoticeList(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log("------------------------------EgovAdminNoticeList [End]");
-  console.groupEnd("EgovAdminNoticeList");
+  console.log("------------------------------EgovAdminFaqList [End]");
+  console.groupEnd("EgovAdminFaqList");
   return (
     <div className="container">
       <div className="c_wrap">
@@ -143,9 +123,9 @@ function EgovAdminNoticeList(props) {
               </Link>
             </li>
             <li>
-              <Link to={URL.INFORM}>사이트 관리</Link>
+              <Link to={URL.INFORM}>사이트관리</Link>
             </li>
-            <li>공지사항관리</li>
+            <li>FAQ관리</li>
           </ul>
         </div>
         {/* <!--// Location --> */}
@@ -162,7 +142,7 @@ function EgovAdminNoticeList(props) {
               <h1 className="tit_1">사이트관리</h1>
             </div>
 
-            <h2 className="tit_2">공지사항관리</h2>
+            <h2 className="tit_2">FAQ관리</h2>
 
             {/* <!-- 검색조건 --> */}
             <div className="condition">
@@ -211,12 +191,11 @@ function EgovAdminNoticeList(props) {
                     </button>
                   </span>
                 </li>
-                {/* user.id 대신 권한그룹 세션값 사용 */}
                 {user &&
                   sessionUserSe === "ADM" && (
                     <li>
                       <Link
-                        to={URL.INFORM_NOTICE_CREATE}
+                        to={URL.ADMIN_FAQ_CREATE}
                         state={{ postId: null, mode:CODE.MODE_CREATE }}
                         className="btn btn_blue_h46 pd35"
                       >
@@ -233,13 +212,46 @@ function EgovAdminNoticeList(props) {
               <div className="head">
                 <span>번호</span>
                 <span>제목</span>
-                <span>작성자</span>
-                <span>작성일</span>
-                <span>조회수</span>
               </div>
-              <div className="result">{listTag}</div>
+              <div className="result">
+                {allList
+                  .slice(
+                    (paginationInfo.currentPageNo - 1) * paginationInfo.recordCountPerPage,
+                    paginationInfo.currentPageNo * paginationInfo.recordCountPerPage
+                  )
+                  .map((item, index) => {
+                    const listIdx =
+                      index + 1 + (paginationInfo.currentPageNo - 1) * paginationInfo.pageSize;
+                    return (
+                      <li key={item.postId} className="list_wrapper">
+                        <div className="list_item" onClick={() => toggleContent(item.postId)}>
+                          <div>{listIdx}</div>
+                          <div className="al">{item.title}</div>
+                          {/* 수정 버튼 */}
+                          <div>
+                          <button
+                            type="button"
+                            className="btn_skyblue_h46 w_100"
+                            onClick={() =>
+                              navigate(URL.ADMIN_FAQ_MODIFY, {
+                                state: { postId: item.postId, mode: CODE.MODE_MODIFY },
+                              })
+                            }
+                          >
+                            수정
+                          </button>
+                          </div>
+                        </div>
+                        {openSet.has(item.postId) && (
+                          <div className="list_item">
+                            <div className="al">{item.content}</div>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+              </div>
             </div>
-            {/* <!--// 게시판목록 --> */}
 
             <div className="board_bot">
               {/* <!-- Paging --> */}
@@ -260,4 +272,4 @@ function EgovAdminNoticeList(props) {
   );
 }
 
-export default EgovAdminNoticeList;
+export default EgovAdminFaqList;

@@ -95,6 +95,11 @@ const URL = {
   ADMIN_NOTICE_MODIFY: "/admin/notice/modify", // 사이트관리/공지사항관리 수정
   ADMIN_NOTICE_REPLY: "/admin/notice/reply", // 사이트관리/공지사항관리 답글 등록
 
+  ADMIN_FAQ: "/admin/faq", // 사이트관리/FAQ관리 목록
+  ADMIN_FAQ_CREATE: "/admin/faq/create", // 사이트관리/FAQ관리 등록
+  ADMIN_FAQ_MODIFY: "/admin/faq/modify", // 사이트관리FAQ관리 수정
+  ADMIN_FAQ_REPLY: "/admin/faq/reply", // 사이트관리/FAQ관리 답글 등록
+
   ADMIN_GALLERY: "/admin/gallery", // 사이트관리/사이트갤러리관리
   ADMIN_GALLERY_DETAIL: "/admin/gallery/detail", // 사이트관리/사이트갤러리관리 상세
   ADMIN_GALLERY_CREATE: "/admin/gallery/create", // 사이트관리/사이트갤러리관리 등록
