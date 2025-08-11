@@ -72,34 +72,15 @@ function EgovAdminMemberEdit(props) {
     });
   };
 
-  const requestToken = () => {
-    // /users/token은 로그인 세션으로 처리
-    // 정보 수정으로 진행해야함
-    // const requestTokenURL = `/users/token`;
+  const dateFormatting = (iso) => {
+    if(iso == null) return;
+    const d = new Date(iso);
 
-    // const requestOptions = {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //     // "Authorization": sessionToken
-    //   },
-    // };
-    
-    // EgovNet.requestFetch(requestTokenURL, requestOptions, (resp) => {
-    //   if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-    //     alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
-    //     setUserDetail({
-    //         ...userDetail,
-    //         tokenIssued: true,
-    //       })
-    //     // navigate({ pathname: URL.MAIN });
-    //   } else {
-    //     navigate(
-    //       { pathname: URL.ERROR },
-    //       { state: { msg: resp.resultMessage } }
-    //     );
-    //   }
-    // });
+    const pad = n => String(n).padStart(2, '0');
+    const formatted = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} `
+                    + `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+                    
+    return formatted
   }
 
   useEffect(() => {
@@ -156,21 +137,6 @@ function EgovAdminMemberEdit(props) {
                 </dt>
                 <dd>
                   {userDetail.email}
-                  {/* 수정/조회 일때 변경 불가 */}
-                  {/* {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <input
-                      className="f_input2 w_full"
-                      type="text"
-                      name="mberId"
-                      title=""
-                      id="mberId"
-                      placeholder=""
-                      defaultValue={userDetail.mberId}
-                      ref={(el) => (checkRef.current[0] = el)}
-                      readOnly
-                      required
-                    />
-                  )} */}
                 </dd>
               </dl>
               <dl>
@@ -179,23 +145,6 @@ function EgovAdminMemberEdit(props) {
                 </dt>
                 <dd>
                   {userDetail.nickname}
-                  {/* <input
-                    className="f_input2 w_full"
-                    type="text"
-                    name="mberNm"
-                    title=""
-                    id="mberNm"
-                    placeholder=""
-                    defaultValue={userDetail.nickname}
-                    onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
-                        nickname: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[2] = el)}
-                    required
-                  /> */}
                 </dd>
               </dl>
               <dl>
@@ -205,7 +154,7 @@ function EgovAdminMemberEdit(props) {
                 <dd>
                   <EgovRadioButtonGroup
                     name="groupId"
-                    radioGroup={groupCodeOptions} // [{ label: "USER", value: "USER" }, { label: "ADMIN", value: "ADMIN" }]
+                    radioGroup={groupCodeOptions}
                     setValue={userDetail.role}
                     setter={(value) =>
                       setUserDetail({
@@ -214,28 +163,6 @@ function EgovAdminMemberEdit(props) {
                       })
                     }
                   />
-                  {/* <label className="f_select w_200" htmlFor="groupId">
-                    <select
-                      id="groupId"
-                      name="groupId"
-                      title="회원권한유형선택"
-                      onChange={(e) =>
-                        setUserDetail({
-                          ...userDetail,
-                          role: e.target.value,
-                        })
-                      }
-                      value={userDetail.role}
-                    >
-                      {groupCodeOptions.map((option) => {
-                        return (
-                          <option value={option.value} key={option.value}>
-                            {option.label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </label> */}
                 </dd>
               </dl>
               <dl>
@@ -251,6 +178,33 @@ function EgovAdminMemberEdit(props) {
                   )}
                 </dd>
               </dl>
+              <dl>
+                <dd></dd>
+              </dl>
+              <dl>
+                <dt>
+                  <label htmlFor="active">OpenAI Key</label>
+                </dt>
+                <dd>
+                  {userDetail.active ? '활성': '비활성'}
+                </dd>
+              </dl>
+              <dl>
+                <dt>
+                  <label htmlFor="apikey">API Key</label>
+                </dt>
+                <dd>
+                  {userDetail.apiKey}
+                </dd>
+              </dl>
+              <dl>
+                <dt>
+                  <label htmlFor="key-created">키 발급일시</label>
+                </dt>
+                <dd>
+                  {dateFormatting(userDetail.createdAt)}
+                </dd>
+              </dl>
 
               {/* <!-- 버튼영역 --> */}
               <div className="board_btn_area">
@@ -261,16 +215,6 @@ function EgovAdminMemberEdit(props) {
                   >
                     저장
                   </button>
-                  {/* {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <button
-                      className="btn btn_skyblue_h46 w_100"
-                      onClick={() => {
-                        deleteMember(memberDetail.uniqId);
-                      }}
-                    >
-                      삭제
-                    </button>
-                  )} */}
                 </div>
 
                 <div className="right_col btn1">
