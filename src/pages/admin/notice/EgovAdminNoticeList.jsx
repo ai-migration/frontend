@@ -143,7 +143,7 @@ function EgovAdminNoticeList(props) {
               </Link>
             </li>
             <li>
-              <Link to={URL.INFORM}>사이트 관리</Link>
+              <Link to={URL.INFORM}>사이트관리</Link>
             </li>
             <li>공지사항관리</li>
           </ul>
