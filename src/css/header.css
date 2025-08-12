@@ -2,161 +2,138 @@
 .support_menu {
   position: absolute;
   left: 0;
-  top: 150px;  /* 햄버거 메뉴와 동일한 위치 */
+  top: 150px;
   width: 100%;
-  background: #fff;  /* 햄버거 메뉴와 동일한 배경색 */
-  z-index: 10;  /* 햄버거 메뉴와 동일한 z-index */
-  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;  /* 햄버거 메뉴와 동일한 애니메이션 */
+  background: #fff;
+  z-index: 10;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
   transform-origin: top;
 }
-
 .support_menu::after {
   content: "";
   display: block;
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 1px;
-  background: #ddd;  /* 햄버거 메뉴와 동일한 하단 테두리 */
+  left: 0; bottom: 0;
+  width: 100%; height: 1px; background: #ddd;
 }
-
-.support_menu.closed {
-  transform: scaleY(0);  /* 햄버거 메뉴와 동일한 닫기 애니메이션 */
-  opacity: 0;
-}
-
-.support_menu.open {
-  transform: scaleY(1);  /* 햄버거 메뉴와 동일한 열기 애니메이션 */
-  opacity: 1;
-}
-
+.support_menu.closed { transform: scaleY(0); opacity: 0; }
+.support_menu.open { transform: scaleY(1); opacity: 1; }
 .support_menu .inner.row {
-  display: flex;
-  gap: 40px;
-  justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 41px 50px 47px 50px;  /* 햄버거 메뉴와 동일한 패딩 */
-  display: flex;
-  gap: 0;  /* float 레이아웃과 일치하도록 gap 제거 */
+  display: flex; gap: 0; justify-content: space-between;
+  max-width: 1200px; margin: 0 auto; padding: 41px 50px 47px 50px;
 }
-
-.support_menu .inner.row::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-
-.support_menu .col {
-  float: left;
-  width: 280px;  /* 햄버거 메뉴와 동일한 너비 */
-}
-
-.support_menu .col:last-child {
-  width: auto;  /* 햄버거 메뉴와 동일 */
-}
-
+.support_menu .inner.row::after { content: ""; display: block; clear: both; }
+.support_menu .col { float: left; width: 280px; }
+.support_menu .col:last-child { width: auto; }
 .support_menu .col h3 {
-  color: #222;  /* 햄버거 메뉴와 동일한 색상 */
-  font-size: 24px;  /* 햄버거 메뉴와 동일한 크기 */
-  font-weight: 700;  /* 햄버거 메뉴와 동일한 굵기 */
-  pointer-events: none;  /* 햄버거 메뉴와 동일 */
-  margin-bottom: 0;  /* 기본 마진 제거 */
-  border-bottom: none;  /* 기존 테두리 제거 */
-  padding-bottom: 0;  /* 기존 패딩 제거 */
+  color: #222; font-size: 24px; font-weight: 700; pointer-events: none;
+  margin-bottom: 0; border-bottom: none; padding-bottom: 0;
 }
-
-.support_menu .col ul {
-  padding-top: 36px;  /* 햄버거 메뉴와 동일한 상단 패딩 */
-}
-
-.support_menu .col ul li + li {
-  margin-top: 17px;  /* 햄버거 메뉴와 동일한 간격 */
-}
-
-.support_menu .col ul li {
-  margin-bottom: 0;  /* 기존 마진 제거 */
-}
-
-.support_menu .col ul li a {
-  color: #777;  /* 햄버거 메뉴와 동일한 색상 */
-  font-size: 18px;  /* 햄버거 메뉴와 동일한 크기 */
-  text-decoration: none;
-}
-
-.support_menu .col ul li a:hover {
-  color: #222;  /* 햄버거 메뉴와 동일한 호버 색상 */
-  text-decoration: underline;
-}
+.support_menu .col ul { padding-top: 36px; }
+.support_menu .col ul li + li { margin-top: 17px; }
+.support_menu .col ul li { margin-bottom: 0; }
+.support_menu .col ul li a { color: #777; font-size: 18px; text-decoration: none; }
+.support_menu .col ul li a:hover { color: #222; text-decoration: underline; }
 
 /* 햄버거 메뉴 위치 조정 */
-.all_menu.WEB,
-.all_menu.Mobile {
-  top: 120px !important; /* 헤더 높이와 동일 */
-}
+.all_menu.WEB, .all_menu.Mobile { top: 120px !important; }
 
 /* 버튼 스타일 */
-.btn,
-.btnAllMenu,
-.btnSupportClose {
-  font-family: 'Noto Sans KR', sans-serif; /* ✅ 햄버거 버튼 글꼴 */
-  font-size: 16px;                         /* ✅ 햄버거 버튼 크기 */
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px 12px;
-  color: #333;
-  transition: all 0.2s ease;
+.btn, .btnAllMenu, .btnSupportClose {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px; background: none; border: none; cursor: pointer;
+  padding: 8px 12px; color: #333; transition: all 0.2s ease;
 }
-
-.btnSupportClose {
-  position: absolute;
-  top: 20px;
-  right: 40px;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.btnSupportClose:hover {
-  color: #007acc;
-  transform: scale(1.1);
-}
+.btnSupportClose { position: absolute; top: 20px; right: 40px; font-size: 24px; font-weight: bold; }
+.btnSupportClose:hover { color: #007acc; transform: scale(1.1); }
 
 /* 모바일에서 고객지원 메뉴 조정 */
 @media (max-width: 768px) {
-  .support_menu {
-    top: 80px; /* 모바일 헤더 높이와 동일 */
-    padding: 20px 0;
-  }
-  
-  .all_menu.WEB,
-  .all_menu.Mobile {
-    top: 80px !important;
-  }
+  .support_menu { top: 80px; padding: 20px 0; }
+  .all_menu.WEB, .all_menu.Mobile { top: 80px !important; }
 }
 
-.logo img {
-  height: 40px; /* 또는 원하는 높이 (예: 32px, 36px 등) */
-  width: auto;  /* 비율 유지 */
-  max-width: 100%;
-  object-fit: contain;
-}
+.logo img { height: 40px; width: auto; max-width: 100%; object-fit: contain; }
 
 /* --- Trendy Sticky Header & Progress Bar --- */
 .header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.86); -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px); transition: box-shadow .2s ease, background .2s ease; }
 .header.is-scrolled { background: rgba(255,255,255,0.92); box-shadow: 0 8px 20px rgba(0,0,0,.06); }
-.header .inner { position: relative; }
 
-/* top scroll progress */
-.header .scroll-progress { position: absolute; left: 0; top: 0; width: 100%; height: 3px; background: linear-gradient(90deg, #7c3aed, #06b6d4, #22c55e); transform-origin: 0 0; will-change: transform; }
+/* ✅ 헤더 레이아웃: [로고] [GNB 전체] [오른쪽(유저+햄버거)] */
+/* ===== 레이아웃 정렬 보강 ===== */
+.header .inner.grid3{
+  display: grid;
+  grid-template-columns: 200px 1fr auto; /* [로고][GNB][우측군] */
+  align-items: center;
+  gap: 24px;
+}
 
-/* GNB link hover underline animation */
-.gnb a { position: relative; display: inline-block; }
-.gnb a::after { content: ""; position: absolute; left: 0; bottom: -6px; width: 100%; height: 2px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .22s ease; opacity: .8; }
-.gnb a:hover::after, .gnb a.active::after, .gnb a[aria-current="page"]::after { transform: scaleX(1); }
+/* GNB 전체를 한 줄 정렬 + 간격 */
+.gnb ul{
+  display: flex;
+  align-items: center;      /* 텍스트/아이콘 수직 중앙정렬 */
+  gap: 28px;                /* 메뉴 간격 */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;      /* 줄바꿈 방지 */
+}
 
-/* All menu button active feedback */
+/* 링크 높이를 버튼과 맞춰 baseline 꼬임 방지 */
+.gnb a{
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  line-height: 1;
+}
+
+/* ===== 챗봇 GNB 버튼 ===== */
+.gnb .gnb-chat{display:flex; margin-right: 4px; flex-shrink: 0;}
+
+.chat-gnb-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1px solid #ececec;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.chat-gnb-btn img{
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+}
+
+.chat-gnb-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  background: #f7f8ff;
+}
+
+.chat-gnb-btn.active{
+  outline: 2px solid #4f46e5;
+  background: #eef2ff;
+}
+.chat-gnb-btn img { width: 26px; height: 26px; object-fit: contain; display: block; }
+
+/* 우측 클러스터(유저+햄버거) */
+/* 우측 클러스터(유저+햄버거) - 오른쪽 끝에 고정 */
+.right_cluster { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  justify-self: end; /* 그리드에서 오른쪽 끝으로 */
+  flex-shrink: 0; /* 줄어들지 않도록 */
+}
+.right_a { display: flex; align-items: center; }
 .btnAllMenu { border-radius: 10px; border: 1px solid transparent; }
 .btnAllMenu.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; box-shadow: 0 6px 16px rgba(14,165,233,.35); }
 
@@ -164,7 +141,201 @@
 .user_info .btn { border-radius: 10px; border: 1px solid rgba(0,0,0,.12); background: #fff; }
 .user_info .btn:hover { box-shadow: 0 6px 16px rgba(0,0,0,.08); }
 
-/* All menu (WEB) open / close smooth scale as already used via classes */
-.all_menu.WEB { transition: transform .18s ease, opacity .18s ease; transform-origin: top; }
+/* All menu (WEB) open / close smooth scale */
+.all_menu.WEB { transition: transform .18s ease, opacity .18s ease; transform-origin: top; z-index: 200; }
 .all_menu.WEB.closed { transform: scaleY(0.98); opacity: 0; pointer-events: none; }
 .all_menu.WEB:not(.closed) { transform: scaleY(1); opacity: 1; }
+
+/* ===== Chat panel (우하단 드로어) ===== */
+.chat-panel {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  height: 520px;
+  max-height: min(640px, calc(100dvh - 32px));
+  display: flex; flex-direction: column;
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.08);
+  transform: translateY(16px) scale(0.98);
+  opacity: 0; pointer-events: none;
+  transition: opacity 180ms ease, transform 200ms cubic-bezier(.22,.61,.36,1);
+  z-index: 4000;
+}
+.chat-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+
+/* Chat Header */
+.chat-panel .chat-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(56,189,248,0.08));
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.chat-head-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.chat-head-left strong { font-weight: 700; letter-spacing: -0.01em; }
+.chat-head-left .chat-head-icon {
+  display: inline-flex; width: 28px; height: 28px; border-radius: 9999px;
+  align-items: center; justify-content: center;
+  background: radial-gradient(60% 60% at 30% 30%, rgba(99,102,241,0.35), transparent 70%),
+              radial-gradient(60% 60% at 70% 70%, rgba(56,189,248,0.35), transparent 70%);
+  color: #111;
+}
+.chat-status { font-size: 12px; color: #10b981; margin-left: 2px; }
+.chat-head-right .chat-head-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.06); background: #fff; color: #333;
+  transition: background 140ms ease, transform 140ms ease;
+}
+.chat-head-right .chat-head-btn:hover { transform: translateY(-1px); }
+
+/* Chat Body */
+.chat-body {
+  flex: 1 1 auto; padding: 12px; overflow: auto;
+  background:
+    radial-gradient(800px 200px at 100% 0%, rgba(56,189,248,0.07), transparent 40%),
+    radial-gradient(600px 200px at 0% 100%, rgba(99,102,241,0.07), transparent 40%),
+    #fff;
+}
+
+/* Messages */
+.chat-msg { display: flex; margin: 8px 0; }
+.chat-msg.me { justify-content: flex-end; }
+.chat-msg .bubble {
+  max-width: 85%; padding: 10px 12px; border-radius: 14px;
+  font-size: 14px; line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.chat-msg.me .bubble { background: linear-gradient(135deg, #6366f1, #38bdf8); color: #fff; border-top-right-radius: 4px; }
+.chat-msg.bot .bubble { background: #f8fafc; border: 1px solid rgba(0,0,0,0.05); color: #0f172a; border-top-left-radius: 4px; }
+
+/* typing indicator */
+.bubble.typing { display: inline-flex; gap: 6px; align-items: center; }
+.bubble.typing .dot { width: 7px; height: 7px; border-radius: 9999px; background: #94a3b8; animation: typingBlink 1.2s infinite ease-in-out; }
+.bubble.typing .dot:nth-child(2) { animation-delay: .15s; }
+.bubble.typing .dot:nth-child(3) { animation-delay: .3s; }
+@keyframes typingBlink { 0%, 80%, 100% { opacity: .2; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+/* Input */
+.chat-input {
+  flex: 0 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 8px;
+  padding: 10px; border-top: 1px solid rgba(0,0,0,0.06); background: #fff;
+}
+.chat-input input {
+  height: 40px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);
+  padding: 0 12px; outline: none; transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.chat-input input:focus { border-color: rgba(99,102,241,0.5); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+.chat-input button {
+  width: 40px; height: 40px; border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(56,189,248,0.12));
+  color: #111; transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.chat-input button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.10); }
+.chat-input button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* 레이어 우선순위 & 클리핑 방지 */
+.header, .header .inner { overflow: visible; }
+.chat-panel{ z-index: 1000; }  /* 헤더/메뉴 위로 */
+
+/* ===== 레이아웃 정렬 보강 ===== */
+.header .inner.grid3{
+  display: grid;
+  grid-template-columns: 200px 1fr auto; /* [로고][GNB][우측군] */
+  align-items: center;
+  gap: 24px;
+}
+
+/* GNB를 왼쪽에 고정 */
+.gnb{ justify-self: start; text-align: left; }
+.gnb ul{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.gnb a{
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  line-height: 1;
+}
+
+/* ===== 챗봇 GNB 버튼 ===== */
+.gnb .gnb-chat{ display: flex; margin-right: 4px; flex-shrink: 0; }
+
+.chat-gnb-btn{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;              /* 클릭 영역 크게 */
+  height: 40px;
+  padding: 0;
+  border-radius: 9999px;
+  background: linear-gradient(#fff,#f9fafb);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, outline-color .15s ease;
+}
+
+.chat-gnb-btn img{
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+}
+
+.chat-gnb-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  background: #f7f8ff;
+}
+
+.chat-gnb-btn.active{
+  outline: 2px solid #4f46e5;
+  background: #eef2ff;
+}
+
+/* 미읽음 배지 */
+.chat-gnb-btn .badge{
+  position: absolute;
+  top: -4px; right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* 상단 스크롤 진행바 (이미 있다면 생략 가능) */
+.scroll-progress{
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: #4f46e5;
+  transform-origin: 0 0;
+  z-index: 1001;
+}
+
+/* 포털 챗 패널이 항상 위로 */
+.chat-panel{ z-index: 1002; }
+
+/* ===== 반응형 간격 최적화 ===== */
+@media (max-width: 1280px){ .gnb ul{ gap: 20px; } }
+@media (max-width: 1024px){ .gnb ul{ gap: 16px; } }
