@@ -212,9 +212,7 @@ function YouTubeEmbed({ video, autoplay = 0 }) {
       </div>
 
             <div className="yt-controls" style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <button type="button" style={btnStyle} onClick={play} aria-label="재생">▶ 재생</button>
-        <button type="button" style={btnStyle} onClick={pause} aria-label="일시정지">⏸ 일시정지</button>
-        <button type="button" style={btnStyle} onClick={stop} aria-label="정지">⏹ 정지</button>
+
       </div>
     </section>
   );
