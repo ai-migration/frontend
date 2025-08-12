@@ -142,3 +142,29 @@
   max-width: 100%;
   object-fit: contain;
 }
+
+/* --- Trendy Sticky Header & Progress Bar --- */
+.header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.86); -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px); transition: box-shadow .2s ease, background .2s ease; }
+.header.is-scrolled { background: rgba(255,255,255,0.92); box-shadow: 0 8px 20px rgba(0,0,0,.06); }
+.header .inner { position: relative; }
+
+/* top scroll progress */
+.header .scroll-progress { position: absolute; left: 0; top: 0; width: 100%; height: 3px; background: linear-gradient(90deg, #7c3aed, #06b6d4, #22c55e); transform-origin: 0 0; will-change: transform; }
+
+/* GNB link hover underline animation */
+.gnb a { position: relative; display: inline-block; }
+.gnb a::after { content: ""; position: absolute; left: 0; bottom: -6px; width: 100%; height: 2px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .22s ease; opacity: .8; }
+.gnb a:hover::after, .gnb a.active::after, .gnb a[aria-current="page"]::after { transform: scaleX(1); }
+
+/* All menu button active feedback */
+.btnAllMenu { border-radius: 10px; border: 1px solid transparent; }
+.btnAllMenu.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; box-shadow: 0 6px 16px rgba(14,165,233,.35); }
+
+/* User info buttons polish */
+.user_info .btn { border-radius: 10px; border: 1px solid rgba(0,0,0,.12); background: #fff; }
+.user_info .btn:hover { box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+
+/* All menu (WEB) open / close smooth scale as already used via classes */
+.all_menu.WEB { transition: transform .18s ease, opacity .18s ease; transform-origin: top; }
+.all_menu.WEB.closed { transform: scaleY(0.98); opacity: 0; pointer-events: none; }
+.all_menu.WEB:not(.closed) { transform: scaleY(1); opacity: 1; }
