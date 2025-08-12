@@ -5,18 +5,13 @@ import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
 import { getSessionItem } from "@/utils/storage";
 
 /**
- * Base URLs: 게이트웨이(8088) 경유가 기본. .env 없으면 8088로 폴백
- *  - VITE_API_BASE:      게이트웨이 베이스 (예: http://localhost:8088)
- *  - VITE_API_POST_BASE: 업로드/POST용 다른 베이스가 필요하면 설정. 없으면 API_BASE 사용
+ * Base URLs
  */
 const RAW_GET_BASE  = import.meta.env.VITE_API_BASE      || "http://localhost:8088";
 const RAW_POST_BASE = import.meta.env.VITE_API_POST_BASE || import.meta.env.VITE_API_BASE || "http://localhost:8088";
-
-// 뒤의 슬래시 제거로 //agents 방지
 const GET_BASE  = (RAW_GET_BASE  || "").replace(/\/+$/, "");
 const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
 
-// 디버그: 적용된 베이스 확인 (env 수정 후 Vite 재시작 필요)
 console.log("GET_BASE =", GET_BASE);
 console.log("POST_BASE =", POST_BASE);
 
@@ -40,24 +35,25 @@ function EgovSupportTransformation() {
   const [toVer, setToVer] = useState("4.3");
 
   const sessionUser = getSessionItem("loginUser");
-  const userId = sessionUser?.id ?? 0; // 백엔드 Agent.userId (없으면 0으로 업로드됨)
+
+  // ✅ 숫자 userId만 뽑아 쓰도록 단일 함수로 정리
   const getNumericUserId = () => {
-  const candidates = [
-    sessionUser?.id,
-    sessionUser?.userId,
-    sessionUser?.userNo,
-    sessionUser?.memberId,
-  ];
-  for (const c of candidates) {
-    const n = Number.parseInt(c, 10);
-    if (Number.isFinite(n) && n > 0) return n;
-  }
-  return null;
-};
-  // 게이트웨이 세션을 쓸 계획이면 true, 아니면 false 가능
+    const candidates = [
+      sessionUser?.id,
+      sessionUser?.userId,
+      sessionUser?.userNo,
+      sessionUser?.memberId,
+    ];
+    for (const c of candidates) {
+      const n = Number.parseInt(c, 10);
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+    return null;
+  };
+
   const USE_CREDENTIALS = true;
 
-  // 단일 파일 업로드(게이트웨이 → agent 서비스 → S3 저장)
+  // ✅ 단일 파일 업로드: @RequestPart("agent")와 @RequestPart("file")에 맞춰 전송
   const uploadOne = async (item, setFiles) => {
     try {
       const uid = getNumericUserId();
@@ -67,21 +63,27 @@ function EgovSupportTransformation() {
         return;
       }
 
-      // 백엔드가 Long으로 받으니 number 형태로 생성
+      // 백엔드에서 agent.getId() = jobId 로 사용
       const clientJobId = Date.now() + Math.floor(Math.random() * 1000);
 
       const form = new FormData();
-      // ✅ 중요: @ModelAttribute Agent 매핑을 위해 "평평한 필드명"으로 추가
-      form.append("userId", String(uid));         // Agent.userId
-      form.append("id", String(clientJobId));        // Agent.id (jobId)
-      // 파일 파트 (@RequestParam("file"))
+
+      // ✅ 변경 1) agent 파트를 JSON Blob으로 추가 (Content-Type: application/json)
+      const agentPayload = {
+        id: clientJobId,     // Agent.id (jobId)
+        userId: uid,         // Agent.userId
+        // 필요 시 추가 가능: inputLanguage: lang
+      };
+      const agentBlob = new Blob([JSON.stringify(agentPayload)], { type: "application/json" });
+      form.append("agent", agentBlob, "agent.json");
+
+      // ✅ 변경 2) 파일 파트 이름은 백엔드의 @RequestPart("file")와 동일해야 함
       form.append("file", item.file, item.file.name);
 
-      // 업로드 시작
+      // 업로드 시작 표시
       setFiles(prev => prev.map(it => it.id === item.id ? { ...it, status: "uploading", jobId: clientJobId } : it));
 
       const res = await axios.post(`${POST_BASE}/agents/conversion`, form, {
-        // Content-Type은 axios가 boundary 포함해서 자동 세팅해야 함(직접 세팅 X)
         onUploadProgress: (evt) => {
           if (!evt.total) return;
           const pct = Math.round((evt.loaded * 100) / evt.total);
@@ -92,9 +94,10 @@ function EgovSupportTransformation() {
         maxContentLength: Infinity,
       });
 
-      // 서버가 jobId/userId/s3Key를 돌려주는 경우(신규 백엔드) 반영
+      // 현재 백엔드는 body 없이 200 OK만 반환하므로 clientJobId 유지
       const srvJobId = res?.data?.jobId;
       const srvUserId = res?.data?.userId;
+
       setFiles(prev => prev.map(it => {
         if (it.id !== item.id) return it;
         return {
@@ -102,8 +105,8 @@ function EgovSupportTransformation() {
           status: "done",
           progress: 100,
           jobId: srvJobId ?? clientJobId,
-          __srvUserId: srvUserId ?? userId,
-          __s3Key: res?.data?.s3Key
+          __srvUserId: srvUserId ?? uid,
+          __s3Key: res?.data?.s3Key, // (있다면 표시)
         };
       }));
     } catch (e) {
@@ -126,7 +129,7 @@ function EgovSupportTransformation() {
         return {
           id: crypto.randomUUID(),
           file,
-          status: "ready",   // 목록에 넣고 곧바로 업로드 시작
+          status: "ready",
           progress: 0,
           jobId: null,
         };
@@ -139,16 +142,15 @@ function EgovSupportTransformation() {
     }
   };
 
-  // 변환 버튼은 업로드와 완전히 분리 (여기서는 업로드 완료된 jobId만 수집)
+  // 변환 버튼: 업로드와 분리
   const handleTransform = (type) => {
     const target = type === "프레임워크 변환" ? files1 : files2;
     const done = target.filter(f => f.status === "done");
     const jobIds = done.map(f => f.jobId);
 
-    // TODO: 여기에서 실제 변환 API 호출 붙이면 됨 (type/lang/fromVer/toVer/jobIds 전달)
+    // TODO: 변환 API 호출 (type/lang/fromVer/toVer/jobIds)
     console.log("변환 준비:", { type, lang, fromVer, toVer, jobIds });
 
-    // UI 피드백 데모
     setLoadingType(type);
     setProgress(100);
     setTimeout(() => {
@@ -158,10 +160,16 @@ function EgovSupportTransformation() {
     }, 500);
   };
 
-  // presigned URL 받아서 다운로드 (게이트웨이 경유)
+  // ✅ 다운로드: 업로드와 동일 규칙의 userId 사용
   const handleDownload = async (jobId) => {
     try {
-      const res = await axios.get(`${GET_BASE}/agents/download/${userId}/${jobId}`, {
+      const uid = getNumericUserId();
+      if (!uid) {
+        alert("로그인 정보의 userId가 숫자가 아닙니다. (id/userId/userNo 중 숫자 필드 필요)");
+        return;
+      }
+
+      const res = await axios.get(`${GET_BASE}/agents/download/${uid}/${jobId}`, {
         withCredentials: USE_CREDENTIALS,
       });
       const url = res.data?.path;
@@ -232,7 +240,7 @@ function EgovSupportTransformation() {
 
       <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
         {transformType === "프레임워크 변환" ? (
-          <>{renderSelect("언어 선택", ["Python", "Java"], lang, setLang)}</>
+          <></>
         ) : (
           <>
             {renderSelect("현재 버전", ["4.1", "4.3"], fromVer, setFromVer)}
@@ -240,7 +248,6 @@ function EgovSupportTransformation() {
           </>
         )}
 
-        {/* 변환 버튼(업로드와 분리) */}
         <button
           onClick={() => handleTransform(transformType)}
           style={{
@@ -293,8 +300,7 @@ function EgovSupportTransformation() {
                     <>
                       <span style={{ color: "#888" }}>🔄 업로드 중</span>
                       <div style={{ height: 6, backgroundColor: "#e0e0e0", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
-                      <div style={{ width: `${item.progress || 0}%`, height: "100%", transition: "width 0.1s ease", backgroundColor: "#4caf50" }} />
-
+                        <div style={{ width: `${item.progress || 0}%`, height: "100%", transition: "width 0.1s ease", backgroundColor: "#4caf50" }} />
                       </div>
                     </>
                   ) : item.status === "done" ? (
