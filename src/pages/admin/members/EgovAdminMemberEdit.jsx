@@ -26,239 +26,62 @@ function EgovAdminMemberEdit(props) {
   ];
   //const groupCodeOptions = [{ value: "GROUP_00000000000000", label: "ROLE_ADMIN" }, { value: "GROUP_00000000000001", label: "ROLE_USER" }];
   //백엔드에서 보내온 값으로 변경(위 1줄 대신 아래 1줄 추가)
-  let [groupCodeOptions, setGroupCodeOptions] = useState([]);
+  // let [groupCodeOptions, setGroupCodeOptions] = useState([]);
   const [modeInfo, setModeInfo] = useState({ mode: props.mode });
-  const [memberDetail, setMemberDetail] = useState({});
+  const [userDetail, setUserDetail] = useState({});
+  const groupCodeOptions = [
+    { value: "ADM", label: "ADM" }, 
+    { value: "USER", label: "USER" }
+  ];
 
   const initMode = () => {
-    switch (props.mode) {
-      case CODE.MODE_CREATE:
-        setModeInfo({
-          ...modeInfo,
-          modeTitle: "등록",
-          editURL: "/members/insert",
-        });
-        break;
+    // Edit 데이터
+    console.log(modeInfo);
+    console.log(location.state)
+    if(modeInfo.mode === CODE.MODE_MODIFY) {
+      const retrieveDetailURL = `/admin/users/${location.state.userId}`;
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      };
 
-      case CODE.MODE_MODIFY:
-        setModeInfo({
-          ...modeInfo,
-          modeTitle: "수정",
-          editURL: `/members/update`,
-        });
-        break;
-      default:
-        navigate({ pathname: URL.ERROR }, { state: { msg: "" } });
+      EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
+        console.log(resp);
+        setUserDetail(resp);
+        // alert('불러오기!');
+      });
     }
-    retrieveDetail();
   };
 
   const retrieveDetail = () => {
-    let retrieveDetailURL = "";
-    if (modeInfo.mode === CODE.MODE_CREATE) {
-      // 조회/등록이면 초기값 지정
-      setMemberDetail({
-        tmplatId: "TMPLAT_MEMBER_DEFAULT", //Template 고정
-        groupId: "GROUP_00000000000001", //그룹ID 초기값
-        mberSttus: "P", //로그인가능여부 초기값
-        checkIdResult: "중복ID를 체크해 주세요.",
-      });
-      retrieveDetailURL = `/members/insert`;
-    }
-    if (modeInfo.mode === CODE.MODE_MODIFY) {
-      // 수정이면 초기값 지정 안함
-      retrieveDetailURL = `/members/update/${uniqId}`;
-    }
+    const retrieveDetailURL = `/admin/users/${location.state.userId}/role`;
     const requestOptions = {
-      method: "GET",
+      method: "PATCH",
       headers: {
-        "Content-type": "application/json",
+        "Content-type": "application/json; charset=UTF-8",
       },
+      body: JSON.stringify({ role : userDetail.role })
     };
+
     EgovNet.requestFetch(retrieveDetailURL, requestOptions, function (resp) {
-      // 수정모드일 경우 조회값 세팅
-      if (modeInfo.mode === CODE.MODE_MODIFY) {
-        setMemberDetail(resp.result.mberManageVO);
-      }
-      groupCodeOptions = []; //중복 option 값 제거
-      //백엔드에서 받은 권한 그룹 options 값 바인딩(아래)
-      resp.result.groupId_result.forEach((item) => {
-        groupCodeOptions.push({ value: item.code, label: item.codeNm });
-      });
-      setGroupCodeOptions(groupCodeOptions); //html 렌더링
+      // console.log(resp);
+      alert('회원정보 수정!');
+      navigate('/admin/members');
     });
   };
 
-  const checkIdDplct = () => {
-    return new Promise((resolve) => {
-      let checkId = memberDetail["mberId"];
-      if (checkId === null || checkId === undefined) {
-        alert("회원ID를 입력해 주세요");
-        return false;
-      }
-      const checkIdURL = `/etc/member_checkid/${checkId}`;
-      const reqOptions = {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-      EgovNet.requestFetch(checkIdURL, reqOptions, function (resp) {
-        if (
-          Number(resp.resultCode) === Number(CODE.RCV_SUCCESS) &&
-          resp.result.usedCnt > 0
-        ) {
-          setMemberDetail({
-            ...memberDetail,
-            checkIdResult: "이미 사용중인 아이디입니다. [ID체크]",
-            mberId: checkId,
-          });
-          resolve(resp.result.usedCnt);
-        } else {
-          setMemberDetail({
-            ...memberDetail,
-            checkIdResult: "사용 가능한 아이디입니다.",
-            mberId: checkId,
-          });
-          resolve(0);
-        }
-      });
-    });
-  };
+  const dateFormatting = (iso) => {
+    if(iso == null) return;
+    const d = new Date(iso);
 
-  const formValidator = (formData) => {
-    return new Promise((resolve) => {
-      if (formData.get("mberId") === null || formData.get("mberId") === "") {
-        alert("회원ID는 필수 값입니다.");
-        return false;
-      }
-      checkIdDplct().then((res) => {
-        if (res > 0) {
-          return false;
-        }
-        if (
-          formData.get("password") === null ||
-          formData.get("password") === ""
-        ) {
-          alert("암호는 필수 값입니다.");
-          return false;
-        }
-        if (formData.get("mberNm") === null || formData.get("mberNm") === "") {
-          alert("회원명은 필수 값입니다.");
-          return false;
-        }
-        if (
-          formData.get("groupId") === null ||
-          formData.get("groupId") === ""
-        ) {
-          alert("권한 그룹은 필수 값입니다.");
-          return false;
-        }
-        if (
-          formData.get("mberSttus") === null ||
-          formData.get("mberSttus") === ""
-        ) {
-          alert("회원상태값은 필수 값입니다.");
-          return false;
-        }
-        resolve(true);
-      });
-    });
-  };
-
-  const formObjValidator = (checkRef) => {
-    if (checkRef.current[0].value === "") {
-      alert("회원ID는 필수 값입니다.");
-      return false;
-    }
-    if (checkRef.current[1].value === "") {
-      memberDetail.password = ""; //수정 시 암호값을 입력하지 않으면 공백으로처리
-    }
-    if (checkRef.current[2].value === "") {
-      alert("회원명은 필수 값입니다.");
-      return false;
-    }
-    return true;
-  };
-
-  const updateMember = () => {
-    let modeStr = modeInfo.mode === CODE.MODE_CREATE ? "POST" : "PUT";
-
-    let requestOptions = {};
-
-    if (modeStr === "POST") {
-      const formData = new FormData();
-
-      for (let key in memberDetail) {
-        formData.append(key, memberDetail[key]);
-        //console.log("boardDetail [%s] ", key, boardDetail[key]);
-      }
-
-      formValidator(formData).then((res) => {
-        if (res) {
-          requestOptions = {
-            method: modeStr,
-            headers: {},
-            body: formData,
-          };
-
-          EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-            if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-              alert("회원 정보가 등록되었습니다.");
-              navigate({ pathname: URL.ADMIN_MEMBERS });
-            } else {
-              navigate(
-                { pathname: URL.ERROR },
-                { state: { msg: resp.resultMessage } }
-              );
-            }
-          });
-        }
-      });
-    } else {
-      if (formObjValidator(checkRef)) {
-        requestOptions = {
-          method: modeStr,
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({ ...memberDetail }),
-        };
-
-        EgovNet.requestFetch(modeInfo.editURL, requestOptions, (resp) => {
-          if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-            navigate({ pathname: URL.ADMIN_MEMBERS });
-          } else {
-            navigate(
-              { pathname: URL.ERROR },
-              { state: { msg: resp.resultMessage } }
-            );
-          }
-        });
-      }
-    }
-  };
-
-  const deleteMember = (uniqId) => {
-    const deleteMemberURL = `/members/delete/${uniqId}`;
-
-    const requestOptions = {
-      method: "DELETE",
-      headers: {
-        "Content-type": "application/json",
-      },
-    };
-
-    EgovNet.requestFetch(deleteMemberURL, requestOptions, (resp) => {
-      console.log("====>>> member delete= ", resp);
-      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
-        alert("회원이 삭제되었습니다.");
-        navigate(URL.ADMIN_MEMBERS, { replace: true });
-      } else {
-        alert("ERR : " + resp.resultMessage);
-      }
-    });
-  };
+    const pad = n => String(n).padStart(2, '0');
+    const formatted = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} `
+                    + `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+                    
+    return formatted
+  }
 
   useEffect(() => {
     initMode();
@@ -310,171 +133,76 @@ function EgovAdminMemberEdit(props) {
             <div className="board_view2">
               <dl>
                 <dt>
-                  <label htmlFor="mberId">회원ID</label>
-                  <span className="req">필수</span>
+                  <label htmlFor="mberId">회원Email</label>
                 </dt>
                 <dd>
-                  {/* 등록 일때 변경 가능 */}
-                  {modeInfo.mode === CODE.MODE_CREATE && (
-                    <>
-                      <input
-                        className="f_input2 w_full"
-                        type="text"
-                        name="mberId"
-                        title=""
-                        id="mberId"
-                        placeholder=""
-                        defaultValue={memberDetail.mberId}
-                        onChange={(e) =>
-                          setMemberDetail({
-                            ...memberDetail,
-                            mberId: e.target.value,
-                          })
-                        }
-                        ref={(el) => (checkRef.current[0] = el)}
-                        required
-                      />
-                      <button
-                        className="btn btn_skyblue_h46"
-                        onClick={() => {
-                          checkIdDplct();
-                        }}
-                      >
-                        {memberDetail.checkIdResult}
-                      </button>
-                    </>
-                  )}
-                  {/* 수정/조회 일때 변경 불가 */}
-                  {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <input
-                      className="f_input2 w_full"
-                      type="text"
-                      name="mberId"
-                      title=""
-                      id="mberId"
-                      placeholder=""
-                      defaultValue={memberDetail.mberId}
-                      ref={(el) => (checkRef.current[0] = el)}
-                      readOnly
-                      required
-                    />
-                  )}
-                </dd>
-              </dl>
-              <dl>
-                <dt>
-                  <label htmlFor="password">회원암호</label>
-                  <span className="req">필수</span>
-                </dt>
-                <dd>
-                  {/* 등록 일때 변경 가능 */}
-                  {modeInfo.mode === CODE.MODE_CREATE && (
-                    <input
-                      className="f_input2 w_full"
-                      type="password"
-                      name="password"
-                      title=""
-                      id="password"
-                      placeholder=""
-                      defaultValue={memberDetail.password}
-                      onChange={(e) =>
-                        setMemberDetail({
-                          ...memberDetail,
-                          password: e.target.value,
-                        })
-                      }
-                      ref={(el) => (checkRef.current[1] = el)}
-                      required
-                    />
-                  )}
-                  {/* 수정/조회 일때 */}
-                  {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <input
-                      className="f_input2 w_full"
-                      type="password"
-                      name="password"
-                      title=""
-                      id="password"
-                      placeholder="빈값이면 기존 암호가 변경되지 않고 그대로 유지됩니다."
-                      defaultValue=""
-                      onChange={(e) =>
-                        setMemberDetail({
-                          ...memberDetail,
-                          password: e.target.value,
-                        })
-                      }
-                      ref={(el) => (checkRef.current[1] = el)}
-                    />
-                  )}
+                  {userDetail.email}
                 </dd>
               </dl>
               <dl>
                 <dt>
                   <label htmlFor="bbsNm">회원명</label>
-                  <span className="req">필수</span>
                 </dt>
                 <dd>
-                  <input
-                    className="f_input2 w_full"
-                    type="text"
-                    name="mberNm"
-                    title=""
-                    id="mberNm"
-                    placeholder=""
-                    defaultValue={memberDetail.mberNm}
-                    onChange={(e) =>
-                      setMemberDetail({
-                        ...memberDetail,
-                        mberNm: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[2] = el)}
-                    required
-                  />
+                  {userDetail.nickname}
                 </dd>
               </dl>
               <dl>
                 <dt>
-                  회원 권한<span className="req">필수</span>
-                </dt>
-                <dd>
-                  <label className="f_select w_200" htmlFor="groupId">
-                    <select
-                      id="groupId"
-                      name="groupId"
-                      title="회원권한유형선택"
-                      onChange={(e) =>
-                        setMemberDetail({
-                          ...memberDetail,
-                          groupId: e.target.value,
-                        })
-                      }
-                      value={memberDetail.groupId}
-                    >
-                      {groupCodeOptions.map((option) => {
-                        return (
-                          <option value={option.value} key={option.value}>
-                            {option.label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </label>
-                </dd>
-              </dl>
-              <dl>
-                <dt>
-                  회원상태<span className="req">필수</span>
+                  회원 권한
                 </dt>
                 <dd>
                   <EgovRadioButtonGroup
-                    name="mberSttus"
-                    radioGroup={mberSttusRadioGroup}
-                    setValue={memberDetail.mberSttus}
-                    setter={(v) =>
-                      setMemberDetail({ ...memberDetail, mberSttus: v })
+                    name="groupId"
+                    radioGroup={groupCodeOptions}
+                    setValue={userDetail.role}
+                    setter={(value) =>
+                      setUserDetail({
+                        ...userDetail,
+                        role: value,
+                      })
                     }
                   />
+                </dd>
+              </dl>
+              <dl>
+                <dt>
+                  토큰
+                </dt>
+                <dd>
+                  {userDetail.tokenIssued && (
+                    <p>토큰 발급이 완료되었습니다.</p>
+                  )}
+                  {!userDetail.tokenIssued && (
+                    <p>토큰이 발급되지 않았습니다.</p>
+                  )}
+                </dd>
+              </dl>
+              <dl>
+                <dd></dd>
+              </dl>
+              <dl>
+                <dt>
+                  <label htmlFor="active">OpenAI Key</label>
+                </dt>
+                <dd>
+                  {userDetail.active ? '활성': '비활성'}
+                </dd>
+              </dl>
+              <dl>
+                <dt>
+                  <label htmlFor="apikey">API Key</label>
+                </dt>
+                <dd>
+                  {userDetail.apiKey}
+                </dd>
+              </dl>
+              <dl>
+                <dt>
+                  <label htmlFor="key-created">키 발급일시</label>
+                </dt>
+                <dd>
+                  {dateFormatting(userDetail.createdAt)}
                 </dd>
               </dl>
 
@@ -482,21 +210,11 @@ function EgovAdminMemberEdit(props) {
               <div className="board_btn_area">
                 <div className="left_col btn1">
                   <button
-                    className="btn btn_skyblue_h46 w_100"
-                    onClick={() => updateMember()}
+                    className="btn_skyblue_h46 w_100"
+                    onClick={() => retrieveDetail()}
                   >
                     저장
                   </button>
-                  {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <button
-                      className="btn btn_skyblue_h46 w_100"
-                      onClick={() => {
-                        deleteMember(memberDetail.uniqId);
-                      }}
-                    >
-                      삭제
-                    </button>
-                  )}
                 </div>
 
                 <div className="right_col btn1">

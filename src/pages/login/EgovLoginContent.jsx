@@ -115,10 +115,10 @@ function EgovLoginContent(props) {
       if (saveIDFlag) setLocalItem(KEY_ID, userInfo.email);
       navigate(URL.MAIN);
       
-      document.querySelector(".all_menu.WEB").classList.add("closed");
-      document.querySelector(".btnAllMenu").classList.remove("active");
-      document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-      document.querySelector(".all_menu.Mobile").classList.add("closed");
+      // document.querySelector(".all_menu.WEB").classList.add("closed");
+      // document.querySelector(".btnAllMenu").classList.remove("active");
+      // document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
+      // document.querySelector(".all_menu.Mobile").classList.add("closed");
 
       // if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) { // 로그인 성공
       //   //setLoginVO(resultVO);
