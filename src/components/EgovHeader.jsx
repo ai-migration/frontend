@@ -6,7 +6,7 @@ import "@/css/header.css";
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem, setSessionItem } from "@/utils/storage";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 function EgovHeader() {
   const sessionToken = getSessionItem("jToken");
@@ -16,6 +16,34 @@ function EgovHeader() {
   const sessionUserSe = sessionUser?.userSe;
   const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
+  const [isAllMenuOpen, setIsAllMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const menuRef = useRef(null);
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 6) return "새벽에 오셨네요";
+    if (hour < 12) return "좋은 아침";
+    if (hour < 18) return "좋은 오후";
+    return "좋은 저녁";
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsAllMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const logInHandler = () => {
     navigate(URL.LOGIN);
@@ -40,26 +68,17 @@ function EgovHeader() {
   };
 
   const toggleAllMenu = () => {
-    const webMenu = document.querySelector(".all_menu.WEB");
-    const btn = document.querySelector(".btnAllMenu");
-    const isClosed = webMenu?.classList.contains("closed");
-    webMenu?.classList.toggle("closed", !isClosed);
-    btn?.classList.toggle("active", isClosed);
-    if (btn) btn.title = isClosed ? "전체메뉴 열림" : "전체메뉴 닫힘";
+    setIsAllMenuOpen((prev) => !prev);
   };
 
   const openAllMenuByHover = () => {
     setIsHovering(true);
-    const menu = document.querySelector(".all_menu.WEB");
-    if (menu) menu.classList.remove("closed");
+    setIsAllMenuOpen(true);
   };
 
   const closeAllMenuByHover = () => {
     setTimeout(() => {
-      if (!isHovering) {
-        const menu = document.querySelector(".all_menu.WEB");
-        if (menu) menu.classList.add("closed");
-      }
+      if (!isHovering) setIsAllMenuOpen(false);
     }, 200);
   };
 
@@ -69,23 +88,15 @@ function EgovHeader() {
 
   const handleMenuMouseLeave = () => {
     setIsHovering(false);
-    const menu = document.querySelector(".all_menu.WEB");
-    if (menu) menu.classList.add("closed");
+    setIsAllMenuOpen(false);
   };
 
   const closeAllMenus = () => {
-    const webMenu = document.querySelector(".all_menu.WEB");
-    if (webMenu) webMenu.classList.add("closed");
-    const btn = document.querySelector(".btnAllMenu");
-    if (btn) {
-      btn.classList.remove("active");
-      btn.title = "전체메뉴 닫힘";
-    }
-    document.querySelector(".all_menu.Mobile")?.classList.add("closed");
+    setIsAllMenuOpen(false);
   };
 
   return (
-    <div className="header">
+    <div className={`header${scrolled ? " header--shadow" : ""}`}>
       <div className="inner">
         <Link to={URL.MAIN} className="ico lnk_go_template" target="_blank">
           홈페이지 템플릿 소개 페이지로 이동
@@ -118,7 +129,7 @@ function EgovHeader() {
         <div className="user_info">
           {sessionUserId ? (
             <>
-              <span className="person">{sessionUserName}</span> 님, {sessionUserSe} 반갑습니다!
+              <span className="person">{sessionUserName}</span> 님, {greeting}! ({sessionUserSe})
               {sessionUserSe === "USER" && (
                 <NavLink to={URL.MYPAGE} className={({ isActive }) => isActive ? "btn login cur" : "btn login"}>
                   마이페이지
@@ -139,15 +150,17 @@ function EgovHeader() {
         <div className="right_a">
           <button
             type="button"
-            className="btn btnAllMenu move-right-50"
-            title="전체메뉴 닫힘"
+            className={`btn btnAllMenu move-right-50${isAllMenuOpen ? " active" : ""}`}
+            title={isAllMenuOpen ? "전체메뉴 열림" : "전체메뉴 닫힘"}
+            aria-expanded={isAllMenuOpen}
             onClick={toggleAllMenu}
           >전체메뉴</button>
         </div>
       </div>
 
       <div
-        className="all_menu WEB closed"
+        ref={menuRef}
+        className={`all_menu WEB${isAllMenuOpen ? "" : " closed"}`}
         onMouseEnter={handleMenuMouseEnter}
         onMouseLeave={handleMenuMouseLeave}
       >

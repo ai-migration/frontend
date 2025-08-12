@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
 
+import * as THREE from "three";
 import simpleMainIng from "/assets/images/simple_test.png";
 import initPage from "@/js/ui";
 
@@ -15,114 +16,237 @@ function EgovMain(props) {
   const location = useLocation();
   console.log("EgovMain [location] : ", location);
 
-  // eslint-disable-next-line no-unused-vars
-  const [noticeBoard, setNoticeBoard] = useState();
-  // eslint-disable-next-line no-unused-vars
-  const [gallaryBoard, setGallaryBoard] = useState();
-  const [noticeListTag, setNoticeListTag] = useState();
-  const [gallaryListTag, setGallaryListTag] = useState();
-  
+  const [noticeItems, setNoticeItems] = useState([]);
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [loading, setLoading] = useState({ notice: true, gallery: true });
+  const [error, setError] = useState({ notice: null, gallery: null });
+  const [activeTab, setActiveTab] = useState("notice");
+  const [isTabHovering, setIsTabHovering] = useState(false);
+
+  const vantaRef = useRef(null);
+  const vantaEffectRef = useRef(null);
+
   useEffect(() => {
     initPage();
   });
 
-  const retrieveList = useCallback(() => {
-    console.groupCollapsed("EgovMain.retrieveList()");
+  // Vanta background effect for the left column (trendy animated background)
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const NET = (await import("vanta/dist/vanta.net.min"))?.default;
+        if (NET && vantaRef.current && !vantaEffectRef.current) {
+          vantaEffectRef.current = NET({
+            el: vantaRef.current,
+            THREE,
+            color: 0x1e90ff,
+            backgroundColor: 0x0a0a0a,
+            points: 8.0,
+            maxDistance: 18.0,
+            spacing: 16.0,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+          });
+        }
+      } catch (e) {
+        // Fallback to static image when Vanta fails to load
+        console.warn("Vanta load failed, using static image", e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+      try {
+        vantaEffectRef.current?.destroy?.();
+        vantaEffectRef.current = null;
+      } catch (_) {}
+    };
+  }, []);
 
+  const buildListItems = (type, items) => {
+    if (!items || items.length === 0) {
+      return [<li key="empty">검색된 결과가 없습니다.</li>];
+    }
+    return items.map((item) => {
+      const created = item.createdAt ? item.createdAt.substring(0, 10) : "";
+      const toPath = type === "gallery" ? URL.INFORM_GALLERY_DETAIL : URL.INFORM_NOTICE_DETAIL;
+      return (
+        <li key={item.postId}>
+          <Link
+            to={{ pathname: toPath }}
+            state={{ postId: item.postId }}
+            className="list_item"
+          >
+            {item.title}
+            <span>{created}</span>
+          </Link>
+        </li>
+      );
+    });
+  };
 
+  const retrieveNotice = useCallback(() => {
     const retrieveListURL = "/posts?type=notice";
     const requestOptions = {
       method: "GET",
-      headers: {
-        "Content-type": "application/json",
-      },
+      headers: { "Content-type": "application/json" },
     };
-  
+    setLoading((prev) => ({ ...prev, notice: true }));
+    setError((prev) => ({ ...prev, notice: null }));
+
     EgovNet.requestFetch(
       retrieveListURL,
       requestOptions,
       (resp) => {
-        resp = resp.slice(0,5);
-        setNoticeBoard(resp);
-
-        let mutNotiListTag = [];
-        mutNotiListTag.push(<li key="0">검색된 결과가 없습니다.</li>); // 게시판 목록 초기값
-
-        // 리스트 항목 구성
-        resp.forEach(function (item, index) {
-          if (index === 0) mutNotiListTag = []; // 목록 초기화
-          item.createdAt = item.createdAt ? item.createdAt.substring(0, 10) : "";
-          mutNotiListTag.push(
-            <li key={item.nttId}>
-              <Link
-                to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
-                state={{
-                  postId: item.postId,
-                }}
-                key={item.postId}
-                className="list_item"
-              >
-                {item.title}
-                <span>{item.createdAt}</span>
-              </Link>
-            </li>
-          );
-        });
-        setNoticeListTag(mutNotiListTag);
+        const list = Array.isArray(resp)
+          ? resp
+          : Array.isArray(resp?.result?.notiList)
+          ? resp.result.notiList
+          : [];
+        const trimmed = list.slice(0, 5);
+        setNoticeItems(trimmed);
+        setLoading((prev) => ({ ...prev, notice: false }));
       },
-      function (resp) {
+      (resp) => {
         console.log("err response : ", resp);
+        setError((prev) => ({ ...prev, notice: "공지사항을 불러오지 못했습니다." }));
+        setLoading((prev) => ({ ...prev, notice: false }));
       }
     );
-    console.groupEnd("EgovMain.retrieveList()");
   }, []);
 
+  const retrieveGallery = useCallback(() => {
+    const retrieveListURL = "/posts?type=gallery";
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-type": "application/json" },
+    };
+    setLoading((prev) => ({ ...prev, gallery: true }));
+    setError((prev) => ({ ...prev, gallery: null }));
+
+    EgovNet.requestFetch(
+      retrieveListURL,
+      requestOptions,
+      (resp) => {
+        const list = Array.isArray(resp)
+          ? resp
+          : Array.isArray(resp?.result?.galList)
+          ? resp.result.galList
+          : [];
+        const trimmed = list.slice(0, 5);
+        setGalleryItems(trimmed);
+        setLoading((prev) => ({ ...prev, gallery: false }));
+      },
+      (resp) => {
+        console.log("err response : ", resp);
+        setError((prev) => ({ ...prev, gallery: "갤러리를 불러오지 못했습니다." }));
+        setLoading((prev) => ({ ...prev, gallery: false }));
+      }
+    );
+  }, []);
+
+  // Initial load
   useEffect(() => {
-    retrieveList();
-  }, [retrieveList]);
+    retrieveNotice();
+    retrieveGallery();
+  }, [retrieveNotice, retrieveGallery]);
+
+  // Auto-rotate tabs every 6s, pause on hover
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!isTabHovering) {
+        setActiveTab((prev) => (prev === "notice" ? "gallery" : "notice"));
+      }
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [isTabHovering]);
 
   console.log("------------------------------EgovMain [End]");
   console.groupEnd("EgovMain");
+
+  const renderSkeleton = () => (
+    <>
+      {Array.from({ length: 5 }).map((_, idx) => (
+        <li key={`skeleton-${idx}`}>
+          <div style={{
+            height: 16,
+            width: "80%",
+            background: "#f0f0f0",
+            borderRadius: 4,
+          }} />
+        </li>
+      ))}
+    </>
+  );
 
   return (
     <div className="container P_MAIN">
       <div className="c_wrap">
         <div className="colbox">
-          <div className="left_col">
+          <div className="left_col" style={{ position: "relative", minHeight: 260 }}>
+            <div ref={vantaRef} style={{ position: "absolute", inset: 0, borderRadius: 8, overflow: "hidden" }} />
             <img
               src={simpleMainIng}
               alt="단순 홈페이지 전자정부 표준프레임워크의 경량환경 내부업무에 대한 최신 정보와 기술을 제공하고 있습니다."
+              style={{ position: "relative", zIndex: 1, mixBlendMode: "screen", opacity: 0.9 }}
             />
           </div>
 
           <div className="right_col">
             <div className="mini_board">
-              <ul className="tab">
+              <ul
+                className="tab"
+                onMouseEnter={() => setIsTabHovering(true)}
+                onMouseLeave={() => setIsTabHovering(false)}
+              >
                 <li>
-                  <a href="#공지사항" className="on">
+                  <a
+                    href="#공지사항"
+                    className={activeTab === "notice" ? "on" : ""}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveTab("notice");
+                    }}
+                  >
                     공지사항
                   </a>
                 </li>
-                {/* <li>
-                  <a href="#갤러리">갤러리</a>
-                </li> */}
+                <li>
+                  <a
+                    href="#갤러리"
+                    className={activeTab === "gallery" ? "on" : ""}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveTab("gallery");
+                    }}
+                  >
+                    갤러리
+                  </a>
+                </li>
               </ul>
               <div className="list">
-                <div className="notice">
-                  <h2 className="blind">공지사항</h2>
-                  <ul>{noticeListTag}</ul>
-                  <Link to={URL.INFORM_NOTICE} className="more">
-                    더보기
-                  </Link>
-                </div>
+                {activeTab === "notice" && (
+                  <div className="notice">
+                    <h2 className="blind">공지사항</h2>
+                    <ul>
+                      {error.notice && <li>{error.notice}</li>}
+                      {loading.notice ? renderSkeleton() : buildListItems("notice", noticeItems)}
+                    </ul>
+                    <Link to={URL.INFORM_NOTICE} className="more">더보기</Link>
+                  </div>
+                )}
 
-                {/* <div className="gallary">
-                  <h2 className="blind">갤러리</h2>
-                  <ul>{gallaryListTag}</ul>
-                  <Link to={URL.INFORM_GALLERY} className="more">
-                    더보기
-                  </Link>
-                </div> */}
+                {activeTab === "gallery" && (
+                  <div className="gallary">
+                    <h2 className="blind">갤러리</h2>
+                    <ul>
+                      {error.gallery && <li>{error.gallery}</li>}
+                      {loading.gallery ? renderSkeleton() : buildListItems("gallery", galleryItems)}
+                    </ul>
+                    <Link to={URL.INFORM_GALLERY} className="more">더보기</Link>
+                  </div>
+                )}
               </div>
             </div>
 

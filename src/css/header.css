@@ -142,3 +142,13 @@
   max-width: 100%;
   object-fit: contain;
 }
+
+/* Scrolled header subtle shadow */
+.header.header--shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Active state for All Menu button */
+.btnAllMenu.active {
+  color: #0a66c2;
+}
