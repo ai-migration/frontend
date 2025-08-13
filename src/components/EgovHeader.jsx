@@ -7,7 +7,7 @@ import "@/css/header.css";
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 
-/** ✅ PNG 아이콘 경로만 바꾸면 즉시 적용 */
+/** ✅ PNG 아이콘 경로만 바꾸면 즉시 적용 (전역 FAB 버튼 이미지) */
 import chatIconPng from "/src/assets/images/due.jpg";
 
 import {
@@ -35,7 +35,7 @@ export function EgovHeader() {
   const [scrolled, setScrolled] = useState2(false);
   const [scrollPct, setScrollPct] = useState2(0);
 
-  // === Chat state ===
+  // === Chat (전역 FAB + 패널) ===
   const [isChatOpen, setIsChatOpen] = useState2(false);
   const [unread, setUnread] = useState2(0);
   const [messages, setMessages] = useState2([
@@ -161,7 +161,7 @@ export function EgovHeader() {
     if (btnEl) btnEl.classList.toggle("active", isMenuOpen);
   }, [isMenuOpen]);
 
-  // === Chat: 열기/닫기 & 바깥 클릭 닫기 ===
+  // === Chat: FAB 열기/닫기 & 바깥 클릭 닫기 ===
   const toggleChat = useCallback2(() => setIsChatOpen((v) => !v), []);
   const closeChat = useCallback2(() => setIsChatOpen(false), []);
 
@@ -242,91 +242,19 @@ export function EgovHeader() {
   );
 
   return (
-    <div
-      ref={headerRef}
-      className={`header ${scrolled ? "is-scrolled" : ""}`}
-      data-state={isMenuOpen ? "open" : "closed"}
-    >
-      {/* 상단 스크롤 진행바 */}
-      <div className="scroll-progress" aria-hidden style={{ transform: `scaleX(${scrollPct / 100})` }} />
+    <>
+      <div
+        ref={headerRef}
+        className={`header ${scrolled ? "is-scrolled" : ""}`}
+        data-state={isMenuOpen ? "open" : "closed"}
+      >
+        {/* 상단 스크롤 진행바 */}
+        <div className="scroll-progress" aria-hidden style={{ transform: `scaleX(${scrollPct / 100})` }} />
 
-      {/* ✅ [로고] [GNB] [오른쪽(유저+햄버거)] */}
-      <div className="inner grid3">
-        {/* 좌: 로고 */}
-        <h1 className="logo">
-          <HLink to={URL2.MAIN} className="w" aria-label="메인으로 이동 (데스크톱 로고)">
-            <img src={logoImg} alt="eGovFrame 심플홈페이지" />
-          </HLink>
-          <HLink to={URL2.MAIN} className="m" aria-label="메인으로 이동 (모바일 로고)">
-            <img src={logoImgMobile} alt="eGovFrame 심플홈페이지" />
-          </HLink>
-        </h1>
-
-        {/* 중: GNB (챗봇 버튼 포함) */}
-        <nav
-          className="gnb gnb-left"
-          role="navigation"
-          aria-label="주요 메뉴"
-          onMouseEnter={openAllMenuByHover}
-          onMouseLeave={closeAllMenuByHover}
-          onFocus={() => setIsMenuOpen(true)}
-          onBlur={() => setIsMenuOpen(false)}
-        >
-          <ul>
-            {/* ▶ 챗봇 버튼: PNG 사용 + 미읽음 배지 */}
-            <li className="gnb-chat">
-              <button
-                ref={chatBtnRef}
-                type="button"
-                className={`chat-gnb-btn ${isChatOpen ? "active" : ""}`}
-                title={chatBtnTitle}
-                aria-label={chatBtnTitle}
-                aria-expanded={isChatOpen}
-                aria-controls="ai-chat-panel"
-                onClick={() => setIsChatOpen((v) => !v)}
-              >
-                <img src={chatIconPng} alt="AI 챗봇 열기" />
-                {unread > 0 && <span className="badge">{unread > 99 ? "99+" : unread}</span>}
-              </button>
-            </li>
-
-            <li><HNavLink to={URL2.ABOUT}>사이트소개</HNavLink></li>
-            <li><HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO}>AI 변환기</HNavLink></li>
-            <li><HNavLink to={URL2.SUPPORT_SECURITY_INTRO}>AI 보안기</HNavLink></li>
-            <li><HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK}>고객지원</HNavLink></li>
-            {sessionUserSe === "ADM" && <li><HNavLink to={URL2.ADMIN}>사이트관리</HNavLink></li>}
-          </ul>
-        </nav>
-
-        {/* 우: 사용자 영역 + 햄버거 버튼 */}
-        <div className="right_cluster">
-          <div
-            className="user_info"
-            aria-live="polite"
-            data-username={sessionUserName || ""}
-            data-role={sessionUserSe || "GUEST"}
-          >
-            {sessionUserId ? (
-              <>
-                <span className="person">{sessionUserName}</span> 님, {sessionUserSe} 반갑습니다!
-                {sessionUserSe === "USER" && (
-                  <HNavLink to={URL2.MYPAGE} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>
-                    마이페이지
-                  </HNavLink>
-                )}
-                <button onClick={logOutHandler} className="btn">로그아웃</button>
-              </>
-            ) : (
-              <>
-                <button onClick={logInHandler} className="btn login">로그인</button>
-                <HNavLink to={URL2.SIGNUP} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>
-                  회원가입
-                </HNavLink>
-              </>
-            )}
-          </div>
-
-          <div className="right_a">
+        {/* ✅ 레이아웃 재구성: [왼쪽(햄버거+로고+GNB)] [오른쪽(유저)] */}
+        <div className="inner grid3">
+          <div className="left_cluster">
+            {/* 햄버거 버튼을 왼쪽으로 이동 */}
             <button
               ref={btnAllMenuRef}
               type="button"
@@ -339,75 +267,158 @@ export function EgovHeader() {
             >
               전체메뉴
             </button>
+
+            {/* 로고 */}
+            <h1 className="logo">
+              <HLink to={URL2.MAIN} className="w" aria-label="메인으로 이동 (데스크톱 로고)">
+                <img src={logoImg} alt="eGovFrame 심플홈페이지" />
+              </HLink>
+              <HLink to={URL2.MAIN} className="m" aria-label="메인으로 이동 (모바일 로고)">
+                <img src={logoImgMobile} alt="eGovFrame 심플홈페이지" />
+              </HLink>
+            </h1>
+
+            {/* GNB: 왼쪽 정렬 */}
+            <nav
+              className="gnb gnb-left"
+              role="navigation"
+              aria-label="주요 메뉴"
+              onMouseEnter={openAllMenuByHover}
+              onMouseLeave={closeAllMenuByHover}
+              onFocus={() => setIsMenuOpen(true)}
+              onBlur={() => setIsMenuOpen(false)}
+            >
+              <ul>
+                {/* (전역 FAB로 이동했으므로 gnb-chat 버튼 제거) */}
+                <li><HNavLink to={URL2.ABOUT}>사이트소개</HNavLink></li>
+                <li><HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO}>AI 변환기</HNavLink></li>
+                <li><HNavLink to={URL2.SUPPORT_SECURITY_INTRO}>AI 보안기</HNavLink></li>
+                <li><HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK}>고객지원</HNavLink></li>
+                {sessionUserSe === "ADM" && <li><HNavLink to={URL2.ADMIN}>사이트관리</HNavLink></li>}
+              </ul>
+            </nav>
+          </div>
+
+          {/* 우: 사용자 영역 (햄버거는 제거) */}
+          <div className="right_cluster">
+            <div
+              className="user_info"
+              aria-live="polite"
+              data-username={sessionUserName || ""}
+              data-role={sessionUserSe || "GUEST"}
+            >
+              {sessionUserId ? (
+                <>
+                  <span className="person">{sessionUserName}</span> 님, {sessionUserSe} 반갑습니다!
+                  {sessionUserSe === "USER" && (
+                    <HNavLink
+                      to={URL2.MYPAGE}
+                      className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}
+                    >
+                      마이페이지
+                    </HNavLink>
+                  )}
+                  <button onClick={logOutHandler} className="btn">로그아웃</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={logInHandler} className="btn login">로그인</button>
+                  <HNavLink
+                    to={URL2.SIGNUP}
+                    className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}
+                  >
+                    회원가입
+                  </HNavLink>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* All Menu (WEB) */}
-      <div
-        id="allmenu-web"
-        ref={webMenuRef}
-        className={`all_menu WEB ${isMenuOpen ? "" : "closed"}`}
-        aria-hidden={!isMenuOpen}
-        onMouseEnter={handleMenuMouseEnter}
-        onMouseLeave={handleMenuMouseLeave}
-      >
-        <div className="inner">
-          <div className="col">
-            <h3>사이트소개</h3>
-            <ul>
-              <li><HNavLink to={URL2.ABOUT_SITE}>소개</HNavLink></li>
-              <li><HNavLink to={URL2.ABOUT_HISTORY}>연혁</HNavLink></li>
-              <li><HNavLink to={URL2.ABOUT_ORGANIZATION}>조직소개</HNavLink></li>
-              <li><HNavLink to={URL2.ABOUT_LOCATION}>찾아오시는 길</HNavLink></li>
-            </ul>
-          </div>
-
-          <div className="col">
-            <h3>AI 변환기</h3>
-            <ul>
-              <li><HNavLink to="/support/transform/intro">기능 소개</HNavLink></li>
-              <li><HNavLink to="/support/transform/transformation">변환 하기</HNavLink></li>
-              <li><HNavLink to="/support/transform/view_transform">변환 이력 조회</HNavLink></li>
-              <li><HNavLink to="/support/transform/view_test">테스트 이력 조회</HNavLink></li>
-              <li><HNavLink to="/support/transform/download">다운로드</HNavLink></li>
-            </ul>
-          </div>
-
-          <div className="col">
-            <h3>AI 보안기</h3>
-            <ul>
-              <li><HNavLink to="/support/security/intro">기능 소개</HNavLink></li>
-              <li><HNavLink to="/support/security/scan">AI 보안 검사</HNavLink></li>
-              <li><HNavLink to="/support/security/vulnerability">보안 취약점탐지</HNavLink></li>
-              <li><HNavLink to="/support/security/report">보안 점검결과</HNavLink></li>
-              <li><HNavLink to="/support/security/report_detail">다운로드</HNavLink></li>
-            </ul>
-          </div>
-
-          <div className="col">
-            <h3>고객지원</h3>
-            <ul>
-              <li><HNavLink to="/support/guide/egovframework">전자정부프레임워크 가이드</HNavLink></li>
-              <li><HNavLink to="/intro">정보마당</HNavLink></li>
-              <li><HNavLink to="/inform">알림마당</HNavLink></li>
-            </ul>
-          </div>
-
-          {sessionUserSe === "ADM" && (
+        {/* All Menu (WEB) */}
+        <div
+          id="allmenu-web"
+          ref={webMenuRef}
+          className={`all_menu WEB ${isMenuOpen ? "" : "closed"}`}
+          aria-hidden={!isMenuOpen}
+          onMouseEnter={handleMenuMouseEnter}
+          onMouseLeave={handleMenuMouseLeave}
+        >
+          <div className="inner">
             <div className="col">
-              <h3>사이트관리</h3>
+              <h3>사이트소개</h3>
               <ul>
-                <li><HNavLink to={URL2.ADMIN_NOTICE}>공지사항 관리</HNavLink></li>
-                <li><HNavLink to={URL2.ADMIN_FAQ}>FAQ 관리</HNavLink></li>
-                <li><HNavLink to={URL2.ADMIN_QNA}>Q&A 관리</HNavLink></li>
-                <li><HNavLink to={URL2.ADMIN_MEMBERS}>회원 관리</HNavLink></li>
-                <li><HNavLink to={URL2.ADMIN_MANAGER}>관리자 관리</HNavLink></li>
+                <li><HNavLink to={URL2.ABOUT_SITE}>소개</HNavLink></li>
+                <li><HNavLink to={URL2.ABOUT_HISTORY}>연혁</HNavLink></li>
+                <li><HNavLink to={URL2.ABOUT_ORGANIZATION}>조직소개</HNavLink></li>
+                <li><HNavLink to={URL2.ABOUT_LOCATION}>찾아오시는 길</HNavLink></li>
               </ul>
             </div>
-          )}
+
+            <div className="col">
+              <h3>AI 변환기</h3>
+              <ul>
+                <li><HNavLink to="/support/transform/intro">기능 소개</HNavLink></li>
+                <li><HNavLink to="/support/transform/transformation">변환 하기</HNavLink></li>
+                <li><HNavLink to="/support/transform/view_transform">변환 이력 조회</HNavLink></li>
+                <li><HNavLink to="/support/transform/view_test">테스트 이력 조회</HNavLink></li>
+                <li><HNavLink to="/support/transform/download">다운로드</HNavLink></li>
+              </ul>
+            </div>
+
+            <div className="col">
+              <h3>AI 보안기</h3>
+              <ul>
+                <li><HNavLink to="/support/security/intro">기능 소개</HNavLink></li>
+                <li><HNavLink to="/support/security/scan">AI 보안 검사</HNavLink></li>
+                <li><HNavLink to="/support/security/vulnerability">보안 취약점탐지</HNavLink></li>
+                <li><HNavLink to="/support/security/report">보안 점검결과</HNavLink></li>
+                <li><HNavLink to="/support/security/report_detail">다운로드</HNavLink></li>
+              </ul>
+            </div>
+
+            <div className="col">
+              <h3>고객지원</h3>
+              <ul>
+                <li><HNavLink to="/support/guide/egovframework">전자정부프레임워크 가이드</HNavLink></li>
+                <li><HNavLink to="/intro">정보마당</HNavLink></li>
+                <li><HNavLink to="/inform">알림마당</HNavLink></li>
+              </ul>
+            </div>
+
+            {sessionUserSe === "ADM" && (
+              <div className="col">
+                <h3>사이트관리</h3>
+                <ul>
+                  <li><HNavLink to={URL2.ADMIN_NOTICE}>공지사항 관리</HNavLink></li>
+                  <li><HNavLink to={URL2.ADMIN_FAQ}>FAQ 관리</HNavLink></li>
+                  <li><HNavLink to={URL2.ADMIN_QNA}>Q&A 관리</HNavLink></li>
+                  <li><HNavLink to={URL2.ADMIN_MEMBERS}>회원 관리</HNavLink></li>
+                  <li><HNavLink to={URL2.ADMIN_MANAGER}>관리자 관리</HNavLink></li>
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* === 전역 Floating Chat Button (FAB) === */}
+      {createPortal(
+        <button
+          ref={chatBtnRef}
+          type="button"
+          className={`chat-fab ${isChatOpen ? "active" : ""}`}
+          title={chatBtnTitle}
+          aria-label={chatBtnTitle}
+          aria-expanded={isChatOpen}
+          aria-controls="ai-chat-panel"
+          onClick={toggleChat}
+        >
+          <img src={chatIconPng} alt="AI 챗봇 열기" />
+          {unread > 0 && <span className="badge">{unread > 99 ? "99+" : unread}</span>}
+        </button>,
+        document.body
+      )}
 
       {/* === Chat Panel: Portal === */}
       {createPortal(
@@ -473,11 +484,10 @@ export function EgovHeader() {
         </section>,
         document.body
       )}
-    </div>
+    </>
   );
 }
 
 // utils import는 파일 하단에 둬도 무방
 import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
-
 export default EgovHeader;
