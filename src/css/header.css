@@ -391,3 +391,69 @@
     bottom: 12px;
   }
 }
+
+:root{
+  --chat-w: min(640px, calc(100vw - 48px)); /* 기존 420px → 640px */
+  --chat-h: min(78vh, 720px);               /* 기존 70vh/560px → 78vh/720px */
+  --chat-fab-size: 200px;                    /* FAB 아이콘도 살짝 키움 (56 → 68) */
+}
+
+/* FAB 크기 업 */
+.chat-fab{
+  width: var(--chat-fab-size);
+  height: var(--chat-fab-size);
+}
+
+/* 패널 크기 업 + FAB 위 여백 자동 보정 */
+.chat-panel{
+  width: var(--chat-w);
+  height: var(--chat-h);
+  bottom: calc(max(24px, env(safe-area-inset-bottom)) + var(--chat-fab-size) + 12px);
+  border-radius: 20px; /* 살짝 더 둥글게 */
+}
+
+/* 헤더/입력부도 살짝 키워주기 */
+.chat-head{ height: 60px; padding: 0 14px; }
+.chat-head-right .chat-head-btn{ width: 34px; height: 34px; }
+
+.chat-input{
+  padding: 12px;
+  gap: 10px;
+}
+.chat-input input{
+  height: 46px;
+  font-size: 15px;
+  border-radius: 14px;
+  padding: 0 14px;
+}
+.chat-input button{
+  width: 46px; height: 46px; border-radius: 14px;
+}
+
+/* 말풍선 최대폭/폰트 살짝 업 */
+.chat-msg .bubble{
+  max-width: 86%;
+  font-size: 15px;           /* 14 → 15 */
+  padding: 12px 14px;        /* 10/12 → 12/14 */
+}
+
+/* 스크롤 체감 개선 */
+.chat-body{
+  overscroll-behavior: contain;
+}
+
+/* ---- 모바일 최적화 (더 크게 띄우기) ---- */
+@media (max-width: 768px){
+  :root{
+    --chat-w: calc(100vw - 20px);
+    --chat-h: min(84vh, 760px);
+    --chat-fab-size: 64px;
+  }
+  .chat-panel{
+    right: 10px;
+    bottom: calc(10px + var(--chat-fab-size) + 10px);
+  }
+  .chat-fab{
+    right: 10px; bottom: 10px;
+  }
+}
