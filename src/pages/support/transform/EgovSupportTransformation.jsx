@@ -1,7 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
+import EgovProgressBar from "@/components/EgovProgressBar";
+
 import { getSessionItem } from "@/utils/storage";
 
 /**
@@ -28,6 +30,10 @@ function EgovSupportTransformation() {
   const [loadingType, setLoadingType] = useState(null);
   const [progress, setProgress] = useState(0);
   const [successType, setSuccessType] = useState(null);
+  const esRef = useRef(null);
+  const [running, setRunning] = useState(false);
+  const [logs, setLogs] = useState([]); // 수신 메시지 기록
+  const [status, setStatus] = useState("IDLE"); // IDLE | RUNNING | DONE | ERROR
 
   // 옵션 (변환 시 사용)
   const [lang, setLang] = useState("Python");
@@ -142,6 +148,9 @@ function EgovSupportTransformation() {
     }
   };
 
+  const appendLog = (line) =>
+    setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()}  ${line}`]);
+
   // 변환 버튼: 업로드와 분리
   const handleTransform = (type) => {
     const target = type === "프레임워크 변환" ? files1 : files2;
@@ -150,14 +159,68 @@ function EgovSupportTransformation() {
 
     // TODO: 변환 API 호출 (type/lang/fromVer/toVer/jobIds)
     console.log("변환 준비:", { type, lang, fromVer, toVer, jobIds });
+    setProgress(0);
+
+
+
+
+    const es = new EventSource("http://localhost:8088/agents/test");
+    esRef.current = es;
+
+    es.addEventListener("step", (e) => {
+      appendLog(`STEP: ${e.data}`);
+      setProgress(prev => {
+        const newValue = prev + 10;
+        console.log('progress:', newValue);
+
+        if (newValue >= 100) {
+          setLoadingType(null);
+          setSuccessType(type);
+        }
+        return newValue;
+      });
+    });
+
+    es.addEventListener("done", (e) => {
+      appendLog(`DONE: ${e.data}`);
+      setStatus("DONE");
+      setRunning(false);
+      es.close();
+      esRef.current = null;
+    });
+
+    es.addEventListener("error", (e) => {
+      // 서버에서 보낸 error 이벤트 또는 네트워크 오류
+      try {
+        const data = e?.data ? JSON.parse(e.data) : null;
+        appendLog(`ERROR: ${data?.message ?? "connection error"}`);
+      } catch {
+        appendLog("ERROR: connection error");
+      }
+      setStatus("ERROR");
+      setRunning(false);
+      es.close();
+      esRef.current = null;
+    });
+
+
+
+
+
+
+
+
+
+
+
 
     setLoadingType(type);
-    setProgress(100);
-    setTimeout(() => {
-      setLoadingType(null);
-      setSuccessType(type);
-      setProgress(0);
-    }, 500);
+    // setProgress(100);
+    // setTimeout(() => {
+    //   setLoadingType(null);
+    //   setSuccessType(type);
+    //   setProgress(0);
+    // }, 500);
   };
 
   // ✅ 다운로드: 업로드와 동일 규칙의 userId 사용
@@ -270,12 +333,41 @@ function EgovSupportTransformation() {
             ? "✅ 변환 완료!"
             : "🚀 변환 하기"}
         </button>
-
+        
         {loadingType === transformType && (
+          <EgovProgressBar
+            progress={progress}
+          />
+        )}
+
+        
+        {(loadingType === transformType ||
+          successType === transformType) && (
+              <div
+                style={{
+                  border: "1px solid #ddd",
+                  padding: 12,
+                  borderRadius: 8,
+                  height: 400,
+                  overflow: "auto",
+                  background: "#fafafa",
+                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                  fontSize: 13,
+                }}
+              >
+                {logs.length === 0 ? (
+                  <div style={{ color: "#888" }}>로그 없음 (시작을 눌러 테스트하세요)</div>
+                ) : (
+                  logs.map((l, i) => <div key={i}>{l}</div>)
+                )}
+            </div>
+        )}
+
+        {/* {loadingType === transformType && (
           <div style={{ marginTop: "8px", height: "8px", background: "#e0e0e0", borderRadius: "4px", overflow: "hidden" }}>
             <div style={{ width: `${progress}%`, height: "100%", transition: "width 0.3s ease" }} />
           </div>
-        )}
+        )} */}
       </div>
 
       {files.length > 0 && (

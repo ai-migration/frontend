@@ -42,7 +42,7 @@ function EgovTestPage() {
 
     es.addEventListener("step", (e) => {
       appendLog(`STEP: ${e.data}`);
-      setProgress(prev => prev + 25);
+      setProgress(prev => prev + 10);
     });
 
     es.addEventListener("done", (e) => {
