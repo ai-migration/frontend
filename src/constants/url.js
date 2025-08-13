@@ -114,6 +114,10 @@ const URL = {
 
   //MYPAGE
   MYPAGE: "/mypage", // 고객지원/마이페이지/회원 수정
+
+  
+  //MYPAGE
+  TESTPAGE: "/test", // 테스트 페이지
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

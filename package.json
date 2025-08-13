@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
+    "@react-spring/web": "^10.0.1",
     "axios": "^1.11.0",
     "egovframe-template-simple-react": "file:",
     "framer-motion": "^12.23.12",

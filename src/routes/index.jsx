@@ -103,6 +103,9 @@ import EgovAdminMemberEdit from "@/pages/admin/members/EgovAdminMemberEdit";
 import EgovMypageEdit from "@/pages/mypage/EgovMypageEdit";
 import initPage from "@/js/ui";
 
+//테스트용 페이지
+import EgovTestPage from "@/pages/main/EgovTestPage";
+
 const RootRoutes = () => {
   //useLocation객체를 이용하여 정규표현식을 사용한 /admin/~ 으로 시작하는 경로와 비교에 사용(아래 1줄) */}
   const location = useLocation();
@@ -530,6 +533,12 @@ const SecondRoutes = () => {
         <Route
           path={URL.MYPAGE}
           element={<EgovMypageEdit />}
+        />
+        
+        {/* Test */}
+        <Route
+          path={URL.TESTPAGE}
+          element={<EgovTestPage />}
         />
       </Routes>
 
