@@ -61,16 +61,17 @@
   flex-shrink: 0;
 }
 
-/* ---------- GNB (왼쪽 정렬) ---------- */
+/* ---------- GNB (왼쪽 정렬 + 햄버거 버튼과 겹치지 않도록 이동) ---------- */
 .gnb {
   justify-self: start;
   text-align: left;
+  margin-left: -80px; /* 메뉴를 왼쪽으로 이동하여 햄버거 버튼과 겹치지 않도록 */
 }
 .gnb ul {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 28px;
+  gap: 24px; /* 메뉴 간 간격 조정 */
   margin: 0;
   padding: 0;
   list-style: none;
@@ -357,15 +358,26 @@
 .header, .header .inner { overflow: visible; }
 .chat-panel { z-index: 4000; }
 
-/* ---------- Responsive ---------- */
+/* ---------- Responsive (GNB 메뉴 이동 조정) ---------- */
 @media (max-width: 1280px) {
+  .gnb {
+    margin-left: -60px; /* 중간 화면에서 조금 덜 이동 */
+  }
   .gnb ul { gap: 20px; }
 }
+
 @media (max-width: 1024px) {
+  .gnb {
+    margin-left: -40px; /* 작은 화면에서 더 적게 이동 */
+  }
   .gnb ul { gap: 16px; }
 }
 
 @media (max-width: 768px) {
+  .gnb {
+    margin-left: 0; /* 모바일에서는 원래 위치로 복귀 */
+  }
+  
   .support_menu { top: 80px; padding: 20px 0; }
   .all_menu.WEB, .all_menu.Mobile { top: 80px !important; }
 
