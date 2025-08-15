@@ -189,7 +189,99 @@ export function EgovHeader() {
     chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
   }, [messages.length]);
 
-  // === Chat: 전송 (Agent/RAG 연동 포인트) ===
+  // === Chat Action UI (icons + gradient chips) =====================
+  const getActionTheme = (url = "") => {
+    if (/\/support\/transform/i.test(url)) return "t-transform";
+    if (/\/support\/security/i.test(url)) return "t-security";
+    if (/\/support\/guide/i.test(url) || /egov/i.test(url)) return "t-guide";
+    if (/\/inform/i.test(url)) return "t-inform";
+    if (/download/i.test(url)) return "t-download";
+    return "t-default";
+  };
+
+  const Icon = ({ theme }) => {
+    if (theme === "t-transform")
+      return (
+        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M3 7h10l-2-2 1.4-1.4L18.8 8l-6.4 4.4L11 11l2-2H3zM21 17H11l2 2-1.4 1.4L5.2 16l6.4-4.4L13 13l-2 2h10z" />
+        </svg>
+      );
+    if (theme === "t-security")
+      return (
+        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 2l7 3v6c0 5-3.6 9.7-7 11-3.4-1.3-7-6-7-11V5l7-3zm0 4l-4 1.7V11c0 3.5 2.2 7.1 4 8 1.8-.9 4-4.5 4-8V7.7L12 6z" />
+        </svg>
+      );
+    if (theme === "t-guide")
+      return (
+        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M4 4h9a4 4 0 014 4v12H8a4 4 0 01-4-4V4zm9 2H6v10a2 2 0 002 2h9V8a2 2 0 00-2-2zM8 6h1a3 3 0 013 3v1H8V6z" />
+        </svg>
+      );
+    if (theme === "t-download")
+      return (
+        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 3v10l3-3 1.4 1.4-5.4 5.4-5.4-5.4L7 10l3 3V3h2zm-7 16h14v2H5v-2z" />
+        </svg>
+      );
+    return (
+      <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v5h4v2h-6V7h2z" />
+      </svg>
+    );
+  };
+
+  const ChatActionBar = ({ actions = [] }) => {
+    if (!Array.isArray(actions) || actions.length === 0) return null;
+
+    return (
+      <div className="action-bar" role="list" aria-label="빠른 이동">
+        {actions.map((a, idx) => {
+          const theme = getActionTheme(a.url);
+          const external = /^https?:\/\//i.test(a.url);
+
+          if (external) {
+            return (
+              <a
+                key={idx}
+                className={`chip ${theme}`}
+                href={a.url}
+                target="_blank"
+                rel="noreferrer"
+                role="listitem"
+                aria-label={`${a.label} (새 창)`}
+                onClick={closeChat}
+              >
+                <Icon theme={theme} />
+                <span className="label">{a.label}</span>
+                <span className="arrow" aria-hidden />
+              </a>
+            );
+          }
+
+          return (
+            <button
+              key={idx}
+              type="button"
+              className={`chip ${theme}`}
+              role="listitem"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(a.url);
+                closeChat();
+              }}
+            >
+              <Icon theme={theme} />
+              <span className="label">{a.label}</span>
+              <span className="arrow" aria-hidden />
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // === Chat: 전송 (Agent / RAG 연동) ===
   const sendMessage = useCallback2(
     async (e) => {
       e?.preventDefault?.();
@@ -202,29 +294,42 @@ export function EgovHeader() {
       setPending(true);
 
       try {
-        // 실제 백엔드 연동 지점:
-        // const res = await fetch("/api/chat", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify({
-        //     text,
-        //     user: { id: sessionUserId, name: sessionUserName, role: sessionUserSe },
-        //   }),
-        //   credentials: "include",
-        // });
-        // const { reply } = await res.json();
+        // ✅ 실제 백엔드 연동
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s 타임아웃
 
-        // 데모 응답
-        const reply =
-          "요청을 접수했어요. 현재 RAG/에이전트 백엔드와 연결 준비 중입니다. 원하는 기능(문서요약, 코드변환, eGovFrame 가이드 질의 등)을 말씀해 주세요!";
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text,
+            user: { id: sessionUserId, name: sessionUserName, role: sessionUserSe },
+          }),
+          credentials: "include",
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
 
-        const botMsg = { id: `b-${Date.now()}`, role: "bot", text: reply };
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const reply = data?.reply ?? "응답을 받았지만 내용이 비어 있어요.";
+        const actions = Array.isArray(data?.actions) ? data.actions : [];
+        const citations = Array.isArray(data?.citations) ? data.citations : [];
+
+        const botMsg = { id: `b-${Date.now()}`, role: "bot", text: reply, actions, citations };
         setMessages((prev) => [...prev, botMsg]);
       } catch (err) {
+        // ❗ 폴백 (연결 오류)
         const botMsg = {
           id: `b-${Date.now()}`,
           role: "bot",
           text: "잠시 후 다시 시도해주세요. (연결 오류)",
+          actions: [
+            { label: "변환 하기", url: "/support/transform/transformation" },
+            { label: "AI 보안 검사", url: "/support/security/scan" },
+            { label: "전자정부프레임워크 가이드", url: "/support/guide/egovframework" },
+          ],
         };
         setMessages((prev) => [...prev, botMsg]);
       } finally {
@@ -421,6 +526,21 @@ export function EgovHeader() {
             {messages.map((m) => (
               <div key={m.id} className={`chat-msg ${m.role}`}>
                 <div className="bubble">{m.text}</div>
+
+                {/* ▶︎ 트렌디 액션 바 */}
+                {m.role === "bot" && <ChatActionBar actions={m.actions} />}
+
+                {/* ▶︎ 근거(선택) */}
+                {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
+                  <details className="citations">
+                    <summary>참고 근거</summary>
+                    <ul>
+                      {m.citations.map((c, i) => (
+                        <li key={i}><strong>{c.source}</strong>: {c.snippet}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
               </div>
             ))}
             {pending && (

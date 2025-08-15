@@ -3,36 +3,53 @@ import react from "@vitejs/plugin-react-swc";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react({
-    // JSX Ã³¸®¸¦ À§ÇÑ Ãß°¡ ¼³Á¤
-    include: "**/*.{jsx,js}",
-  })],
-  
+  plugins: [
+    react({
+      // JSX í˜¸í™˜ íŒŒì¼ í¬í•¨ ì„¤ì •
+      include: "**/*.{jsx,js}",
+    }),
+  ],
+
   base: "/",
+
   server: {
     port: 3000,
+    proxy: {
+      // â”€â”€ ì—¬ê¸° ì¶”ê°€: /api â†’ 8000 FastAPI ì„œë²„ë¡œ í”„ë¡ì‹œ
+      "/api": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        // backendê°€ /api í”„ë¦¬í”½ìŠ¤ë¥¼ ê·¸ëŒ€ë¡œ ê¸°ëŒ€í•˜ë¯€ë¡œ rewrite ë¶ˆí•„ìš”
+        // í•„ìš” ì‹œ: rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
+
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
   },
+
   test: {
     globals: true,
     include: ["src/**/*.test.js", "src/**/*.test.jsx"],
     environment: "jsdom",
     setupFiles: "./vitest.setup.js",
     transformMode: {
-      web: [/\.[jt]sx?$/],  // ¸ğµç JS/JSX/TS/TSX ÆÄÀÏÀ» web ¸ğµå·Î º¯È¯
+      web: [/\.[jt]sx?$/], // ëª¨ë“  JS/JSX/TS/TSXì„ web ëª¨ë“œë¡œ ë³€í™˜
     },
   },
+
   build: {
     chunkSizeWarningLimit: 100000000,
   },
-  // .js ÆÄÀÏ¿¡¼­ JSX ±¸¹®À» Áö¿øÇÏµµ·Ï ¼³Á¤
+
+  // .js íŒŒì¼ì—ì„œë„ JSX í—ˆìš©
   esbuild: {
     loader: "jsx",
-    include: /\.[jt]sx?$/,  // .js, .jsx, .ts, .tsx ¸ğµÎ Æ÷ÇÔ
+    include: /\.[jt]sx?$/, // .js, .jsx, .ts, .tsx
     exclude: [],
   },
+
   optimizeDeps: {
     esbuildOptions: {
       loader: {

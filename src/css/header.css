@@ -457,3 +457,128 @@
     right: 10px; bottom: 10px;
   }
 }
+
+/* 추천 바로가기 카드 */
+.actions-card {
+  margin: 8px 0 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.55));
+  border: 1px solid rgba(0,0,0,0.06);
+  backdrop-filter: blur(6px);
+}
+.actions-title {
+  display:flex; align-items:center; gap:8px;
+  font-weight: 600; font-size: 13px; color:#111; margin-bottom:8px;
+}
+.actions-title .spark { opacity:.8 }
+
+/* 칩 그리드 */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+.action-chip {
+  width: 100%;
+  display:flex; align-items:center; gap:10px;
+  padding: 10px 12px;
+  border-radius: 9999px;
+  background: #f6f7fb;
+  border: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.action-chip:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  background: #fff;
+}
+.action-chip .ic { display:flex; align-items:center; justify-content:center; }
+.action-chip .tx { font-size: 13px; font-weight: 600; color:#222; }
+.action-chip .k {
+  margin-left: auto;
+  font-size: 10px; line-height: 1;
+  color:#666; background:#eef0f3; border:1px solid #e5e7eb;
+  padding: 3px 6px; border-radius: 6px;
+}
+@media (max-width: 420px) {
+  .action-grid { grid-template-columns: repeat(2, 1fr); }
+}
+/* ====== Chat Action Bar (glass + gradient chips) ====== */
+.chat-panel .action-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  padding: 6px 2px 2px;
+  border-radius: 14px;
+  background: color-mix(in oklab, rgba(255,255,255,0.06) 60%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow-x: auto;
+}
+.chat-panel .action-bar::-webkit-scrollbar { height: 6px; }
+.chat-panel .action-bar::-webkit-scrollbar-thumb {
+  background: rgba(120,120,120,.25);
+  border-radius: 99px;
+}
+.chat-panel .chip {
+  --bg: linear-gradient(135deg, #E2E8F0 0%, #CBD5E1 100%);
+  --fg: #0b1220;
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 999px; border: none;
+  background: var(--bg); color: var(--fg); font-weight: 600; line-height: 1;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08), inset 0 0 0 1px rgba(255,255,255,.35);
+  transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+}
+.chat-panel .chip .icon { width: 18px; height: 18px; opacity: .9; }
+.chat-panel .chip .label { letter-spacing: .2px; }
+.chat-panel .chip .arrow::after { content: "›"; display: inline-block; margin-left: 2px; transform: translateY(-1px); opacity: .7; }
+.chat-panel .chip:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(0,0,0,.12), inset 0 0 0 1px rgba(255,255,255,.4); filter: saturate(1.05); }
+.chat-panel .chip:active { transform: translateY(0); }
+.chat-panel .chip.t-transform { --bg: linear-gradient(135deg, #a7f3d0 0%, #60a5fa 100%); --fg: #081420; }
+.chat-panel .chip.t-security  { --bg: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%); --fg: #1a1200; }
+.chat-panel .chip.t-guide     { --bg: linear-gradient(135deg, #e9d5ff 0%, #7c3aed 100%); --fg: #fff; }
+.chat-panel .chip.t-inform    { --bg: linear-gradient(135deg, #bfdbfe 0%, #3b82f6 100%); --fg: #072042; }
+.chat-panel .chip.t-download  { --bg: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%); --fg: #230707; }
+.chat-panel .chip.t-default   { --bg: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); --fg: #0b1220; }
+.chat-panel .chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* === Chat message vertical stack & actions row === */
+.chat-panel .chat-body .chat-msg {
+  display: flex;
+  flex-direction: column;   /* 자식(버블, 액션바)을 세로 쌓기 */
+  gap: 6px;
+}
+
+/* 발신자별 정렬(선택) — 필요 없으면 제거 가능 */
+.chat-panel .chat-body .chat-msg.me   { align-items: flex-end; }
+.chat-panel .chat-body .chat-msg.bot  { align-items: flex-start; }
+
+/* 버블 너비(선택) — 줄바꿈 예쁘게 */
+.chat-panel .chat-body .chat-msg .bubble {
+  max-width: 86%;
+}
+
+/* 액션 바를 '아래 한 줄'로 강제 */
+.chat-panel .msg-actions-row {
+  display: flex;
+  width: 100%;
+}
+
+/* 액션 바 안에서 칩들을 가로로, 필요 시 줄바꿈 */
+.chat-panel .msg-actions-row .action-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+  padding-top: 2px;
+  /* 버블과 좌우 정렬 느낌 맞추기(봇=왼쪽, 나=오른쪽) */
+  align-items: center;
+  justify-content: flex-start; /* 봇 말 아래는 왼쪽 정렬 */
+}
+
+.chat-panel .chat-msg.me .msg-actions-row .action-bar {
+  justify-content: flex-end;   /* 내 말 아래는 오른쪽 정렬 (원하면 유지) */
+}
