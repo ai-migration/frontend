@@ -1,14 +1,13 @@
+// src/components/layout/EgovHeader.jsx
 import { Link as HLink, NavLink as HNavLink, useNavigate as useHNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import * as EgovNet2 from "@/api/egovFetch";
 import URL2 from "@/constants/url";
-import CODE from "@/constants/code"; // (미사용이어도 보존)
 import "@/css/header.css";
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
 
-/** ✅ 전역 FAB 버튼 이미지 (원하면 PNG 교체) */
 import chatIconPng from "/src/assets/images/due.jpg";
 
 import {
@@ -19,7 +18,7 @@ import {
   useCallback as useCallback2,
 } from "react";
 
-export function EgovHeader() {
+export default function EgovHeader() {
   // --- Session / user ---
   const sessionToken = getSI("jToken");
   const sessionUser = getSI("loginUser");
@@ -36,7 +35,7 @@ export function EgovHeader() {
   const [scrolled, setScrolled] = useState2(false);
   const [scrollPct, setScrollPct] = useState2(0);
 
-  // === Chat (전역 FAB + 패널) ===
+  // === Chat (전역 FAB + 드로어) ===
   const [isChatOpen, setIsChatOpen] = useState2(false);
   const [unread, setUnread] = useState2(0);
   const [messages, setMessages] = useState2([
@@ -55,9 +54,12 @@ export function EgovHeader() {
   const chatListRef = useRef2(null);
   const chatBtnRef = useRef2(null);
   const inputRef = useRef2(null);
+  const firstTrapRef = useRef2(null);   // 포커스 트랩 sentinel
+  const lastTrapRef = useRef2(null);    // 포커스 트랩 sentinel
+  const previouslyFocusedRef = useRef2(null);
 
-  // A11y: button title 동기화
-  const menuBtnTitle = useMemo2(() => (isMenuOpen ? "전체메뉴 열림" : "전체메뉴 닫힘"), [isMenuOpen]);
+  // A11y: 버튼 title 동기화
+  const menuBtnTitle = useMemo2(() => (isMenuOpen ? "전체메뉴 닫기" : "전체메뉴 열기"), [isMenuOpen]);
   const chatBtnTitle = useMemo2(() => (isChatOpen ? "챗봇 닫기" : "챗봇 열기"), [isChatOpen]);
 
   // --- Handlers ---
@@ -99,7 +101,6 @@ export function EgovHeader() {
     setIsHovering(true);
     setIsMenuOpen(true);
   }, []);
-
   const handleMenuMouseLeave = useCallback2(() => {
     setIsHovering(false);
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
@@ -122,12 +123,15 @@ export function EgovHeader() {
     const onKeyDown = (e) => {
       if (e.key === "Escape") {
         setIsMenuOpen(false);
-        setIsChatOpen(false);
+        if (isChatOpen) {
+          setIsChatOpen(false);
+          previouslyFocusedRef.current?.focus?.();
+        }
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [isChatOpen]);
 
   // 스크롤 상태 (헤더 음영/축소 + 진행바)
   useEffect2(() => {
@@ -155,7 +159,7 @@ export function EgovHeader() {
     if (btnEl) btnEl.classList.toggle("active", isMenuOpen);
   }, [isMenuOpen]);
 
-  // === Chat: FAB 열기/닫기 & 바깥 클릭 닫기 ===
+  // === Chat: 열기/닫기 & 바깥 클릭 닫기 ===
   const toggleChat = useCallback2(() => setIsChatOpen((v) => !v), []);
   const closeChat = useCallback2(() => setIsChatOpen(false), []);
 
@@ -166,20 +170,25 @@ export function EgovHeader() {
       const btn = chatBtnRef.current;
       if (panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) {
         setIsChatOpen(false);
+        previouslyFocusedRef.current?.focus?.();
       }
     };
     document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [isChatOpen]);
 
-  // Chat 열릴 때 포커스/미읽음 처리
+  // Chat 열릴 때 포커스/미읽음/포커스 트랩 준비
   useEffect2(() => {
     if (isChatOpen) {
       setUnread(0);
+      previouslyFocusedRef.current = document.activeElement;
       setTimeout(() => {
         inputRef.current?.focus();
         chatListRef.current?.scrollTo({ top: chatListRef.current.scrollHeight, behavior: "smooth" });
       }, 10);
+    } else {
+      // 닫히면 포커스 복구
+      previouslyFocusedRef.current?.focus?.();
     }
   }, [isChatOpen]);
 
@@ -189,7 +198,29 @@ export function EgovHeader() {
     chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
   }, [messages.length]);
 
-  // === Chat Action UI (icons + gradient chips) =====================
+  // 포커스 트랩: Tab 순환
+  const trapKeyDown = useCallback2((e) => {
+    if (!isChatOpen || e.key !== "Tab") return;
+    const focusables = chatRef.current?.querySelectorAll(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusables || focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }, [isChatOpen]);
+
+  // === Chat Action UI =====================
   const getActionTheme = (url = "") => {
     if (/\/support\/transform/i.test(url)) return "t-transform";
     if (/\/support\/security/i.test(url)) return "t-security";
@@ -233,13 +264,11 @@ export function EgovHeader() {
 
   const ChatActionBar = ({ actions = [] }) => {
     if (!Array.isArray(actions) || actions.length === 0) return null;
-
     return (
       <div className="action-bar" role="list" aria-label="빠른 이동">
         {actions.map((a, idx) => {
           const theme = getActionTheme(a.url);
           const external = /^https?:\/\//i.test(a.url);
-
           if (external) {
             return (
               <a
@@ -258,7 +287,6 @@ export function EgovHeader() {
               </a>
             );
           }
-
           return (
             <button
               key={idx}
@@ -319,7 +347,7 @@ export function EgovHeader() {
 
         const botMsg = { id: `b-${Date.now()}`, role: "bot", text: reply, actions, citations };
         setMessages((prev) => [...prev, botMsg]);
-      } catch (err) {
+      } catch {
         // ❗ 폴백 (연결 오류)
         const botMsg = {
           id: `b-${Date.now()}`,
@@ -342,21 +370,34 @@ export function EgovHeader() {
 
   return (
     <>
-      <div ref={headerRef} className={`header ${scrolled ? "is-scrolled" : ""}`} data-state={isMenuOpen ? "open" : "closed"}>
-        {/* 상단 스크롤 진행바 (트렌디) */}
+      <div
+        ref={headerRef}
+        className={`header ${scrolled ? "is-scrolled" : ""}`}
+        data-state={isMenuOpen ? "open" : "closed"}
+      >
+        {/* 상단 스크롤 진행바 */}
         <div className="scroll-progress" aria-hidden style={{ transform: `scaleX(${scrollPct / 100})` }} />
 
-        <div className="inner">
-          <HLink to={URL2.MAIN} className="ico lnk_go_template" target="_blank">홈페이지 템플릿 소개 페이지로 이동</HLink>
+        <div className="inner grid3">
+          {/* 왼쪽 클러스터: 로고 + 템플릿 링크 */}
+          <div className="left_cluster">
+            <HLink to={URL2.MAIN} className="ico lnk_go_template" target="_blank" aria-label="홈페이지 템플릿 안내 새창">
+              홈페이지 템플릿
+            </HLink>
 
-          <h1 className="logo">
-            <HLink to={URL2.MAIN} className="w" aria-label="메인으로 이동 (데스크톱 로고)"><img src={logoImg} alt="eGovFrame 심플홈페이지" /></HLink>
-            <HLink to={URL2.MAIN} className="m" aria-label="메인으로 이동 (모바일 로고)"><img src={logoImgMobile} alt="eGovFrame 심플홈페이지" /></HLink>
-          </h1>
+            <h1 className="logo">
+              <HLink to={URL2.MAIN} className="w" aria-label="메인으로 이동 (데스크톱 로고)">
+                <img src={logoImg} alt="eGovFrame 심플홈페이지" />
+              </HLink>
+              <HLink to={URL2.MAIN} className="m" aria-label="메인으로 이동 (모바일 로고)">
+                <img src={logoImgMobile} alt="eGovFrame 심플홈페이지" />
+              </HLink>
+            </h1>
+          </div>
 
           {/* GNB: 호버 시 전체메뉴 오픈 */}
           <nav
-            className="gnb shift-left-40"
+            className="gnb"
             role="navigation"
             aria-label="주요 메뉴"
             onMouseEnter={openAllMenuByHover}
@@ -373,30 +414,29 @@ export function EgovHeader() {
             </ul>
           </nav>
 
-          {/* User Area */}
-          <div className="user_info" aria-live="polite" data-username={sessionUserName || ""} data-role={sessionUserSe || "GUEST"}>
-            {sessionUserId ? (
-              <>
-                <span className="person">{sessionUserName}</span> 님, {sessionUserSe} 반갑습니다!
-                {sessionUserSe === "USER" && (
-                  <HNavLink to={URL2.MYPAGE} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>마이페이지</HNavLink>
-                )}
-                <button onClick={logOutHandler} className="btn">로그아웃</button>
-              </>
-            ) : (
-              <>
-                <button onClick={logInHandler} className="btn login">로그인</button>
-                <HNavLink to={URL2.SIGNUP} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>회원가입</HNavLink>
-              </>
-            )}
-          </div>
+          {/* User Area + 전체메뉴 버튼 */}
+          <div className="right_cluster">
+            <div className="user_info" aria-live="polite" data-username={sessionUserName || ""} data-role={sessionUserSe || "GUEST"}>
+              {sessionUserId ? (
+                <>
+                  <span className="person">{sessionUserName}</span> 님, {sessionUserSe}
+                  {sessionUserSe === "USER" && (
+                    <HNavLink to={URL2.MYPAGE} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>마이페이지</HNavLink>
+                  )}
+                  <button onClick={logOutHandler} className="btn">로그아웃</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={logInHandler} className="btn login">로그인</button>
+                  <HNavLink to={URL2.SIGNUP} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>회원가입</HNavLink>
+                </>
+              )}
+            </div>
 
-          {/* 전체메뉴 버튼 */}
-          <div className="right_a">
             <button
               ref={btnAllMenuRef}
               type="button"
-              className="btn btnAllMenu move-right-50"
+              className="btn btnAllMenu"
               title={menuBtnTitle}
               aria-expanded={isMenuOpen}
               aria-controls="allmenu-web"
@@ -485,7 +525,10 @@ export function EgovHeader() {
           aria-label={chatBtnTitle}
           aria-expanded={isChatOpen}
           aria-controls="ai-chat-panel"
-          onClick={toggleChat}
+          onClick={() => {
+            previouslyFocusedRef.current = chatBtnRef.current;
+            toggleChat();
+          }}
         >
           <img src={chatIconPng} alt="AI 챗봇 열기" />
           {unread > 0 && <span className="badge">{unread > 99 ? "99+" : unread}</span>}
@@ -493,16 +536,20 @@ export function EgovHeader() {
         document.body
       )}
 
-      {/* === Chat Panel: Portal === */}
+      {/* === Chat Panel: Portal + Focus Trap === */}
       {createPortal(
         <section
           id="ai-chat-panel"
           ref={chatRef}
           className={`chat-panel ${isChatOpen ? "open" : ""}`}
           role="dialog"
-          aria-modal="false"
+          aria-modal="true"
           aria-label="AI 챗봇"
+          onKeyDown={trapKeyDown}
         >
+          {/* focus trap sentinels */}
+          <span tabIndex="0" ref={firstTrapRef} className="sr-only">시작</span>
+
           <header className="chat-head">
             <div className="chat-head-left">
               <span className="chat-head-icon" aria-hidden="true">
@@ -514,7 +561,7 @@ export function EgovHeader() {
               <span className="chat-status" aria-live="polite">● 온라인</span>
             </div>
             <div className="chat-head-right">
-              <button className="chat-head-btn" onClick={closeChat} aria-label="챗봇 닫기">
+              <button className="chat-head-btn" onClick={() => { closeChat(); previouslyFocusedRef.current?.focus?.(); }} aria-label="챗봇 닫기">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
@@ -526,11 +573,7 @@ export function EgovHeader() {
             {messages.map((m) => (
               <div key={m.id} className={`chat-msg ${m.role}`}>
                 <div className="bubble">{m.text}</div>
-
-                {/* ▶︎ 트렌디 액션 바 */}
                 {m.role === "bot" && <ChatActionBar actions={m.actions} />}
-
-                {/* ▶︎ 근거(선택) */}
                 {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
                   <details className="citations">
                     <summary>참고 근거</summary>
@@ -569,11 +612,11 @@ export function EgovHeader() {
               </svg>
             </button>
           </form>
+
+          <span tabIndex="0" ref={lastTrapRef} className="sr-only">끝</span>
         </section>,
         document.body
       )}
     </>
   );
 }
-
-export default EgovHeader;
