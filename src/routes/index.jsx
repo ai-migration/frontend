@@ -5,13 +5,13 @@ import URL from "@/constants/url";
 import CODE from "@/constants/code";
 
 //COMMON
-import EgovHeader from "@/components/EgovHeader";
-import EgovFooter from "@/components/EgovFooter";
+import ModernHeader from "@/components/ModernHeader";
+import ModernFooter from "@/components/ModernFooter";
 import EgovInfoPopup from "@/components/EgovInfoPopup";
 import EgovError from "@/components/EgovError";
 
-import EgovMain from "@/pages/main/EgovMain";
-import EgovLogin from "@/pages/login/EgovLogin";
+import ModernMain from "@/pages/main/ModernMain";
+import ModernLogin from "@/pages/login/ModernLogin";
 import EgovSignup from "@/pages/signup/EgovSignup";
 import EgovSignupAgree from "@/pages/signup/EgovSignupAgree";
 import EgovSignupForm from "@/pages/signup/EgovSignupForm";
@@ -256,7 +256,7 @@ const SecondRoutes = () => {
 
   return (
     <>
-      <EgovHeader />
+      <ModernHeader />
       <Routes>
         {/* MAIN */}
         <Route path={URL.MAIN} element={<EgovMain />} />
@@ -264,7 +264,7 @@ const SecondRoutes = () => {
         {/* LOGIN */}
         <Route
           path={URL.LOGIN}
-          element={<EgovLogin onChangeLogin={(user) => setLoginVO(user)} />}
+          element={<ModernLogin onChangeLogin={(user) => setLoginVO(user)} />}
         />
 
         {/* SIGNUP */}
@@ -533,7 +533,7 @@ const SecondRoutes = () => {
         />
       </Routes>
 
-      <EgovFooter />
+      <ModernFooter />
       <EgovInfoPopup />
     </>
   );
