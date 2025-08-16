@@ -1,82 +1,465 @@
 @charset "utf-8";
 
-/* Web Font */
-@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 300;
-    src: url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff2) format('woff2'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff) format('woff'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.otf) format('opentype');} 
-    
-@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 400;src: 
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff2) format('woff2'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff) format('woff'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.otf) format('opentype');} 
-    
-@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 500;
-    src: url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff2) format('woff2'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff) format('woff'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.otf) format('opentype');} 
-    
-@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 700;
-    src: url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff2) format('woff2'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff) format('woff'),
-    url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.otf) format('opentype');}
-
-/* Reset style */
-* {word-break: keep-all; word-wrap: break-word; box-sizing: border-box; -webkit-box-sizing: border-box;}
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p,
-blockquote, pre, a, abbr, acronym, address, big, cite, code, del, em, font, img, ins, q, s, small, strike, strong, sub, sup,
-dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, thead, tbody, tfoot, tr, th, td, input {
-    margin: 0; padding: 0;
+/* Modern CSS Custom Properties */
+:root {
+  /* Primary Colors */
+  --primary-blue: #0000FF;
+  --primary-white: #ffffff;
+  --primary-black: #000000;
+  
+  /* Blue Variations */
+  --blue-50: #f0f0ff;
+  --blue-100: #e0e0ff;
+  --blue-200: #c0c0ff;
+  --blue-300: #9999ff;
+  --blue-400: #6666ff;
+  --blue-500: #0000ff;
+  --blue-600: #0000e6;
+  --blue-700: #0000cc;
+  --blue-800: #0000b3;
+  --blue-900: #000099;
+  
+  /* Grayscale */
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-400: #bdbdbd;
+  --gray-500: #9e9e9e;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  
+  /* Semantic Colors */
+  --success: #4caf50;
+  --warning: #ff9800;
+  --error: #f44336;
+  --info: var(--blue-500);
+  
+  /* Typography */
+  --font-family-sans: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-blue: 0 10px 15px -3px rgb(0 0 255 / 0.1), 0 4px 6px -4px rgb(0 0 255 / 0.1);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  
+  /* Z-Index */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
 }
 
-blockquote, button, fieldset, iframe {border: 0;}
-cite, em, u, address, i {font-style: normal;}
-img {border: 0; vertical-align: top;}
-hr, legend {position: absolute; left: -9999px; top: -9999px;}
-caption {text-indent: -9999px; font-size: 0;}
-li {list-style: none;}
-table {width: 100%; table-layout: fixed; border-collapse: collapse;}
-a:link, a:visited, a:hover, a:active {text-decoration: none;}
+/* Modern Web Fonts */
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff2) format('woff2'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff) format('woff'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.otf) format('opentype');
+} 
 
-/* Blind 숨김처리 */
-.blind {position: absolute; left: -9999px; top: -9999px;}
-.skip {position: absolute; left: -9999px; top: -9999px;}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff2) format('woff2'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff) format('woff'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.otf) format('opentype');
+} 
 
-body {font-family: 'Noto Sans KR', sans-serif; font-size: 16px;}
-button, textarea {font-family: 'Noto Sans KR', sans-serif;}
-button {cursor: pointer;}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff2) format('woff2'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff) format('woff'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.otf) format('opentype');
+} 
 
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff2) format('woff2'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff) format('woff'),
+       url(https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.otf) format('opentype');
+}
 
-/* 정렬 */
-.al_c {text-align: center;}
-.al_r {text-align: right;}
+/* Modern CSS Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
+html {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+  scroll-behavior: smooth;
+}
 
-/* 가로길이 */
-.w_full {width: 100%;}
-.w_half {width: 50%;}
-.w_quarter {width: 25%;}
-.w_50 {width: 50px;}
-.w_70 {width: 70px;}
-.w_80 {width: 80px;}
-.w_100 {width: 100px;}
-.w_120 {width: 120px;}
-.w_130 {width: 130px;}
-.w_150 {width: 150px;}
-.w_200 {width: 200px;}
-.w_250 {width: 250px;}
-.w_300 {width: 300px;}
-.w_350 {width: 350px;}
-.w_400 {width: 400px;}
-.w_500 {width: 500px;}
+body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--gray-900);
+  background-color: var(--primary-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  word-break: keep-all;
+  word-wrap: break-word;
+  overflow-x: hidden;
+}
 
-.h_30 {height: 30px;}
-.h_100 {height: 100px;}
+/* Remove default button styles */
+button {
+  font-family: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  outline: none;
+}
 
+/* Remove default input styles */
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+}
 
-/* 여백 */
-.mt0 {margin-top: 0 !important;}
-.mt10 {margin-top: 10px !important;}
-.mt40 {margin-top: 40px !important;}
-.ml10 {margin-left: 10px !important;}
-.pb10 {padding-bottom: 10px !important;}
+/* Remove default link styles */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-blue);
+}
+
+/* List styles */
+ol,
+ul {
+  list-style: none;
+}
+
+/* Table styles */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+/* Image styles */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Accessibility */
+.blind,
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: var(--z-tooltip);
+}
+
+.skip:focus {
+  position: absolute;
+  left: 6px;
+  top: 7px;
+  width: auto;
+  height: auto;
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary-blue);
+  color: var(--primary-white);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility Classes */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+.text-primary { color: var(--primary-blue); }
+.text-white { color: var(--primary-white); }
+.text-gray-500 { color: var(--gray-500); }
+.text-gray-600 { color: var(--gray-600); }
+.text-gray-700 { color: var(--gray-700); }
+.text-gray-800 { color: var(--gray-800); }
+.text-gray-900 { color: var(--gray-900); }
+
+.bg-primary { background-color: var(--primary-blue); }
+.bg-white { background-color: var(--primary-white); }
+.bg-gray-50 { background-color: var(--gray-50); }
+.bg-gray-100 { background-color: var(--gray-100); }
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+/* Modern Glass Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-xl);
+}
+
+.glass-blue {
+  background: rgba(0, 0, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 255, 0.2);
+  border-radius: var(--radius-xl);
+}
+
+/* Modern Card Styles */
+.card {
+  background: var(--primary-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+  border: 1px solid var(--gray-200);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
+}
+
+.card-primary {
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-600));
+  color: var(--primary-white);
+  border: none;
+}
+
+.card-primary:hover {
+  box-shadow: var(--shadow-blue);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--primary-blue);
+  color: var(--primary-white);
+  border-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+  background: var(--blue-700);
+  border-color: var(--blue-700);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.btn-outline:hover {
+  background: var(--primary-blue);
+  color: var(--primary-white);
+}
+
+.btn-white {
+  background: var(--primary-white);
+  color: var(--primary-blue);
+  border-color: var(--gray-200);
+}
+
+.btn-white:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+.hover-lift {
+  transition: transform var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reveal animation for scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
