@@ -1,30 +1,72 @@
 import { Link } from "react-router-dom";
 import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
+import "@/css/modern-styles.css";
+import "@/css/visual-effects.css";
 
 function EgovSupportIntro() {
   return (
-    <div className="container">
-      <div className="c_wrap">
-        <div className="location">
-          <ul>
-            <li><Link to="/" className="home">Home</Link></li>
-            <li><Link to="/support">AI 변환기</Link></li>
-            <li>기능 소개</li>
-          </ul>
-        </div>
+    <div className="modern-page-container">
+      <div className="modern-page-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb">
+          <div className="breadcrumb-container">
+            <Link to="/" className="breadcrumb-home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+              </svg>
+              Home
+            </Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <Link to="/support" className="breadcrumb-link">AI 변환기</Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <span className="breadcrumb-current">기능 소개</span>
+          </div>
+        </nav>
 
-        <div className="layout">
+        <div className="modern-layout">
+          {/* Left Navigation */}
           <EgovLeftNavTransform />
-          <div className="contents SITE_GALLARY_VIEW" id="contents">
-            <div className="top_tit">
-              <h1 className="tit_1">AI 변환기</h1>
-            </div>
-            <h2 className="tit_2">기능 소개</h2>
 
-            <div className="board_view2">
-              <p className="msg_1">
-                AI 변환기는 사용자가 업로드한 코드를 <strong>전자정부표준프레임워크(eGovFrame)</strong> 구조에 맞춰 자동으로 변환해주는 도구입니다.
-              </p>
+          {/* Main Content */}
+          <main className="modern-content">
+            {/* Hero Section */}
+            <section className="content-hero">
+              <div className="hero-content">
+                <div className="hero-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
+                    <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
+                    <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                  </svg>
+                </div>
+                <h1 className="hero-title">AI 변환기</h1>
+                <p className="hero-description">전자정부표준프레임워크로 코드를 자동 변환하는 AI 도구입니다</p>
+              </div>
+            </section>
+
+            {/* Content Section */}
+            <section className="content-section">
+              <div className="info-card">
+                <div className="card-header">
+                  <div className="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <h2 className="card-title">기능 소개</h2>
+                </div>
+                <div className="card-content">
+                  <p className="card-text">
+                    AI 변환기는 사용자가 업로드한 코드를 <strong>전자정부표준프레임워크(eGovFrame)</strong> 구조에 맞춰 자동으로 변환해주는 도구입니다.
+                  </p>
 
               <div
                 style={{
