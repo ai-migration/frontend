@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
+    "@react-spring/web": "^10.0.1",
     "axios": "^1.11.0",
     "egovframe-template-simple-react": "file:",
     "framer-motion": "^12.23.12",
@@ -12,6 +13,7 @@
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.4.0",
+    "react-syntax-highlighter": "^15.6.1",
     "three": "^0.178.0",
     "vanta": "^0.5.24",
     "web-vitals": "^2.1.4"

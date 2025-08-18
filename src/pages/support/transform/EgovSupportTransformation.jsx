@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
+import EgovProgressBar from "@/components/EgovProgressBar";
 import { getSessionItem } from "@/utils/storage";
 
 /**
@@ -16,11 +17,11 @@ console.log("GET_BASE =", GET_BASE);
 console.log("POST_BASE =", POST_BASE);
 
 function EgovSupportTransformation() {
-  const MAX_FILES = 10;
-  const MAX_SIZE_MB = 200;
+  const MAX_SIZE_MB = 20;
 
-  const [files1, setFiles1] = useState([]); // 프레임워크 변환용
-  const [files2, setFiles2] = useState([]); // 버전 변환용
+  // ✅ 단일 파일 상태로 변경
+  const [file1, setFile1] = useState(null); // 프레임워크 변환용 (단일)
+  const [file2, setFile2] = useState(null); // 버전 변환용 (단일)
   const fileInputRef1 = useRef(null);
   const fileInputRef2 = useRef(null);
 
@@ -28,9 +29,14 @@ function EgovSupportTransformation() {
   const [loadingType, setLoadingType] = useState(null);
   const [progress, setProgress] = useState(0);
   const [successType, setSuccessType] = useState(null);
+  const esRef = useRef(null);
+  const [running, setRunning] = useState(false);
+  const [logs, setLogs] = useState([]); // 수신 메시지 기록
+  const [status, setStatus] = useState("IDLE"); // IDLE | RUNNING | DONE | ERROR
 
   // 옵션 (변환 시 사용)
   const [lang, setLang] = useState("Python");
+  const [conversionType, setConversionType] = useState("CODE");
   const [fromVer, setFromVer] = useState("4.1");
   const [toVer, setToVer] = useState("4.3");
 
@@ -52,112 +58,167 @@ function EgovSupportTransformation() {
   };
 
   const USE_CREDENTIALS = true;
+    // ✅ 업로드를 호출하면 jobId를 resolve 해주는 Promise 기반 함수
+  const uploadOne = async (item, setFile) => {
+    const uid = getNumericUserId();
+    if (!uid) {
+      alert("로그인 정보의 userId가 숫자가 아닙니다. (id/userId/userNo 중 숫자 필드 필요)");
+      throw new Error("invalid user id");
+    }
 
-  // ✅ 단일 파일 업로드: @RequestPart("agent")와 @RequestPart("file")에 맞춰 전송
-  const uploadOne = async (item, setFiles) => {
-    try {
-      const uid = getNumericUserId();
-      console.log("sessionUser =", sessionUser);
-      if (!uid) {
-        alert("로그인 정보의 userId가 숫자가 아닙니다. (id/userId/userNo 중 숫자 필드 필요)");
+    // 클라이언트 기준 가채(jobId)
+    const clientJobId = Date.now() + Math.floor(Math.random() * 1000);
+
+    const form = new FormData();
+    const agentPayload = { jobId: clientJobId, userId: uid , filePath: item.file.name, inputeGovFrameVer: fromVer, outputeGovFrameVer: toVer, isTestCode: false, conversionType: conversionType}; // 필요 데이터 추가
+    const agentBlob = new Blob([JSON.stringify(agentPayload)], { type: "application/json" });
+    form.append("agent", agentBlob, "agent.json");
+    form.append("file", item.file, item.file.name);
+
+    // 업로드 시작
+    setFile(prev => ({ ...prev, status: "uploading", jobId: clientJobId }));
+    
+    const res = await axios.post(`${POST_BASE}/agents/conversion`, form, {
+      onUploadProgress: (evt) => {
+        if (!evt.total) return;
+        const pct = Math.round((evt.loaded * 100) / evt.total);
+        setFile(prev => ({ ...prev, progress: pct }));
+      },
+      withCredentials: USE_CREDENTIALS,
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+    });
+
+    const srvJobId = res?.data?.jobId ?? clientJobId;
+    const srvUserId = res?.data?.userId ?? uid;
+
+    setFile(prev => ({
+        ...prev,
+        status: "done",
+        progress: 100,
+        jobId: srvJobId,
+        __srvUserId: srvUserId,
+        __s3Key: res?.data?.s3Key,
+    }));
+
+    // ✅ 업로드 완료 후 서버의 jobId를 반환
+    return { jobId: srvJobId, userId: srvUserId };
+    };
+
+  // ✅ 단일 파일 선택 즉시 업로드
+  const handleFileChangeSingle = (e, setFile) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isZip = file.name.toLowerCase().endsWith(".zip");
+    const okSize = file.size <= MAX_SIZE_MB * 1024 * 1024;
+    if (!isZip || !okSize) {
+      alert(`.zip 파일만 업로드 가능하며, ${MAX_SIZE_MB}MB 이하만 허용됩니다.`);
+      return;
+    }
+
+    const item = {
+      id: crypto.randomUUID(),
+      file,
+      status: "ready",
+      progress: 0,
+      jobId: null,
+    };
+
+    setFile(item);
+    // 선택 즉시 업로드 (원치 않으면 이 줄을 주석 처리)
+    // uploadOne(item, setFile);
+  };
+
+  const appendLog = (line) =>
+    setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()}  ${line}`]);
+
+  // 변환 버튼: 업로드와 분리되었지만, "클릭 시 업로드를 실행"하고 "그 다음 SSE"
+  const handleTransform = async (type) => {
+    // const conversionType = type === "프레임워크 변환" ? "CODE" : "EGOV";
+    setConversionType(type === "프레임워크 변환" ? "CODE" : "EGOV");
+    const target = type === "프레임워크 변환" ? file1 : file2;
+    const setFile = type === "프레임워크 변환" ? setFile1 : setFile2;
+
+    if (!target) {
+        alert("파일을 먼저 선택하세요.");
         return;
-      }
-
-      // 백엔드에서 agent.getId() = jobId 로 사용
-      const clientJobId = Date.now() + Math.floor(Math.random() * 1000);
-
-      const form = new FormData();
-
-      // ✅ 변경 1) agent 파트를 JSON Blob으로 추가 (Content-Type: application/json)
-      const agentPayload = {
-        id: clientJobId,     // Agent.id (jobId)
-        userId: uid,         // Agent.userId
-        // 필요 시 추가 가능: inputLanguage: lang
-      };
-      const agentBlob = new Blob([JSON.stringify(agentPayload)], { type: "application/json" });
-      form.append("agent", agentBlob, "agent.json");
-
-      // ✅ 변경 2) 파일 파트 이름은 백엔드의 @RequestPart("file")와 동일해야 함
-      form.append("file", item.file, item.file.name);
-
-      // 업로드 시작 표시
-      setFiles(prev => prev.map(it => it.id === item.id ? { ...it, status: "uploading", jobId: clientJobId } : it));
-
-      const res = await axios.post(`${POST_BASE}/agents/conversion`, form, {
-        onUploadProgress: (evt) => {
-          if (!evt.total) return;
-          const pct = Math.round((evt.loaded * 100) / evt.total);
-          setFiles(prev => prev.map(it => it.id === item.id ? { ...it, progress: pct } : it));
-        },
-        withCredentials: USE_CREDENTIALS,
-        maxBodyLength: Infinity,
-        maxContentLength: Infinity,
-      });
-
-      // 현재 백엔드는 body 없이 200 OK만 반환하므로 clientJobId 유지
-      const srvJobId = res?.data?.jobId;
-      const srvUserId = res?.data?.userId;
-
-      setFiles(prev => prev.map(it => {
-        if (it.id !== item.id) return it;
-        return {
-          ...it,
-          status: "done",
-          progress: 100,
-          jobId: srvJobId ?? clientJobId,
-          __srvUserId: srvUserId ?? uid,
-          __s3Key: res?.data?.s3Key, // (있다면 표시)
-        };
-      }));
-    } catch (e) {
-      console.error(e);
-      setFiles(prev => prev.map(it => it.id === item.id ? { ...it, status: "error" } : it));
     }
-  };
-
-  // 파일 선택 즉시 업로드
-  const handleFileChange = (e, setFiles, files) => {
-    const newFiles = Array.from(e.target.files || []);
-    const totalFiles = files.length + newFiles.length;
-    if (totalFiles > MAX_FILES) return;
-
-    const validated = newFiles
-      .map((file) => {
-        const isZip = file.name.toLowerCase().endsWith(".zip");
-        const okSize = file.size <= MAX_SIZE_MB * 1024 * 1024;
-        if (!isZip || !okSize) return null;
-        return {
-          id: crypto.randomUUID(),
-          file,
-          status: "ready",
-          progress: 0,
-          jobId: null,
-        };
-      })
-      .filter(Boolean);
-
-    if (validated.length > 0) {
-      setFiles(prev => [...prev, ...validated]);
-      validated.forEach(f => uploadOne(f, setFiles)); // 즉시 업로드
+    if (target.status === "uploading") {
+        alert("이미 업로드 중입니다. 잠시만 기다려주세요.");
+        return;
     }
-  };
-
-  // 변환 버튼: 업로드와 분리
-  const handleTransform = (type) => {
-    const target = type === "프레임워크 변환" ? files1 : files2;
-    const done = target.filter(f => f.status === "done");
-    const jobIds = done.map(f => f.jobId);
-
-    // TODO: 변환 API 호출 (type/lang/fromVer/toVer/jobIds)
-    console.log("변환 준비:", { type, lang, fromVer, toVer, jobIds });
 
     setLoadingType(type);
-    setProgress(100);
-    setTimeout(() => {
+    setProgress(0);
+    setLogs([]);
+    setRunning(true);
+    setStatus("RUNNING");
+
+    try {
+      // ✅ 여기서 업로드 실행 (파일이 ready 상태였더라도 클릭 시 업로드)
+      const { jobId, userId } = await uploadOne(target, setFile);
+
+      // ✅ 업로드 완료 후에야 SSE 시작
+      const es = new EventSource(
+        `${GET_BASE}/response/${userId}/${jobId}`
+      );
+      esRef.current = es;
+
+      es.addEventListener("agent-message", (e) => {
+        const payload = JSON.parse(e.data);  // ← JSON 파싱
+        console.log(payload);
+        appendLog(`STEP: ${payload.description}`);
+        if(payload.language != null)
+          appendLog(`LANGUAGE: ${payload.language}`);
+        setProgress((prev) => {
+          const v = Math.min(prev + 12.5, 100);
+          if (v >= 100) {
+            setLoadingType(null);
+            setSuccessType(type);
+          }
+          return v;
+        });
+      });
+
+      es.addEventListener("step", (e) => {
+        appendLog(`STEP: ${e.data}`);
+        setProgress((prev) => {
+          const v = Math.min(prev + 10, 100);
+          if (v >= 100) {
+            setLoadingType(null);
+            setSuccessType(type);
+          }
+          return v;
+        });
+      });
+
+      es.addEventListener("done", (e) => {
+        appendLog(`DONE: ${e.data}`);
+        setStatus("DONE");
+        setRunning(false);
+        es.close();
+        esRef.current = null;
+      });
+
+      es.addEventListener("error", (e) => {
+        try {
+          const data = e?.data ? JSON.parse(e.data) : null;
+          appendLog(`ERROR: ${data?.message ?? "connection error"}`);
+        } catch {
+          appendLog("ERROR: connection error");
+        }
+        setStatus("ERROR");
+        setRunning(false);
+        es.close();
+        esRef.current = null;
+      });
+    } catch (err) {
+      console.error(err);
+      setStatus("ERROR");
+      setRunning(false);
       setLoadingType(null);
-      setSuccessType(type);
-      setProgress(0);
-    }, 500);
+    }
   };
 
   // ✅ 다운로드: 업로드와 동일 규칙의 userId 사용
@@ -208,7 +269,8 @@ function EgovSupportTransformation() {
     </div>
   );
 
-  const UploadBox = ({ title, note1, note2, fileInputRef, files, setFiles, transformType }) => (
+  // ✅ 단일 파일용 업로드 박스
+  const UploadBox = ({ title, note1, note2, fileInputRef, file, setFile, transformType }) => (
     <div className="upload-box-wrapper" style={{ backgroundColor: "#F0F8F0", padding: "24px", borderRadius: "8px", border: "1px solid #D1E7DD", marginTop: "20px" }}>
       <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "12px" }}>{title}</h3>
       <ul style={{ fontSize: "14px", marginBottom: "16px", color: "#333" }}>
@@ -217,7 +279,12 @@ function EgovSupportTransformation() {
       </ul>
 
       <div
-        onDrop={(e) => { e.preventDefault(); handleFileChange({ target: { files: e.dataTransfer.files } }, setFiles, files); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          const f = e.dataTransfer.files?.[0];
+          if (!f) return;
+          handleFileChangeSingle({ target: { files: [f] } }, setFile);
+        }}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => fileInputRef.current.click()}
         style={{ border: "2px dashed #CCCCCC", borderRadius: "6px", padding: "40px 20px", textAlign: "center", backgroundColor: "#fff", cursor: "pointer" }}
@@ -232,8 +299,8 @@ function EgovSupportTransformation() {
           ref={fileInputRef}
           type="file"
           accept=".zip,application/zip"
-          multiple
-          onChange={(e) => handleFileChange(e, setFiles, files)}
+          multiple={false}  // ✅ 단일 파일
+          onChange={(e) => handleFileChangeSingle(e, setFile)}
           style={{ display: "none" }}
         />
       </div>
@@ -270,65 +337,82 @@ function EgovSupportTransformation() {
             ? "✅ 변환 완료!"
             : "🚀 변환 하기"}
         </button>
-
+        
         {loadingType === transformType && (
-          <div style={{ marginTop: "8px", height: "8px", background: "#e0e0e0", borderRadius: "4px", overflow: "hidden" }}>
-            <div style={{ width: `${progress}%`, height: "100%", transition: "width 0.3s ease" }} />
+          <EgovProgressBar progress={progress} />
+        )}
+
+        {(loadingType === transformType || successType === transformType) && (
+          <div
+            style={{
+              border: "1px solid #ddd",
+              padding: 12,
+              borderRadius: 8,
+              height: 400,
+              overflow: "auto",
+              background: "#fafafa",
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+              fontSize: 13,
+            }}
+          >
+            {logs.length === 0 ? (
+              <div style={{ color: "#888" }}>로그 없음 (시작을 눌러 테스트하세요)</div>
+            ) : (
+              logs.map((l, i) => <div key={i}>{l}</div>)
+            )}
           </div>
         )}
       </div>
 
-      {files.length > 0 && (
+      {file && (
         <div style={{ marginTop: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", marginBottom: "10px" }}>
-            <span style={{ color: "#246BEB", fontWeight: "bold" }}>{files.length}개</span> / {MAX_FILES}개
-            <button onClick={() => setFiles([])} style={{ border: "none", background: "transparent", color: "#666", cursor: "pointer" }}>
-              ❌ 전체 파일 삭제
+            <span style={{ color: "#246BEB", fontWeight: "bold" }}>1개</span>
+            <button onClick={() => setFile(null)} style={{ border: "none", background: "transparent", color: "#666", cursor: "pointer" }}>
+              ❌ 파일 삭제
             </button>
           </div>
 
           <ul style={{ listStyle: "none", padding: 0 }}>
-            {files.map((item) => (
-              <li key={item.id} style={{ display: "flex", alignItems: "center", gap: 12, backgroundColor: "#fff", border: "1px solid #ddd", borderRadius: "6px", padding: "10px 16px", marginBottom: "8px", fontSize: "14px" }}>
-                <div style={{ flex: 1 }}>
-                  {item.file.name} [{Math.round(item.file.size / 1024)}KB]
-                  {item.jobId ? <span style={{ marginLeft: 8, color: "#246BEB" }}>(jobId: {item.jobId})</span> : null}
-                </div>
+            <li style={{ display: "flex", alignItems: "center", gap: 12, backgroundColor: "#fff", border: "1px solid #ddd", borderRadius: "6px", padding: "10px 16px", marginBottom: "8px", fontSize: "14px" }}>
+              <div style={{ flex: 1 }}>
+                {file.file.name} [{Math.round(file.file.size / 1024)}KB]
+                {file.jobId ? <span style={{ marginLeft: 8, color: "#246BEB" }}>(jobId: {file.jobId})</span> : null}
+              </div>
 
-                <div style={{ minWidth: 160 }}>
-                  {item.status === "uploading" ? (
-                    <>
-                      <span style={{ color: "#888" }}>🔄 업로드 중</span>
-                      <div style={{ height: 6, backgroundColor: "#e0e0e0", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
-                        <div style={{ width: `${item.progress || 0}%`, height: "100%", transition: "width 0.1s ease", backgroundColor: "#4caf50" }} />
-                      </div>
-                    </>
-                  ) : item.status === "done" ? (
-                    <span style={{ color: "green" }}>✅ 완료</span>
-                  ) : item.status === "error" ? (
-                    <span style={{ color: "#cc0000" }}>⚠ 실패</span>
-                  ) : (
-                    <span style={{ color: "#888" }}>대기</span>
-                  )}
-                </div>
-
-                {item.status === "done" && item.jobId && (
-                  <button
-                    onClick={() => handleDownload(item.jobId)}
-                    style={{ background: "none", border: "1px solid #246BEB", color: "#246BEB", padding: "6px 10px", borderRadius: 6, cursor: "pointer" }}
-                  >
-                    ⬇ 다운로드
-                  </button>
+              <div style={{ minWidth: 160 }}>
+                {file.status === "uploading" ? (
+                  <>
+                    <span style={{ color: "#888" }}>🔄 업로드 중</span>
+                    <div style={{ height: 6, backgroundColor: "#e0e0e0", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                      <div style={{ width: `${file.progress || 0}%`, height: "100%", transition: "width 0.1s ease", backgroundColor: "#4caf50" }} />
+                    </div>
+                  </>
+                ) : file.status === "done" ? (
+                  <span style={{ color: "green" }}>✅ 완료</span>
+                ) : file.status === "error" ? (
+                  <span style={{ color: "#cc0000" }}>⚠ 실패</span>
+                ) : (
+                  <span style={{ color: "#888" }}>대기</span>
                 )}
+              </div>
 
+              {file.status === "done" && file.jobId && (
                 <button
-                  onClick={() => setFiles((prev) => prev.filter((f) => f.id !== item.id))}
-                  style={{ background: "none", border: "none", color: "#cc0000", cursor: "pointer" }}
+                  onClick={() => handleDownload(file.jobId)}
+                  style={{ background: "none", border: "1px solid #246BEB", color: "#246BEB", padding: "6px 10px", borderRadius: 6, cursor: "pointer" }}
                 >
-                  × 삭제
+                  ⬇ 다운로드
                 </button>
-              </li>
-            ))}
+              )}
+
+              <button
+                onClick={() => setFile(null)}
+                style={{ background: "none", border: "none", color: "#cc0000", cursor: "pointer" }}
+              >
+                × 삭제
+              </button>
+            </li>
           </ul>
         </div>
       )}
@@ -355,20 +439,20 @@ function EgovSupportTransformation() {
             {UploadBox({
               title: "전자정부프레임워크 변환",
               note1: ".zip 파일만 등록할 수 있습니다.",
-              note2: `파일당 ${MAX_SIZE_MB}MB 이하, 최대 ${MAX_FILES}개까지 등록 가능`,
+              note2: `1개 파일, ${MAX_SIZE_MB}MB 이하 등록 가능`,
               fileInputRef: fileInputRef1,
-              files: files1,
-              setFiles: setFiles1,
+              file: file1,
+              setFile: setFile1,
               transformType: "프레임워크 변환",
             })}
 
             {UploadBox({
               title: "전자정부프레임워크 버전 변환",
               note1: ".zip 파일만 등록할 수 있습니다.",
-              note2: `파일당 ${MAX_SIZE_MB}MB 이하, 최대 ${MAX_FILES}개까지 등록 가능`,
+              note2: `1개 파일, ${MAX_SIZE_MB}MB 이하 등록 가능`,
               fileInputRef: fileInputRef2,
-              files: files2,
-              setFiles: setFiles2,
+              file: file2,
+              setFile: setFile2,
               transformType: "버전 변환",
             })}
           </div>
