@@ -548,7 +548,7 @@ export default function EgovHeader() {
           onKeyDown={trapKeyDown}
         >
           {/* focus trap sentinels */}
-          <span tabIndex="0" ref={firstTrapRef} className="sr-only">시작</span>
+          
 
           <header className="chat-head">
             <div className="chat-head-left">
@@ -613,7 +613,7 @@ export default function EgovHeader() {
             </button>
           </form>
 
-          <span tabIndex="0" ref={lastTrapRef} className="sr-only">끝</span>
+          
         </section>,
         document.body
       )}
