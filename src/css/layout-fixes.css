@@ -1,0 +1,359 @@
+/* Layout Spacing and Animation Fixes */
+
+/* Layout Spacing Adjustments */
+.modern-layout {
+  display: grid !important;
+  grid-template-columns: 280px 1fr !important;
+  gap: 1rem !important;
+  align-items: start !important;
+}
+
+/* Hide LeftNav Blue Line Indicators */
+.link-indicator {
+  display: none !important;
+}
+
+.nav-link:hover .link-indicator,
+.nav-link.active .link-indicator {
+  display: none !important;
+}
+
+/* Header Animations */
+.modern-header {
+  animation: headerSlideDown 0.8s ease-out;
+}
+
+@keyframes headerSlideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.logo-link {
+  animation: logoFadeIn 1s ease-out 0.2s both;
+}
+
+@keyframes logoFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.desktop-nav .nav-item {
+  animation: navItemSlideIn 0.6s ease-out both;
+}
+
+.desktop-nav .nav-item:nth-child(1) { animation-delay: 0.4s; }
+.desktop-nav .nav-item:nth-child(2) { animation-delay: 0.5s; }
+.desktop-nav .nav-item:nth-child(3) { animation-delay: 0.6s; }
+.desktop-nav .nav-item:nth-child(4) { animation-delay: 0.7s; }
+.desktop-nav .nav-item:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes navItemSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.action-btn {
+  animation: buttonFadeIn 0.6s ease-out both;
+}
+
+.action-btn:nth-of-type(1) { animation-delay: 0.9s; }
+.action-btn:nth-of-type(2) { animation-delay: 1s; }
+
+@keyframes buttonFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Main Page Animations */
+.hero-section {
+  animation: heroFadeIn 1s ease-out;
+}
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-carousel {
+  animation: carouselSlideIn 1.2s ease-out 0.2s both;
+}
+
+@keyframes carouselSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.notice-card {
+  animation: cardSlideIn 0.8s ease-out 0.4s both;
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.quick-card {
+  animation: quickCardFadeIn 0.6s ease-out both;
+}
+
+.quick-card:nth-child(1) { animation-delay: 0.6s; }
+.quick-card:nth-child(2) { animation-delay: 0.7s; }
+
+@keyframes quickCardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.service-card {
+  animation: serviceCardRise 0.8s ease-out both;
+}
+
+.service-card:nth-child(1) { animation-delay: 0.8s; }
+.service-card:nth-child(2) { animation-delay: 0.9s; }
+.service-card:nth-child(3) { animation-delay: 1s; }
+.service-card:nth-child(4) { animation-delay: 1.1s; }
+
+@keyframes serviceCardRise {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.video-section {
+  animation: videoSectionFade 1s ease-out 1.2s both;
+}
+
+@keyframes videoSectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth Hover Animations */
+.nav-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 255, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.nav-link:hover::before {
+  left: 100%;
+}
+
+.modern-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 255, 0.02), transparent);
+  transition: left 0.6s ease;
+  z-index: 0;
+}
+
+.modern-card:hover::before {
+  left: 100%;
+}
+
+.modern-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Staggered Animation for Multiple Elements */
+.services-grid .service-card {
+  opacity: 0;
+  animation: staggeredFadeIn 0.6s ease-out forwards;
+}
+
+.services-grid .service-card:nth-child(1) { animation-delay: 0.1s; }
+.services-grid .service-card:nth-child(2) { animation-delay: 0.2s; }
+.services-grid .service-card:nth-child(3) { animation-delay: 0.3s; }
+.services-grid .service-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes staggeredFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Page Content Animations */
+.modern-page-container {
+  animation: pageContainerFade 0.8s ease-out;
+}
+
+@keyframes pageContainerFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.content-hero {
+  animation: contentHeroSlide 1s ease-out 0.2s both;
+}
+
+@keyframes contentHeroSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-section {
+  animation: contentSectionFade 0.8s ease-out both;
+}
+
+.content-section:nth-child(2) { animation-delay: 0.3s; }
+.content-section:nth-child(3) { animation-delay: 0.4s; }
+.content-section:nth-child(4) { animation-delay: 0.5s; }
+
+@keyframes contentSectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Layout Adjustments */
+@media (max-width: 1200px) {
+  .modern-layout {
+    grid-template-columns: 260px 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .modern-layout {
+    grid-template-columns: 240px 1fr !important;
+    gap: 0.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .modern-header,
+  .hero-section,
+  .hero-carousel,
+  .notice-card,
+  .quick-card,
+  .service-card,
+  .video-section,
+  .content-hero,
+  .content-section {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  .nav-link:hover,
+  .modern-card:hover,
+  .service-card:hover,
+  .benefit-card:hover {
+    transform: none !important;
+  }
+}
