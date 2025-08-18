@@ -42,6 +42,7 @@ import EgovSupportApply from "@/pages/support/apply/EgovSupportApply";
 import EgovSupportIntro from "@/pages/support/transform/EgovSupportIntro";
 import EgovSupportTransformation from "@/pages/support/transform/EgovSupportTransformation";
 import EgovSupportViewTransformation from "@/pages/support/transform/EgovSupportViewTransformation";
+import EgovSupportViewTransformationDetail from "@/pages/support/transform/EgovSupportViewTransformationDetail";
 import EgovSupportViewTest from "@/pages/support/transform/EgovSupportViewTest";
 import EgovSupportDownload from "@/pages/support/transform/EgovSupportDownload";
 import EgovSecurityIntro from "@/pages/support/security/EgovSecurityIntro";
@@ -343,6 +344,7 @@ const SecondRoutes = () => {
 
         <Route path={URL.SUPPORT_TRANSFORM_TRANSFORMATION} element={<EgovSupportTransformation />} />
         <Route path={URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON} element={<EgovSupportViewTransformation />} />
+        <Route path={URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL} element={<EgovSupportViewTransformationDetail />} />
         <Route path={URL.SUPPORT_TRANSFORM_VIEW_TEST} element={<EgovSupportViewTest />} />
         <Route path={URL.SUPPORT_TRANSFORM_DOWNLOAD} element={<EgovSupportDownload />} />
 

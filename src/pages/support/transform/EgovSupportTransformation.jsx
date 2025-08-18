@@ -36,6 +36,7 @@ function EgovSupportTransformation() {
 
   // 옵션 (변환 시 사용)
   const [lang, setLang] = useState("Python");
+  const [conversionType, setConversionType] = useState("CODE");
   const [fromVer, setFromVer] = useState("4.1");
   const [toVer, setToVer] = useState("4.3");
 
@@ -61,31 +62,31 @@ function EgovSupportTransformation() {
   const uploadOne = async (item, setFile) => {
     const uid = getNumericUserId();
     if (!uid) {
-        alert("로그인 정보의 userId가 숫자가 아닙니다. (id/userId/userNo 중 숫자 필드 필요)");
-        throw new Error("invalid user id");
+      alert("로그인 정보의 userId가 숫자가 아닙니다. (id/userId/userNo 중 숫자 필드 필요)");
+      throw new Error("invalid user id");
     }
 
     // 클라이언트 기준 가채(jobId)
     const clientJobId = Date.now() + Math.floor(Math.random() * 1000);
 
     const form = new FormData();
-    const agentPayload = { jobId: clientJobId, userId: uid };
+    const agentPayload = { jobId: clientJobId, userId: uid , filePath: item.file.name, inputeGovFrameVer: fromVer, outputeGovFrameVer: toVer, isTestCode: false, conversionType: conversionType}; // 필요 데이터 추가
     const agentBlob = new Blob([JSON.stringify(agentPayload)], { type: "application/json" });
     form.append("agent", agentBlob, "agent.json");
     form.append("file", item.file, item.file.name);
 
     // 업로드 시작
     setFile(prev => ({ ...prev, status: "uploading", jobId: clientJobId }));
-
+    
     const res = await axios.post(`${POST_BASE}/agents/conversion`, form, {
-        onUploadProgress: (evt) => {
+      onUploadProgress: (evt) => {
         if (!evt.total) return;
         const pct = Math.round((evt.loaded * 100) / evt.total);
         setFile(prev => ({ ...prev, progress: pct }));
-        },
-        withCredentials: USE_CREDENTIALS,
-        maxBodyLength: Infinity,
-        maxContentLength: Infinity,
+      },
+      withCredentials: USE_CREDENTIALS,
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
     });
 
     const srvJobId = res?.data?.jobId ?? clientJobId;
@@ -134,6 +135,8 @@ function EgovSupportTransformation() {
 
   // 변환 버튼: 업로드와 분리되었지만, "클릭 시 업로드를 실행"하고 "그 다음 SSE"
   const handleTransform = async (type) => {
+    // const conversionType = type === "프레임워크 변환" ? "CODE" : "EGOV";
+    setConversionType(type === "프레임워크 변환" ? "CODE" : "EGOV");
     const target = type === "프레임워크 변환" ? file1 : file2;
     const setFile = type === "프레임워크 변환" ? setFile1 : setFile2;
 
@@ -158,17 +161,18 @@ function EgovSupportTransformation() {
 
       // ✅ 업로드 완료 후에야 SSE 시작
       const es = new EventSource(
-      `${GET_BASE}/response/${userId}/${jobId}`
+        `${GET_BASE}/response/${userId}/${jobId}`
       );
       esRef.current = es;
 
-        
       es.addEventListener("agent-message", (e) => {
         const payload = JSON.parse(e.data);  // ← JSON 파싱
         console.log(payload);
-        appendLog(`LANGUAGE: ${payload.language}, STEP: ${payload.description}`);
+        appendLog(`STEP: ${payload.description}`);
+        if(payload.language != null)
+          appendLog(`LANGUAGE: ${payload.language}`);
         setProgress((prev) => {
-          const v = Math.min(prev + 50, 100);
+          const v = Math.min(prev + 12.5, 100);
           if (v >= 100) {
             setLoadingType(null);
             setSuccessType(type);
