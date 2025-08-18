@@ -398,8 +398,8 @@ export default function EgovHeader() {
                   </svg>
                 </div>
                 <div className="logo-text">
-                  <span className="logo-title">전자정부</span>
-                  <span className="logo-subtitle">eGov Framework</span>
+                  <span className="logo-title">AI CODE MIGRATION</span>
+                  <span className="logo-subtitle">KT AIVLE AI</span>
                 </div>
               </HLink>
             </h1>
