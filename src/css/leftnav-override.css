@@ -1,0 +1,11 @@
+/* LeftNav Override Styles */
+
+/* Hide all link indicators */
+.link-indicator {
+  display: none !important;
+}
+
+.nav-link:hover .link-indicator,
+.nav-link.active .link-indicator {
+  display: none !important;
+}
