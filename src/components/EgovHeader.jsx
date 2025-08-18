@@ -7,6 +7,7 @@ import "@/css/header.css";
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
+import Icon from "@/components/icons/Icon";
 
 import chatIconPng from "/src/assets/images/due.jpg";
 
@@ -372,7 +373,7 @@ export default function EgovHeader() {
     <>
       <div
         ref={headerRef}
-        className={`header ${scrolled ? "is-scrolled" : ""}`}
+        className={`header ${scrolled ? "scrolled" : ""}`}
         data-state={isMenuOpen ? "open" : "closed"}
       >
         {/* 상단 스크롤 진행바 */}
@@ -397,7 +398,7 @@ export default function EgovHeader() {
 
           {/* GNB: 호버 시 전체메뉴 오픈 */}
           <nav
-            className="gnb"
+            className={`gnb ${isMenuOpen ? "active" : ""}`}
             role="navigation"
             aria-label="주요 메뉴"
             onMouseEnter={openAllMenuByHover}
@@ -414,12 +415,12 @@ export default function EgovHeader() {
             </ul>
           </nav>
 
-          {/* User Area + 전체메뉴 버튼 */}
+          {/* User Area + Mobile Menu Toggle */}
           <div className="right_cluster">
             <div className="user_info" aria-live="polite" data-username={sessionUserName || ""} data-role={sessionUserSe || "GUEST"}>
               {sessionUserId ? (
                 <>
-                  <span className="person">{sessionUserName}</span> 님, {sessionUserSe}
+                  <span className="person">{sessionUserName}</span>
                   {sessionUserSe === "USER" && (
                     <HNavLink to={URL2.MYPAGE} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>마이페이지</HNavLink>
                   )}
@@ -433,17 +434,22 @@ export default function EgovHeader() {
               )}
             </div>
 
+            {/* Mobile Menu Toggle */}
             <button
               ref={btnAllMenuRef}
               type="button"
-              className="btn btnAllMenu"
+              className={`mobile-menu-toggle ${isMenuOpen ? "active" : ""}`}
               title={menuBtnTitle}
               aria-expanded={isMenuOpen}
               aria-controls="allmenu-web"
               aria-haspopup="menu"
               onClick={toggleAllMenu}
             >
-              전체메뉴
+              {isMenuOpen ? (
+                <Icon name="close" size={24} />
+              ) : (
+                <Icon name="menu" size={24} />
+              )}
             </button>
           </div>
         </div>

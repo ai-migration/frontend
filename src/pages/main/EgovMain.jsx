@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
+import AnimatedWrapper from "@/components/AnimatedWrapper";
+import AnimatedCard from "@/components/AnimatedCard";
+import { containerVariants, itemVariants, scrollVariants } from "@/utils/animations";
 
 // ✅ 동적 효과/겹침 해결용 스타일 (기존 파일 재사용)
 import "@/css/mainMotion.css";
+import "@/css/main-modern.css";
 
 /** 접근성/성능: 사용자 환경 설정 확인 */
 function usePrefersReducedMotion() {
@@ -315,24 +320,21 @@ function MainHeroCarousel() {
         <>
           <button className="nav prev" onClick={prev} aria-label="이전 슬라이드">‹</button>
           <button className="nav next" onClick={next} aria-label="다음 슬라이드">›</button>
+          
+          <div className="indicators">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                className={`indicator ${i === index ? "active" : ""}`}
+                onClick={() => setIndex(i)}
+                aria-label={`슬라이드 ${i + 1}로 이동`}
+              />
+            ))}
+          </div>
         </>
       )}
 
-      {slides.length > 1 && (
-        <div className="dots" role="tablist" aria-label="슬라이드 선택">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              className={`dot ${i === index ? "active" : ""}`}
-              onClick={() => setIndex(i)}
-              role="tab"
-              aria-selected={i === index}
-              aria-controls={`slide-${i}`}
-              tabIndex={i === index ? 0 : -1}
-            />
-          ))}
-        </div>
-      )}
+
     </section>
   );
 }
@@ -404,77 +406,104 @@ function EgovMain(props) {
   console.groupEnd("EgovMain");
 
   return (
-    <div className="container P_MAIN">
+    <AnimatedWrapper className="container P_MAIN">
       <div className="c_wrap">
-        <div className="colbox">
-          <div className="left_col">
+        <motion.div 
+          className="colbox"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="left_col" variants={itemVariants}>
             {/* ✅ 자동 슬라이드 캐러셀 */}
             <MainHeroCarousel />
-          </div>
+          </motion.div>
 
-          <div className="right_col">
-            <div className="mini_board glass reveal">
+          <motion.div className="right_col" variants={itemVariants}>
+            <AnimatedCard className="mini_board glass">
               <ul className="tab">
                 <li><a href="#공지사항" className="on">공지사항</a></li>
               </ul>
               <div className="list">
                 <div className="notice">
                   <h2 className="blind">공지사항</h2>
-                  <ul>{noticeListTag}</ul>
+                  <motion.ul
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {noticeListTag}
+                  </motion.ul>
                   <Link to={URL.INFORM_NOTICE} className="more">더보기</Link>
                 </div>
               </div>
-            </div>
+            </AnimatedCard>
 
-            <div className="banner reveal hover-lift">
-              <Link to={URL.SUPPORT_DOWNLOAD} className="bn1 card">
+            <motion.div 
+              className="banner"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <AnimatedCard as={Link} to={URL.SUPPORT_DOWNLOAD} className="bn1">
                 <strong>자료실</strong>
                 <span>다양한 자료를<br/>다운로드 받으실 수 있습니다.</span>
-              </Link>
-              <Link to={URL.ABOUT} className="bn2 card">
+              </AnimatedCard>
+              <AnimatedCard as={Link} to={URL.ABOUT} className="bn2">
                 <strong>표준프레임워크센터</strong>
                 <span>표준프레임워크센터의<br/>약도 등의 정보를 제공합니다.</span>
-              </Link>
-            </div>
-          </div>
-        </div>
+              </AnimatedCard>
+            </motion.div>
+          </motion.div>
+        </motion.div>
 
         {/* 🔽 캐러셀과 '자세히 보기' 4개 사이에 유튜브 삽입 (겹침 방지 스타일 포함) */}
-        <YouTubeEmbed video="https://youtu.be/JNsKvZo6MDs?si=xG50mmAa6J2-SJW2" autoplay={0} />
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+        >
+          <YouTubeEmbed video="https://youtu.be/JNsKvZo6MDs?si=xG50mmAa6J2-SJW2" autoplay={0} />
+        </motion.div>
 
-        <div className="banner_bot"></div>
-        <div className="banner_bot">
-          <div className="b1 card reveal hover-lift">
+        <motion.div 
+          className="banner_bot"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <AnimatedCard className="b1" variants={itemVariants}>
             <div>
               <h2>주요사업 소개</h2>
               <p>표준프레임워크가 제공하는<br/>주요 사업을 소개합니다.</p>
             </div>
             <Link to={URL.INTRO_WORKS}>자세히 보기</Link>
-          </div>
-          <div className="b2 card reveal hover-lift">
+          </AnimatedCard>
+          <AnimatedCard className="b2" variants={itemVariants}>
             <div>
               <h2>대표서비스 소개</h2>
               <p>표준프레임워크 실행환경의<br/>서비스 그룹에서 제공하는<br/>대표서비스입니다.</p>
             </div>
             <Link to={URL.INTRO_SERVICE}>자세히 보기</Link>
-          </div>
-          <div className="b3 card reveal hover-lift">
+          </AnimatedCard>
+          <AnimatedCard className="b3" variants={itemVariants}>
             <div>
               <h2>서비스 신청</h2>
               <p>표준프레임워크 경량환경<br/>홈페이지의 다양한 서비스를<br/>신청 하실 수 있습니다.</p>
             </div>
             <Link to={URL.SUPPORT_APPLY}>자세히 보기</Link>
-          </div>
-          <div className="b4 card reveal hover-lift">
+          </AnimatedCard>
+          <AnimatedCard className="b4" variants={itemVariants}>
             <div>
               <h2>일정 현황</h2>
               <p>표준프레임워크 경량환경<br/>홈페이지의 전체적인 일정<br/>현황을 조회하실 수 있습니다.</p>
             </div>
             <Link to={URL.INFORM}>자세히 보기</Link>
-          </div>
-        </div>
+          </AnimatedCard>
+        </motion.div>
       </div>
-    </div>
+    </AnimatedWrapper>
   );
 }
 
