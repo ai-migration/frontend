@@ -426,45 +426,115 @@ function EgovMain(props) {
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Section - Inspired by Hyundai AutoEver */}
       <section className="hero-section">
-        {/* 정부 건물 실루엣 SVG */}
-        <div className="government-silhouette">
-          <svg viewBox="0 0 800 200" preserveAspectRatio="none">
-            <path d="M0,200 L0,120 L80,120 L80,80 L120,80 L120,60 L180,60 L180,40 L220,40 L220,20 L280,20 L280,40 L320,40 L320,60 L380,60 L380,80 L420,80 L420,120 L500,120 L500,100 L540,100 L540,80 L580,80 L580,60 L620,60 L620,80 L660,80 L660,100 L700,100 L700,120 L800,120 L800,200 Z" fill="rgba(0, 0, 255, 0.03)"/>
-            <circle cx="250" cy="30" r="8" fill="rgba(0, 0, 255, 0.1)">
-              <animate attributeName="opacity" values="0.1;0.3;0.1" dur="3s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="550" cy="70" r="6" fill="rgba(65, 105, 225, 0.1)">
-              <animate attributeName="opacity" values="0.1;0.25;0.1" dur="4s" repeatCount="indefinite"/>
-            </circle>
-          </svg>
+        {/* 배경 그래픽 요소들 */}
+        <div className="hero-background">
+          <div className="geometric-pattern">
+            <div className="pattern-element pattern-1"></div>
+            <div className="pattern-element pattern-2"></div>
+            <div className="pattern-element pattern-3"></div>
+          </div>
+          <div className="tech-lines">
+            <svg viewBox="0 0 1400 600" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="techGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="rgba(0, 0, 255, 0)" />
+                  <stop offset="50%" stopColor="rgba(0, 0, 255, 0.15)" />
+                  <stop offset="100%" stopColor="rgba(0, 0, 255, 0)" />
+                </linearGradient>
+              </defs>
+              <path d="M0,300 Q350,200 700,300 T1400,300" stroke="url(#techGradient)" strokeWidth="3" fill="none">
+                <animate attributeName="stroke-dasharray" values="0,2000;2000,0;0,2000" dur="12s" repeatCount="indefinite"/>
+              </path>
+              <path d="M0,400 Q450,300 900,400 T1400,400" stroke="url(#techGradient)" strokeWidth="2" fill="none" opacity="0.6">
+                <animate attributeName="stroke-dasharray" values="0,1800;1800,0;0,1800" dur="15s" repeatCount="indefinite"/>
+              </path>
+            </svg>
+          </div>
         </div>
 
-        {/* 데이터 플로우 라인 */}
-        <div className="data-flow-lines">
-          <svg viewBox="0 0 1200 400" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(0, 0, 255, 0)" />
-                <stop offset="50%" stopColor="rgba(0, 0, 255, 0.1)" />
-                <stop offset="100%" stopColor="rgba(0, 0, 255, 0)" />
-              </linearGradient>
-            </defs>
-            <path d="M0,200 Q300,150 600,200 T1200,200" stroke="url(#flowGradient)" strokeWidth="2" fill="none">
-              <animate attributeName="stroke-dasharray" values="0,1000;1000,0;0,1000" dur="8s" repeatCount="indefinite"/>
-            </path>
-            <path d="M0,250 Q400,200 800,250 T1200,250" stroke="url(#flowGradient)" strokeWidth="1.5" fill="none" opacity="0.7">
-              <animate attributeName="stroke-dasharray" values="0,800;800,0;0,800" dur="10s" repeatCount="indefinite"/>
-            </path>
-          </svg>
-        </div>
-
+        {/* 메인 콘텐츠 영역 */}
         <div className="hero-container">
-          <div className="hero-content">
+          {/* 텍스트 콘텐츠 영역 */}
+          <div className="hero-text-section">
+            <div className="hero-badge">
+              <span className="badge-text">Digital Government Platform</span>
+            </div>
+            <h1 className="hero-main-title">
+              <span className="title-line-1">전자정부 표준</span>
+              <span className="title-line-2">프레임워크</span>
+            </h1>
+            <p className="hero-subtitle">
+              혁신적인 AI 기술과 표준화된 개발 환경으로<br/>
+              공공 서비스의 디지털 전환을 선도합니다
+            </p>
+            <div className="hero-actions">
+              <Link to="/support/transform/intro" className="hero-btn primary">
+                <span>AI 변환기 시작하기</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="7" y1="17" x2="17" y2="7"></line>
+                  <polyline points="7,7 17,7 17,17"></polyline>
+                </svg>
+              </Link>
+              <Link to="/support/security/intro" className="hero-btn secondary">
+                <span>AI 보안기 체험하기</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </Link>
+            </div>
+          </div>
+
+          {/* 비주얼 콘텐츠 영역 */}
+          <div className="hero-visual-section">
             <div className="hero-carousel-wrapper">
               <MainHeroCarousel />
             </div>
+            
+            {/* 플로팅 스탯 카드들 */}
+            <div className="floating-stats">
+              <div className="stat-card stat-1">
+                <div className="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">99.9%</span>
+                  <span className="stat-label">안정성</span>
+                </div>
+              </div>
+              
+              <div className="stat-card stat-2">
+                <div className="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">50%</span>
+                  <span className="stat-label">개발시간 단축</span>
+                </div>
+              </div>
+              
+              <div className="stat-card stat-3">
+                <div className="stat-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">100+</span>
+                  <span className="stat-label">보안 검사 항목</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-content">
+          <div className="hero-sidebar">
             
             <div className="hero-sidebar">
               {/* Notice Board */}

@@ -419,9 +419,9 @@ export default function EgovHeader() {
             </h1>
           </div>
 
-          {/* 데스크톱 네비게이션 */}
+          {/* 데스크톱 네비게이션 - Corporate Style */}
           <nav
-            className="desktop-nav"
+            className="desktop-nav corporate-nav"
             role="navigation"
             aria-label="주요 메뉴"
             onMouseEnter={openAllMenuByHover}
@@ -430,33 +430,67 @@ export default function EgovHeader() {
             <ul className="nav-list">
               <li className="nav-item">
                 <HNavLink to={URL2.ABOUT} className="nav-link">
-                  <span>사이트소개</span>
-                  <div className="nav-indicator"></div>
+                  <div className="nav-link-content">
+                    <div className="nav-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                      </svg>
+                    </div>
+                    <span className="nav-text">사이트소개</span>
+                  </div>
                 </HNavLink>
               </li>
               <li className="nav-item">
                 <HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO} className="nav-link">
-                  <span>AI 변환기</span>
-                  <div className="nav-indicator"></div>
+                  <div className="nav-link-content">
+                    <div className="nav-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
+                        <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
+                        <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                      </svg>
+                    </div>
+                    <span className="nav-text">AI 변환기</span>
+                  </div>
                 </HNavLink>
               </li>
               <li className="nav-item">
                 <HNavLink to={URL2.SUPPORT_SECURITY_INTRO} className="nav-link">
-                  <span>AI 보안기</span>
-                  <div className="nav-indicator"></div>
+                  <div className="nav-link-content">
+                    <div className="nav-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      </svg>
+                    </div>
+                    <span className="nav-text">AI 보안기</span>
+                  </div>
                 </HNavLink>
               </li>
               <li className="nav-item">
                 <HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK} className="nav-link">
-                  <span>고객지원</span>
-                  <div className="nav-indicator"></div>
+                  <div className="nav-link-content">
+                    <div className="nav-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </div>
+                    <span className="nav-text">고객지원</span>
+                  </div>
                 </HNavLink>
               </li>
               {sessionUserSe === "ADM" && (
                 <li className="nav-item">
                   <HNavLink to={URL2.ADMIN} className="nav-link">
-                    <span>사이트관리</span>
-                    <div className="nav-indicator"></div>
+                    <div className="nav-link-content">
+                      <div className="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                      </div>
+                      <span className="nav-text">사이트관리</span>
+                    </div>
                   </HNavLink>
                 </li>
               )}
