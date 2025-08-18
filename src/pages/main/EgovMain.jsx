@@ -7,6 +7,7 @@ import URL from "@/constants/url";
 // ✅ 동적 효과/겹침 해결용 스타일 (기존 파일 재사용)
 import "@/css/mainMotion.css";
 import "@/css/modern-styles.css";
+import "@/css/visual-effects.css";
 
 /** 접근성/성능: 사용자 환경 설정 확인 */
 function usePrefersReducedMotion() {
@@ -406,8 +407,59 @@ function EgovMain(props) {
 
   return (
     <main className="modern-main">
+      {/* 배경 애니메이션 요소들 */}
+      <div className="main-background">
+        <div className="animated-grid"></div>
+        <div className="floating-elements">
+          <div className="element element-1"></div>
+          <div className="element element-2"></div>
+          <div className="element element-3"></div>
+          <div className="element element-4"></div>
+          <div className="element element-5"></div>
+        </div>
+        <div className="wave-animation">
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="currentColor"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="currentColor"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="currentColor"></path>
+          </svg>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="hero-section">
+        {/* 정부 건물 실루엣 SVG */}
+        <div className="government-silhouette">
+          <svg viewBox="0 0 800 200" preserveAspectRatio="none">
+            <path d="M0,200 L0,120 L80,120 L80,80 L120,80 L120,60 L180,60 L180,40 L220,40 L220,20 L280,20 L280,40 L320,40 L320,60 L380,60 L380,80 L420,80 L420,120 L500,120 L500,100 L540,100 L540,80 L580,80 L580,60 L620,60 L620,80 L660,80 L660,100 L700,100 L700,120 L800,120 L800,200 Z" fill="rgba(0, 0, 255, 0.03)"/>
+            <circle cx="250" cy="30" r="8" fill="rgba(0, 0, 255, 0.1)">
+              <animate attributeName="opacity" values="0.1;0.3;0.1" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="550" cy="70" r="6" fill="rgba(65, 105, 225, 0.1)">
+              <animate attributeName="opacity" values="0.1;0.25;0.1" dur="4s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+
+        {/* 데이터 플로우 라인 */}
+        <div className="data-flow-lines">
+          <svg viewBox="0 0 1200 400" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(0, 0, 255, 0)" />
+                <stop offset="50%" stopColor="rgba(0, 0, 255, 0.1)" />
+                <stop offset="100%" stopColor="rgba(0, 0, 255, 0)" />
+              </linearGradient>
+            </defs>
+            <path d="M0,200 Q300,150 600,200 T1200,200" stroke="url(#flowGradient)" strokeWidth="2" fill="none">
+              <animate attributeName="stroke-dasharray" values="0,1000;1000,0;0,1000" dur="8s" repeatCount="indefinite"/>
+            </path>
+            <path d="M0,250 Q400,200 800,250 T1200,250" stroke="url(#flowGradient)" strokeWidth="1.5" fill="none" opacity="0.7">
+              <animate attributeName="stroke-dasharray" values="0,800;800,0;0,800" dur="10s" repeatCount="indefinite"/>
+            </path>
+          </svg>
+        </div>
+
         <div className="hero-container">
           <div className="hero-content">
             <div className="hero-carousel-wrapper">
@@ -476,6 +528,42 @@ function EgovMain(props) {
 
       {/* Video Section */}
       <section className="video-section">
+        {/* 기술 네트워크 배경 */}
+        <div className="tech-network-bg">
+          <svg viewBox="0 0 1200 600" preserveAspectRatio="none">
+            <defs>
+              <radialGradient id="nodeGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(0, 0, 255, 0.1)" />
+                <stop offset="100%" stopColor="rgba(0, 0, 255, 0)" />
+              </radialGradient>
+            </defs>
+            {/* 네트워크 노드들 */}
+            <circle cx="200" cy="100" r="4" fill="url(#nodeGradient)">
+              <animate attributeName="r" values="4;8;4" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="600" cy="150" r="3" fill="url(#nodeGradient)">
+              <animate attributeName="r" values="3;6;3" dur="5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="1000" cy="80" r="5" fill="url(#nodeGradient)">
+              <animate attributeName="r" values="5;9;5" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="400" cy="300" r="3" fill="url(#nodeGradient)">
+              <animate attributeName="r" values="3;7;3" dur="6s" repeatCount="indefinite"/>
+            </circle>
+            
+            {/* 연결 라인들 */}
+            <line x1="200" y1="100" x2="600" y2="150" stroke="rgba(0, 0, 255, 0.05)" strokeWidth="1">
+              <animate attributeName="stroke-opacity" values="0.05;0.15;0.05" dur="4s" repeatCount="indefinite"/>
+            </line>
+            <line x1="600" y1="150" x2="1000" y2="80" stroke="rgba(0, 0, 255, 0.05)" strokeWidth="1">
+              <animate attributeName="stroke-opacity" values="0.05;0.12;0.05" dur="5s" repeatCount="indefinite"/>
+            </line>
+            <line x1="200" y1="100" x2="400" y2="300" stroke="rgba(0, 0, 255, 0.05)" strokeWidth="1">
+              <animate attributeName="stroke-opacity" values="0.05;0.1;0.05" dur="6s" repeatCount="indefinite"/>
+            </line>
+          </svg>
+        </div>
+
         <div className="video-container">
           <div className="section-header">
             <h2>전자정부 프레임워크 소개</h2>
@@ -487,6 +575,33 @@ function EgovMain(props) {
 
       {/* Services Section */}
       <section className="services-section">
+        {/* 서비스 연결망 배경 */}
+        <div className="services-network-bg">
+          <svg viewBox="0 0 1400 800" preserveAspectRatio="none">
+            <defs>
+              <pattern id="serviceGrid" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                <circle cx="50" cy="50" r="1" fill="rgba(0, 0, 255, 0.05)">
+                  <animate attributeName="r" values="1;3;1" dur="8s" repeatCount="indefinite"/>
+                </circle>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#serviceGrid)" opacity="0.3"/>
+            
+            {/* 서비스 연결 라인들 */}
+            <g stroke="rgba(0, 0, 255, 0.08)" strokeWidth="1" fill="none">
+              <path d="M200,200 Q400,100 600,200 T1000,200">
+                <animate attributeName="stroke-dasharray" values="0,2000;2000,0;0,2000" dur="12s" repeatCount="indefinite"/>
+              </path>
+              <path d="M300,400 Q500,300 700,400 T1100,400">
+                <animate attributeName="stroke-dasharray" values="0,1800;1800,0;0,1800" dur="10s" repeatCount="indefinite"/>
+              </path>
+              <path d="M100,600 Q350,500 600,600 T1200,600">
+                <animate attributeName="stroke-dasharray" values="0,2200;2200,0;0,2200" dur="14s" repeatCount="indefinite"/>
+              </path>
+            </g>
+          </svg>
+        </div>
+
         <div className="services-container">
           <div className="section-header">
             <h2>주요 서비스</h2>

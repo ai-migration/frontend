@@ -5,6 +5,7 @@ import * as EgovNet2 from "@/api/egovFetch";
 import URL2 from "@/constants/url";
 import "@/css/header.css";
 import "@/css/modern-styles.css";
+import "@/css/visual-effects.css";
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
@@ -377,6 +378,19 @@ export default function EgovHeader() {
         className={`modern-header ${scrolled ? "is-scrolled" : ""} ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}
         data-state={isMenuOpen ? "open" : "closed"}
       >
+        {/* 배경 그래픽 요소들 */}
+        <div className="header-background">
+          <div className="bg-pattern-1"></div>
+          <div className="bg-pattern-2"></div>
+          <div className="bg-pattern-3"></div>
+          <div className="floating-shapes">
+            <div className="shape shape-1"></div>
+            <div className="shape shape-2"></div>
+            <div className="shape shape-3"></div>
+            <div className="shape shape-4"></div>
+          </div>
+        </div>
+
         {/* 상단 스크롤 진행바 */}
         <div className="scroll-progress" aria-hidden style={{ transform: `scaleX(${scrollPct / 100})` }} />
 
