@@ -103,7 +103,7 @@ function EgovLoginContent(props) {
       // let jToken = resp?.accessToken.split(' ')[1] || null;
 
       const obj = {
-        id: resp?.nickname,
+        id: resp?.id,
         name: resp?.nickname,
         userSe: resp?.role,
       };

@@ -30,7 +30,7 @@ function EgovAboutSite() {
           <div className="contents SITE_INTRO" id="contents">
             {/* <!-- 본문 --> */}
 
-            <h1 className="tit_3">사이트 소개</h1>
+            <h1 className="tit_3">프로젝트 소개</h1>
 
             <p className="txt_1">
               표준프레임워크 경량환경의 개요와 연혁, 조직소개,

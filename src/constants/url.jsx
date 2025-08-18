@@ -29,6 +29,7 @@ const URL = {
   SUPPORT_TRASNFORM_INTRO: `${BASE}/support/transform/intro`,
   SUPPORT_TRANSFORM_TRANSFORMATION: `${BASE}/support/transform/transformation`,
   SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON: `${BASE}/support/transform/view_transform`,
+  SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL: `${BASE}/support/transform/view_transform/detail`,
   SUPPORT_TRANSFORM_VIEW_TEST: `${BASE}/support/transform/view_test`,
   SUPPORT_TRANSFORM_DOWNLOAD: `${BASE}/support/transform/download`,
 

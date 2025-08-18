@@ -211,7 +211,7 @@ function YouTubeEmbed({ video, autoplay = 0 }) {
         )}
       </div>
 
-      <div className="yt-controls" style={{ display: "flex", gap: 8, marginTop: 10 }}>
+            <div className="yt-controls" style={{ display: "flex", gap: 8, marginTop: 10 }}>
 
       </div>
     </section>

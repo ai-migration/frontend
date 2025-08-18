@@ -30,6 +30,7 @@ const URL = {
   SUPPORT_TRANSFORM_INTRO : "/support/transform/intro", // 고객지원/변환/기능 소개
   SUPPORT_TRANSFORM_TRANSFORMATION : "/support/transform/transformation", // 고객지원/변환/변환
   SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON : "/support/transform/view_transform", // 고객지원/변환/변환 이력 조회
+  SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL : "/support/transform/view_transform/detail", // 고객지원/변환/변환 이력 조회 상세
   SUPPORT_TRANSFORM_VIEW_TEST : "/support/transform/view_test", // 고객지원/변환/테스트 이력 조회
   SUPPORT_TRANSFORM_DOWNLOAD : "/support/transform/download", // 고객지원/변환/다운로드
 
@@ -114,6 +115,10 @@ const URL = {
 
   //MYPAGE
   MYPAGE: "/mypage", // 고객지원/마이페이지/회원 수정
+
+  
+  //MYPAGE
+  TESTPAGE: "/test", // 테스트 페이지
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
