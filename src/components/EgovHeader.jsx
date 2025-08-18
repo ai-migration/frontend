@@ -9,7 +9,7 @@ import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
 
-import chatIconPng from "/src/assets/images/due.jpg";
+// Removed chatIconPng import - using SVG icon instead
 
 import {
   useEffect as useEffect2,
@@ -666,7 +666,7 @@ export default function EgovHeader() {
         <button
           ref={chatBtnRef}
           type="button"
-          className={`chat-fab ${isChatOpen ? "active" : ""}`}
+          className={`modern-chat-fab ${isChatOpen ? "active" : ""}`}
           title={chatBtnTitle}
           aria-label={chatBtnTitle}
           aria-expanded={isChatOpen}
@@ -676,8 +676,17 @@ export default function EgovHeader() {
             toggleChat();
           }}
         >
-          <img src={chatIconPng} alt="AI 챗봇 열기" />
-          {unread > 0 && <span className="badge">{unread > 99 ? "99+" : unread}</span>}
+          <div className="fab-icon-container">
+            <svg className="fab-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="9" cy="12" r="1" fill="currentColor"/>
+              <circle cx="15" cy="12" r="1" fill="currentColor"/>
+              <circle cx="12" cy="9" r="1" fill="currentColor"/>
+            </svg>
+            <div className="fab-pulse-ring"></div>
+            <div className="fab-pulse-ring-2"></div>
+          </div>
+          {unread > 0 && <span className="modern-badge">{unread > 99 ? "99+" : unread}</span>}
         </button>,
         document.body
       )}
@@ -687,7 +696,7 @@ export default function EgovHeader() {
         <section
           id="ai-chat-panel"
           ref={chatRef}
-          className={`chat-panel ${isChatOpen ? "open" : ""}`}
+          className={`modern-chat-panel ${isChatOpen ? "open" : ""}`}
           role="dialog"
           aria-modal="true"
           aria-label="AI 챗봇"
@@ -696,18 +705,24 @@ export default function EgovHeader() {
           {/* focus trap sentinels */}
           
 
-          <header className="chat-head">
+          <header className="modern-chat-head">
             <div className="chat-head-left">
-              <span className="chat-head-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                  <path d="M12 2l1.4 4.3L18 8l-4.3 1.7L12 14l-1.7-4.3L6 8l4.6-1.7L12 2z" />
+              <div className="chat-head-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
-              </span>
-              <strong>AI 도우미</strong>
-              <span className="chat-status" aria-live="polite">● 온라인</span>
+                <div className="icon-glow"></div>
+              </div>
+              <div className="chat-title-section">
+                <strong>전자정부 AI 도우미</strong>
+                <span className="chat-status" aria-live="polite">
+                  <span className="status-dot"></span>
+                  온라인
+                </span>
+              </div>
             </div>
             <div className="chat-head-right">
-              <button className="chat-head-btn" onClick={() => { closeChat(); previouslyFocusedRef.current?.focus?.(); }} aria-label="챗봇 닫기">
+              <button className="modern-chat-close-btn" onClick={() => { closeChat(); previouslyFocusedRef.current?.focus?.(); }} aria-label="챗봇 닫기">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
@@ -715,13 +730,13 @@ export default function EgovHeader() {
             </div>
           </header>
 
-          <div className="chat-body" ref={chatListRef}>
+          <div className="modern-chat-body" ref={chatListRef}>
             {messages.map((m) => (
-              <div key={m.id} className={`chat-msg ${m.role}`}>
-                <div className="bubble">{m.text}</div>
+              <div key={m.id} className={`modern-chat-msg ${m.role}`}>
+                <div className="modern-bubble">{m.text}</div>
                 {m.role === "bot" && <ChatActionBar actions={m.actions} />}
                 {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
-                  <details className="citations">
+                  <details className="modern-citations">
                     <summary>참고 근거</summary>
                     <ul>
                       {m.citations.map((c, i) => (
@@ -733,30 +748,35 @@ export default function EgovHeader() {
               </div>
             ))}
             {pending && (
-              <div className="chat-msg bot">
-                <div className="bubble typing">
-                  <span className="dot" />
-                  <span className="dot" />
-                  <span className="dot" />
+              <div className="modern-chat-msg bot">
+                <div className="modern-bubble typing">
+                  <div className="typing-indicator">
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          <form className="chat-input" onSubmit={sendMessage}>
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="메시지를 입력하세요… (Enter 전송)"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              aria-label="메시지 입력"
-            />
-            <button type="submit" disabled={pending || !input.trim()} aria-label="전송">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
-              </svg>
-            </button>
+          <form className="modern-chat-input" onSubmit={sendMessage}>
+            <div className="input-container">
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="전자정부 서비스에 대해 궁금한 점을 물어보세요..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                aria-label="메시지 입력"
+              />
+              <button type="submit" disabled={pending || !input.trim()} aria-label="전송" className="send-button">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                </svg>
+              </button>
+            </div>
           </form>
 
           
