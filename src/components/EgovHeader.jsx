@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import * as EgovNet2 from "@/api/egovFetch";
 import URL2 from "@/constants/url";
 import "@/css/header.css";
+import "@/css/modern-styles.css";
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
@@ -34,6 +35,7 @@ export default function EgovHeader() {
   const [isHovering, setIsHovering] = useState2(false);
   const [scrolled, setScrolled] = useState2(false);
   const [scrollPct, setScrollPct] = useState2(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState2(false);
 
   // === Chat (전역 FAB + 드로어) ===
   const [isChatOpen, setIsChatOpen] = useState2(false);
@@ -370,150 +372,294 @@ export default function EgovHeader() {
 
   return (
     <>
-      <div
+      <header
         ref={headerRef}
-        className={`header ${scrolled ? "is-scrolled" : ""}`}
+        className={`modern-header ${scrolled ? "is-scrolled" : ""} ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}
         data-state={isMenuOpen ? "open" : "closed"}
       >
         {/* 상단 스크롤 진행바 */}
         <div className="scroll-progress" aria-hidden style={{ transform: `scaleX(${scrollPct / 100})` }} />
 
-        <div className="inner grid3">
-          {/* 왼쪽 클러스터: 로고 + 템플릿 링크 */}
-          <div className="left_cluster">
-            <HLink to={URL2.MAIN} className="ico lnk_go_template" target="_blank" aria-label="홈페이지 템플릿 안내 새창">
-              홈페이지 템플릿
-            </HLink>
-
+        <div className="header-container">
+          {/* 로고 영역 */}
+          <div className="logo-section">
             <h1 className="logo">
-              <HLink to={URL2.MAIN} className="w" aria-label="메인으로 이동 (데스크톱 로고)">
-                <img src={logoImg} alt="eGovFrame 심플홈페이지" />
-              </HLink>
-              <HLink to={URL2.MAIN} className="m" aria-label="메인으로 이동 (모바일 로고)">
-                <img src={logoImgMobile} alt="eGovFrame 심플홈페이지" />
+              <HLink to={URL2.MAIN} className="logo-link" aria-label="홈으로 이동">
+                <div className="logo-icon">
+                  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="url(#logoGradient)"/>
+                    <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h12v2H8v-2z" fill="white"/>
+                    <defs>
+                      <linearGradient id="logoGradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                        <stop stopColor="#0000FF"/>
+                        <stop offset="1" stopColor="#4169E1"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div className="logo-text">
+                  <span className="logo-title">전자정부</span>
+                  <span className="logo-subtitle">eGov Framework</span>
+                </div>
               </HLink>
             </h1>
           </div>
 
-          {/* GNB: 호버 시 전체메뉴 오픈 */}
+          {/* 데스크톱 네비게이션 */}
           <nav
-            className="gnb"
+            className="desktop-nav"
             role="navigation"
             aria-label="주요 메뉴"
             onMouseEnter={openAllMenuByHover}
             onMouseLeave={closeAllMenuByHover}
-            onFocus={() => setIsMenuOpen(true)}
-            onBlur={() => setIsMenuOpen(false)}
           >
-            <ul>
-              <li><HNavLink to={URL2.ABOUT}>사이트소개</HNavLink></li>
-              <li><HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO}>AI 변환기</HNavLink></li>
-              <li><HNavLink to={URL2.SUPPORT_SECURITY_INTRO}>AI 보안기</HNavLink></li>
-              <li><HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK}>고객지원</HNavLink></li>
-              {sessionUserSe === "ADM" && (<li><HNavLink to={URL2.ADMIN}>사이트관리</HNavLink></li>)}
+            <ul className="nav-list">
+              <li className="nav-item">
+                <HNavLink to={URL2.ABOUT} className="nav-link">
+                  <span>사이트소개</span>
+                  <div className="nav-indicator"></div>
+                </HNavLink>
+              </li>
+              <li className="nav-item">
+                <HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO} className="nav-link">
+                  <span>AI 변환기</span>
+                  <div className="nav-indicator"></div>
+                </HNavLink>
+              </li>
+              <li className="nav-item">
+                <HNavLink to={URL2.SUPPORT_SECURITY_INTRO} className="nav-link">
+                  <span>AI 보안기</span>
+                  <div className="nav-indicator"></div>
+                </HNavLink>
+              </li>
+              <li className="nav-item">
+                <HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK} className="nav-link">
+                  <span>고객지원</span>
+                  <div className="nav-indicator"></div>
+                </HNavLink>
+              </li>
+              {sessionUserSe === "ADM" && (
+                <li className="nav-item">
+                  <HNavLink to={URL2.ADMIN} className="nav-link">
+                    <span>사이트관리</span>
+                    <div className="nav-indicator"></div>
+                  </HNavLink>
+                </li>
+              )}
             </ul>
           </nav>
 
-          {/* User Area + 전체메뉴 버튼 */}
-          <div className="right_cluster">
-            <div className="user_info" aria-live="polite" data-username={sessionUserName || ""} data-role={sessionUserSe || "GUEST"}>
+          {/* 사용자 정보 및 액션 버튼 */}
+          <div className="header-actions">
+            <div className="user-section">
               {sessionUserId ? (
-                <>
-                  <span className="person">{sessionUserName}</span> 님, {sessionUserSe}
-                  {sessionUserSe === "USER" && (
-                    <HNavLink to={URL2.MYPAGE} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>마이페이지</HNavLink>
-                  )}
-                  <button onClick={logOutHandler} className="btn">로그아웃</button>
-                </>
+                <div className="user-info">
+                  <div className="user-avatar">
+                    <span>{sessionUserName?.charAt(0)}</span>
+                  </div>
+                  <div className="user-details">
+                    <span className="user-name">{sessionUserName}</span>
+                    <span className="user-role">{sessionUserSe}</span>
+                  </div>
+                  <div className="user-actions">
+                    {sessionUserSe === "USER" && (
+                      <HNavLink to={URL2.MYPAGE} className="action-btn secondary">
+                        마이페이지
+                      </HNavLink>
+                    )}
+                    <button onClick={logOutHandler} className="action-btn primary">
+                      로그아웃
+                    </button>
+                  </div>
+                </div>
               ) : (
-                <>
-                  <button onClick={logInHandler} className="btn login">로그인</button>
-                  <HNavLink to={URL2.SIGNUP} className={({ isActive }) => (isActive ? "btn login cur" : "btn login")}>회원가입</HNavLink>
-                </>
+                <div className="auth-buttons">
+                  <button onClick={logInHandler} className="action-btn secondary">
+                    로그인
+                  </button>
+                  <HNavLink to={URL2.SIGNUP} className="action-btn primary">
+                    회원가입
+                  </HNavLink>
+                </div>
               )}
             </div>
 
+            {/* 모바일 메뉴 토글 */}
+            <button
+              className="mobile-menu-toggle"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-expanded={isMobileMenuOpen}
+              aria-label="모바일 메뉴 토글"
+            >
+              <span className="hamburger-line"></span>
+              <span className="hamburger-line"></span>
+              <span className="hamburger-line"></span>
+            </button>
+
+            {/* 데스크톱 전체메뉴 버튼 */}
             <button
               ref={btnAllMenuRef}
               type="button"
-              className="btn btnAllMenu"
+              className="all-menu-btn"
               title={menuBtnTitle}
               aria-expanded={isMenuOpen}
               aria-controls="allmenu-web"
-              aria-haspopup="menu"
               onClick={toggleAllMenu}
             >
-              전체메뉴
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+              <span>전체메뉴</span>
             </button>
           </div>
         </div>
 
-        {/* All Menu (WEB) */}
+        {/* 모바일 메뉴 */}
+        <div className={`mobile-menu ${isMobileMenuOpen ? "open" : ""}`}>
+          <div className="mobile-menu-content">
+            <nav className="mobile-nav">
+              <ul className="mobile-nav-list">
+                <li>
+                  <HNavLink to={URL2.ABOUT} onClick={() => setIsMobileMenuOpen(false)}>
+                    사이트소개
+                  </HNavLink>
+                </li>
+                <li>
+                  <HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO} onClick={() => setIsMobileMenuOpen(false)}>
+                    AI 변환기
+                  </HNavLink>
+                </li>
+                <li>
+                  <HNavLink to={URL2.SUPPORT_SECURITY_INTRO} onClick={() => setIsMobileMenuOpen(false)}>
+                    AI 보안기
+                  </HNavLink>
+                </li>
+                <li>
+                  <HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK} onClick={() => setIsMobileMenuOpen(false)}>
+                    고객지원
+                  </HNavLink>
+                </li>
+                {sessionUserSe === "ADM" && (
+                  <li>
+                    <HNavLink to={URL2.ADMIN} onClick={() => setIsMobileMenuOpen(false)}>
+                      사이트관리
+                    </HNavLink>
+                  </li>
+                )}
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        {/* All Menu (WEB) - Modern Mega Menu */}
         <div
           id="allmenu-web"
           ref={webMenuRef}
-          className={`all_menu WEB ${isMenuOpen ? "" : "closed"}`}
+          className={`mega-menu ${isMenuOpen ? "open" : "closed"}`}
           aria-hidden={!isMenuOpen}
           onMouseEnter={handleMenuMouseEnter}
           onMouseLeave={handleMenuMouseLeave}
         >
-          <div className="inner">
-            <div className="col">
-              <h3>사이트소개</h3>
-              <ul>
-                <li><HNavLink to={URL2.ABOUT_SITE}>소개</HNavLink></li>
-                <li><HNavLink to={URL2.ABOUT_HISTORY}>연혁</HNavLink></li>
-                <li><HNavLink to={URL2.ABOUT_ORGANIZATION}>조직소개</HNavLink></li>
-                <li><HNavLink to={URL2.ABOUT_LOCATION}>찾아오시는 길</HNavLink></li>
-              </ul>
-            </div>
-
-            <div className="col">
-              <h3>AI 변환기</h3>
-              <ul>
-                <li><HNavLink to="/support/transform/intro">기능 소개</HNavLink></li>
-                <li><HNavLink to="/support/transform/transformation">변환 하기</HNavLink></li>
-                <li><HNavLink to="/support/transform/view_transform">변환 이력 조회</HNavLink></li>
-                <li><HNavLink to="/support/transform/view_test">테스트 이력 조회</HNavLink></li>
-                <li><HNavLink to="/support/transform/download">다운로드</HNavLink></li>
-              </ul>
-            </div>
-
-            <div className="col">
-              <h3>AI 보안기</h3>
-              <ul>
-                <li><HNavLink to="/support/security/intro">기능 소개</HNavLink></li>
-                <li><HNavLink to="/support/security/scan">AI 보안 검사</HNavLink></li>
-                <li><HNavLink to="/support/security/vulnerability">보안 취약점탐지</HNavLink></li>
-                <li><HNavLink to="/support/security/report">보안 점검결과</HNavLink></li>
-                <li><HNavLink to="/support/security/report_detail">다운로드</HNavLink></li>
-              </ul>
-            </div>
-
-            <div className="col">
-              <h3>고객지원</h3>
-              <ul>
-                <li><HNavLink to="/support/guide/egovframework">전자정부프레임워크 가이드</HNavLink></li>
-                <li><HNavLink to="/intro">정보마당</HNavLink></li>
-                <li><HNavLink to="/inform">알림마당</HNavLink></li>
-              </ul>
-            </div>
-
-            {sessionUserSe === "ADM" && (
-              <div className="col">
-                <h3>사이트관리</h3>
-                <ul>
-                  <li><HNavLink to={URL2.ADMIN_NOTICE}>공지사항 관리</HNavLink></li>
-                  <li><HNavLink to={URL2.ADMIN_FAQ}>FAQ 관리</HNavLink></li>
-                  <li><HNavLink to={URL2.ADMIN_QNA}>Q&A 관리</HNavLink></li>
-                  <li><HNavLink to={URL2.ADMIN_MEMBERS}>회원 관리</HNavLink></li>
-                  <li><HNavLink to={URL2.ADMIN_MANAGER}>관리자 관리</HNavLink></li>
+          <div className="mega-menu-content">
+            <div className="mega-menu-grid">
+              <div className="mega-menu-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                      <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                    </svg>
+                  </div>
+                  <h3>사이트소개</h3>
+                </div>
+                <ul className="section-links">
+                  <li><HNavLink to={URL2.ABOUT_SITE}>소개</HNavLink></li>
+                  <li><HNavLink to={URL2.ABOUT_HISTORY}>연혁</HNavLink></li>
+                  <li><HNavLink to={URL2.ABOUT_ORGANIZATION}>조직소개</HNavLink></li>
+                  <li><HNavLink to={URL2.ABOUT_LOCATION}>찾아오시는 길</HNavLink></li>
                 </ul>
               </div>
-            )}
+
+              <div className="mega-menu-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
+                      <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
+                      <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                    </svg>
+                  </div>
+                  <h3>AI 변환기</h3>
+                </div>
+                <ul className="section-links">
+                  <li><HNavLink to="/support/transform/intro">기능 소개</HNavLink></li>
+                  <li><HNavLink to="/support/transform/transformation">변환 하기</HNavLink></li>
+                  <li><HNavLink to="/support/transform/view_transform">변환 이력 조회</HNavLink></li>
+                  <li><HNavLink to="/support/transform/view_test">테스트 이력 조회</HNavLink></li>
+                  <li><HNavLink to="/support/transform/download">다운로드</HNavLink></li>
+                </ul>
+              </div>
+
+              <div className="mega-menu-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                  </div>
+                  <h3>AI 보안기</h3>
+                </div>
+                <ul className="section-links">
+                  <li><HNavLink to="/support/security/intro">기능 소개</HNavLink></li>
+                  <li><HNavLink to="/support/security/scan">AI 보안 검사</HNavLink></li>
+                  <li><HNavLink to="/support/security/vulnerability">보안 취약점탐지</HNavLink></li>
+                  <li><HNavLink to="/support/security/report">보안 점검결과</HNavLink></li>
+                  <li><HNavLink to="/support/security/report_detail">다운로드</HNavLink></li>
+                </ul>
+              </div>
+
+              <div className="mega-menu-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </div>
+                  <h3>고객지원</h3>
+                </div>
+                <ul className="section-links">
+                  <li><HNavLink to="/support/guide/egovframework">전자정부프레임워크 가이드</HNavLink></li>
+                  <li><HNavLink to="/intro">정보마당</HNavLink></li>
+                  <li><HNavLink to="/inform">알림마당</HNavLink></li>
+                </ul>
+              </div>
+
+              {sessionUserSe === "ADM" && (
+                <div className="mega-menu-section admin-section">
+                  <div className="section-header">
+                    <div className="section-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                      </svg>
+                    </div>
+                    <h3>사이트관리</h3>
+                  </div>
+                  <ul className="section-links">
+                    <li><HNavLink to={URL2.ADMIN_NOTICE}>공지사항 관리</HNavLink></li>
+                    <li><HNavLink to={URL2.ADMIN_FAQ}>FAQ 관리</HNavLink></li>
+                    <li><HNavLink to={URL2.ADMIN_QNA}>Q&A 관리</HNavLink></li>
+                    <li><HNavLink to={URL2.ADMIN_MEMBERS}>회원 관리</HNavLink></li>
+                    <li><HNavLink to={URL2.ADMIN_MANAGER}>관리자 관리</HNavLink></li>
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* === 전역 Floating Chat Button (FAB) === */}
       {createPortal(

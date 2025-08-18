@@ -6,6 +6,7 @@ import URL from "@/constants/url";
 
 // ✅ 동적 효과/겹침 해결용 스타일 (기존 파일 재사용)
 import "@/css/mainMotion.css";
+import "@/css/modern-styles.css";
 
 /** 접근성/성능: 사용자 환경 설정 확인 */
 function usePrefersReducedMotion() {
@@ -404,77 +405,183 @@ function EgovMain(props) {
   console.groupEnd("EgovMain");
 
   return (
-    <div className="container P_MAIN">
-      <div className="c_wrap">
-        <div className="colbox">
-          <div className="left_col">
-            {/* ✅ 자동 슬라이드 캐러셀 */}
-            <MainHeroCarousel />
-          </div>
-
-          <div className="right_col">
-            <div className="mini_board glass reveal">
-              <ul className="tab">
-                <li><a href="#공지사항" className="on">공지사항</a></li>
-              </ul>
-              <div className="list">
-                <div className="notice">
-                  <h2 className="blind">공지사항</h2>
-                  <ul>{noticeListTag}</ul>
-                  <Link to={URL.INFORM_NOTICE} className="more">더보기</Link>
+    <main className="modern-main">
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-container">
+          <div className="hero-content">
+            <div className="hero-carousel-wrapper">
+              <MainHeroCarousel />
+            </div>
+            
+            <div className="hero-sidebar">
+              {/* Notice Board */}
+              <div className="notice-card modern-card reveal">
+                <div className="card-header">
+                  <div className="header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                  </div>
+                  <h2>공지사항</h2>
+                  <Link to={URL.INFORM_NOTICE} className="view-all-btn">
+                    전체보기
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="9,18 15,12 9,6"></polyline>
+                    </svg>
+                  </Link>
                 </div>
+                <div className="notice-list">
+                  <ul>{noticeListTag}</ul>
+                </div>
+              </div>
+
+              {/* Quick Access Cards */}
+              <div className="quick-access-grid">
+                <Link to={URL.SUPPORT_DOWNLOAD} className="quick-card modern-card reveal hover-lift">
+                  <div className="quick-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7,10 12,15 17,10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </div>
+                  <div className="quick-card-content">
+                    <h3>자료실</h3>
+                    <p>다양한 자료를 다운로드 받으실 수 있습니다</p>
+                  </div>
+                </Link>
+
+                <Link to={URL.ABOUT} className="quick-card modern-card reveal hover-lift">
+                  <div className="quick-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                  </div>
+                  <div className="quick-card-content">
+                    <h3>찾아오시는 길</h3>
+                    <p>표준프레임워크센터의 위치 정보를 제공합니다</p>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section */}
+      <section className="video-section">
+        <div className="video-container">
+          <div className="section-header">
+            <h2>전자정부 프레임워크 소개</h2>
+            <p>최신 기술과 트렌드를 반영한 전자정부 표준 프레임워크를 소개합니다</p>
+          </div>
+          <YouTubeEmbed video="https://youtu.be/JNsKvZo6MDs?si=xG50mmAa6J2-SJW2" autoplay={0} />
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="services-section">
+        <div className="services-container">
+          <div className="section-header">
+            <h2>주요 서비스</h2>
+            <p>전자정부 프레임워크가 제공하는 핵심 서비스들을 확인해보세요</p>
+          </div>
+          
+          <div className="services-grid">
+            <div className="service-card modern-card reveal hover-lift">
+              <div className="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+              </div>
+              <div className="service-content">
+                <h3>주요사업 소개</h3>
+                <p>표준프레임워크가 제공하는 주요 사업을 소개합니다</p>
+                <Link to={URL.INTRO_WORKS} className="service-link">
+                  자세히 보기
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7,7 17,7 17,17"></polyline>
+                  </svg>
+                </Link>
               </div>
             </div>
 
-            <div className="banner reveal hover-lift">
-              <Link to={URL.SUPPORT_DOWNLOAD} className="bn1 card">
-                <strong>자료실</strong>
-                <span>다양한 자료를<br/>다운로드 받으실 수 있습니다.</span>
-              </Link>
-              <Link to={URL.ABOUT} className="bn2 card">
-                <strong>표준프레임워크센터</strong>
-                <span>표준프레임워크센터의<br/>약도 등의 정보를 제공합니다.</span>
-              </Link>
+            <div className="service-card modern-card reveal hover-lift">
+              <div className="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </div>
+              <div className="service-content">
+                <h3>대표서비스 소개</h3>
+                <p>표준프레임워크 실행환경의 서비스 그룹에서 제공하는 대표서비스입니다</p>
+                <Link to={URL.INTRO_SERVICE} className="service-link">
+                  자세히 보기
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7,7 17,7 17,17"></polyline>
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            <div className="service-card modern-card reveal hover-lift">
+              <div className="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                  <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                  <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"></path>
+                  <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"></path>
+                </svg>
+              </div>
+              <div className="service-content">
+                <h3>서비스 신청</h3>
+                <p>표준프레임워크 경량환경 홈페이지의 다양한 서비스를 신청하실 수 있습니다</p>
+                <Link to={URL.SUPPORT_APPLY} className="service-link">
+                  자세히 보기
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7,7 17,7 17,17"></polyline>
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            <div className="service-card modern-card reveal hover-lift">
+              <div className="service-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <div className="service-content">
+                <h3>일정 현황</h3>
+                <p>표준프레임워크 경량환경 홈페이지의 전체적인 일정 현황을 조회하실 수 있습니다</p>
+                <Link to={URL.INFORM} className="service-link">
+                  자세히 보기
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7,7 17,7 17,17"></polyline>
+                  </svg>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* 🔽 캐러셀과 '자세히 보기' 4개 사이에 유튜브 삽입 (겹침 방지 스타일 포함) */}
-        <YouTubeEmbed video="https://youtu.be/JNsKvZo6MDs?si=xG50mmAa6J2-SJW2" autoplay={0} />
-
-        <div className="banner_bot"></div>
-        <div className="banner_bot">
-          <div className="b1 card reveal hover-lift">
-            <div>
-              <h2>주요사업 소개</h2>
-              <p>표준프레임워크가 제공하는<br/>주요 사업을 소개합니다.</p>
-            </div>
-            <Link to={URL.INTRO_WORKS}>자세히 보기</Link>
-          </div>
-          <div className="b2 card reveal hover-lift">
-            <div>
-              <h2>대표서비스 소개</h2>
-              <p>표준프레임워크 실행환경의<br/>서비스 그룹에서 제공하는<br/>대표서비스입니다.</p>
-            </div>
-            <Link to={URL.INTRO_SERVICE}>자세히 보기</Link>
-          </div>
-          <div className="b3 card reveal hover-lift">
-            <div>
-              <h2>서비스 신청</h2>
-              <p>표준프레임워크 경량환경<br/>홈페이지의 다양한 서비스를<br/>신청 하실 수 있습니다.</p>
-            </div>
-            <Link to={URL.SUPPORT_APPLY}>자세히 보기</Link>
-          </div>
-          <div className="b4 card reveal hover-lift">
-            <div>
-              <h2>일정 현황</h2>
-              <p>표준프레임워크 경량환경<br/>홈페이지의 전체적인 일정<br/>현황을 조회하실 수 있습니다.</p>
-            </div>
-            <Link to={URL.INFORM}>자세히 보기</Link>
-          </div>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
