@@ -8,14 +8,44 @@
   align-items: start !important;
 }
 
-/* Hide LeftNav Blue Line Indicators */
+/* Hide LeftNav Blue Line Indicators - Complete Removal */
 .link-indicator {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .nav-link:hover .link-indicator,
 .nav-link.active .link-indicator {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Remove any blue line effects from navigation */
+.nav-link::after,
+.nav-link::before {
+  display: none !important;
+}
+
+.nav-link.active::after,
+.nav-link.active::before,
+.nav-link:hover::after,
+.nav-link:hover::before {
+  display: none !important;
+}
+
+/* Remove border bottom blue lines */
+.nav ul li a.cur {
+  border-bottom: none !important;
+}
+
+.c_wrap .layout .nav ul li a.cur {
+  border-bottom: none !important;
 }
 
 /* Header Animations */

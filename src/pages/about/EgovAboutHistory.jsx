@@ -2,31 +2,36 @@ import { Link } from "react-router-dom";
 
 import URL from "@/constants/url";
 import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavAbout";
+import "@/css/modern-styles.css";
 
 function EgovAboutHistory() {
   return (
-    <div className="container">
-      <div className="c_wrap">
-        {/* <!-- Location --> */}
-        <div className="location">
-          <ul>
-            <li>
-              <Link to={URL.MAIN} className="home">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to={URL.ABOUT}>사이트 소개</Link>
-            </li>
-            <li>연혁</li>
-          </ul>
-        </div>
-        {/* <!--// Location --> */}
+    <div className="modern-page-container">
+      <div className="modern-page-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb">
+          <div className="breadcrumb-container">
+            <Link to={URL.MAIN} className="breadcrumb-home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+              </svg>
+              Home
+            </Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <Link to={URL.ABOUT} className="breadcrumb-link">사이트 소개</Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <span className="breadcrumb-current">연혁</span>
+          </div>
+        </nav>
 
-        <div className="layout">
-          {/* <!-- Navigation --> */}
-          <EgovLeftNav></EgovLeftNav>
-          {/* <!--// Navigation --> */}
+        <div className="modern-layout">
+          {/* Left Navigation */}
+          <EgovLeftNav />
 
           <div className="contents SITE_INTRO" id="contents">
             {/* <!-- 본문 --> */}
