@@ -4,6 +4,7 @@ import axios from "axios";
 import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
 import EgovProgressBar from "@/components/EgovProgressBar";
 import { getSessionItem } from "@/utils/storage";
+import "@/css/modern-styles.css";
 
 /**
  * Base URLs
@@ -420,44 +421,1195 @@ function EgovSupportTransformation() {
   );
 
   return (
-    <div className="container">
-      <div className="c_wrap">
-        <div className="location">
-          <ul>
-            <li><Link to="/" className="home">Home</Link></li>
-            <li><Link to="/support">AI 변환기</Link></li>
-            <li>프레임워크 변환</li>
-          </ul>
-        </div>
-
-        <div className="layout">
-          <EgovLeftNavTransform />
-          <div className="contents SITE_GALLARY_VIEW" id="contents">
-            <div className="top_tit"><h1 className="tit_1">AI 변환기</h1></div>
-            <h2 className="tit_2">프레임워크 변환</h2>
-
-            {UploadBox({
-              title: "전자정부프레임워크 변환",
-              note1: ".zip 파일만 등록할 수 있습니다.",
-              note2: `1개 파일, ${MAX_SIZE_MB}MB 이하 등록 가능`,
-              fileInputRef: fileInputRef1,
-              file: file1,
-              setFile: setFile1,
-              transformType: "프레임워크 변환",
-            })}
-
-            {UploadBox({
-              title: "전자정부프레임워크 버전 변환",
-              note1: ".zip 파일만 등록할 수 있습니다.",
-              note2: `1개 파일, ${MAX_SIZE_MB}MB 이하 등록 가능`,
-              fileInputRef: fileInputRef2,
-              file: file2,
-              setFile: setFile2,
-              transformType: "버전 변환",
-            })}
+    <div className="modern-page-container">
+      <div className="modern-page-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb">
+          <div className="breadcrumb-container">
+            <Link to="/" className="breadcrumb-home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+              </svg>
+              Home
+            </Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <Link to="/support" className="breadcrumb-link">AI 변환기</Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <span className="breadcrumb-current">프레임워크 변환</span>
           </div>
+        </nav>
+
+        <div className="modern-layout">
+          <EgovLeftNavTransform />
+          
+          <main className="modern-content" id="contents">
+            {/* Hero Section */}
+            <section className="content-hero">
+              <div className="hero-content">
+                <div className="hero-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="16,18 22,12 16,6"></polyline>
+                    <polyline points="8,6 2,12 8,18"></polyline>
+                  </svg>
+                </div>
+                <h1 className="hero-title">프레임워크 변환</h1>
+                <p className="hero-description">
+                  기존 코드를 전자정부표준프레임워크로 자동 변환하거나 버전을 업그레이드할 수 있습니다.
+                </p>
+              </div>
+            </section>
+
+            {/* Framework Conversion Section */}
+            <section className="content-section modern-card">
+              <div className="card-header">
+                <div className="header-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="16,18 22,12 16,6"></polyline>
+                    <polyline points="8,6 2,12 8,18"></polyline>
+                  </svg>
+                  <h2>전자정부프레임워크 변환</h2>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="upload-section">
+                  <div className="upload-info">
+                    <ul className="info-list">
+                      <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14,2 14,8 20,8"></polyline>
+                        </svg>
+                        .zip 파일만 등록할 수 있습니다.
+                      </li>
+                      <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M12 6v6l4 2"></path>
+                        </svg>
+                        1개 파일, {MAX_SIZE_MB}MB 이하 등록 가능
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div
+                    className="upload-dropzone"
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const f = e.dataTransfer.files?.[0];
+                      if (!f) return;
+                      handleFileChangeSingle({ target: { files: [f] } }, setFile1);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onClick={() => fileInputRef1.current.click()}
+                  >
+                    <div className="dropzone-content">
+                      <div className="dropzone-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17,8 12,3 7,8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                      </div>
+                      <h3>파일을 드래그하여 업로드</h3>
+                      <p>또는 클릭하여 파일을 선택하세요</p>
+                      <button type="button" className="upload-btn">
+                        파일 선택
+                      </button>
+                    </div>
+                    <input
+                      ref={fileInputRef1}
+                      type="file"
+                      accept=".zip,application/zip"
+                      multiple={false}
+                      onChange={(e) => handleFileChangeSingle(e, setFile1)}
+                      style={{ display: "none" }}
+                    />
+                  </div>
+
+                  {file1 && (
+                    <div className="file-preview">
+                      <div className="file-item">
+                        <div className="file-info">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                          </svg>
+                          <div className="file-details">
+                            <span className="file-name">{file1.file.name}</span>
+                            <span className="file-size">{Math.round(file1.file.size / 1024)}KB</span>
+                            {file1.jobId && <span className="job-id">JobId: {file1.jobId}</span>}
+                          </div>
+                        </div>
+                        <div className="file-status">
+                          {file1.status === "uploading" ? (
+                            <div className="status-uploading">
+                              <div className="spinner"></div>
+                              <span>업로드 중... {file1.progress || 0}%</span>
+                            </div>
+                          ) : file1.status === "done" ? (
+                            <div className="status-done">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="20,6 9,17 4,12"></polyline>
+                              </svg>
+                              <span>완료</span>
+                            </div>
+                          ) : file1.status === "error" ? (
+                            <div className="status-error">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                              </svg>
+                              <span>실패</span>
+                            </div>
+                          ) : (
+                            <div className="status-ready">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                              </svg>
+                              <span>대기</span>
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          className="remove-file-btn"
+                          onClick={() => setFile1(null)}
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="action-section">
+                    <button
+                      onClick={() => handleTransform("프레임워크 변환")}
+                      className={`transform-btn ${loadingType === "프레임워크 변환" ? "loading" : ""} ${successType === "프레임워크 변환" ? "success" : ""}`}
+                      disabled={!!loadingType}
+                    >
+                      {loadingType === "프레임워크 변환" ? (
+                        <>
+                          <div className="btn-spinner"></div>
+                          변환중... ({progress}%)
+                        </>
+                      ) : successType === "프레임워크 변환" ? (
+                        <>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="20,6 9,17 4,12"></polyline>
+                          </svg>
+                          변환 완료!
+                        </>
+                      ) : (
+                        <>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="16,18 22,12 16,6"></polyline>
+                            <polyline points="8,6 2,12 8,18"></polyline>
+                          </svg>
+                          변환 시작
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {loadingType === "프레임워크 변환" && (
+                    <div className="progress-section">
+                      <EgovProgressBar progress={progress} />
+                    </div>
+                  )}
+
+                  {(loadingType === "프레임워크 변환" || successType === "프레임워크 변환") && (
+                    <div className="logs-section">
+                      <div className="logs-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14,2 14,8 20,8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        <h4>변환 로그</h4>
+                      </div>
+                      <div className="logs-content">
+                        {logs.length === 0 ? (
+                          <div className="logs-empty">
+                            <span>로그가 없습니다</span>
+                          </div>
+                        ) : (
+                          logs.map((log, i) => (
+                            <div key={i} className="log-entry">
+                              {log}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {file1 && file1.status === "done" && file1.jobId && (
+                    <div className="download-section">
+                      <button
+                        onClick={() => handleDownload(file1.jobId)}
+                        className="download-btn-action"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7,10 12,15 17,10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        결과 다운로드
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Version Conversion Section */}
+            <section className="content-section modern-card">
+              <div className="card-header">
+                <div className="header-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
+                    <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
+                    <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                  </svg>
+                  <h2>전자정부프레임워크 버전 변환</h2>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="upload-section">
+                  <div className="upload-info">
+                    <ul className="info-list">
+                      <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14,2 14,8 20,8"></polyline>
+                        </svg>
+                        .zip 파일만 등록할 수 있습니다.
+                      </li>
+                      <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M12 6v6l4 2"></path>
+                        </svg>
+                        1개 파일, {MAX_SIZE_MB}MB 이하 등록 가능
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="version-selectors">
+                    <div className="version-selector">
+                      <label>현재 버전</label>
+                      <select
+                        value={fromVer}
+                        onChange={(e) => setFromVer(e.target.value)}
+                        className="version-select"
+                      >
+                        <option value="4.1">4.1</option>
+                        <option value="4.3">4.3</option>
+                      </select>
+                    </div>
+                    <div className="version-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9,18 15,12 9,6"></polyline>
+                      </svg>
+                    </div>
+                    <div className="version-selector">
+                      <label>타겟 버전</label>
+                      <select
+                        value={toVer}
+                        onChange={(e) => setToVer(e.target.value)}
+                        className="version-select"
+                      >
+                        <option value="4.3">4.3</option>
+                        <option value="4.1">4.1</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div
+                    className="upload-dropzone"
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const f = e.dataTransfer.files?.[0];
+                      if (!f) return;
+                      handleFileChangeSingle({ target: { files: [f] } }, setFile2);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onClick={() => fileInputRef2.current.click()}
+                  >
+                    <div className="dropzone-content">
+                      <div className="dropzone-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17,8 12,3 7,8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                      </div>
+                      <h3>파일을 드래그하여 업로드</h3>
+                      <p>또는 클릭하여 파일을 선택하세요</p>
+                      <button type="button" className="upload-btn">
+                        파일 선택
+                      </button>
+                    </div>
+                    <input
+                      ref={fileInputRef2}
+                      type="file"
+                      accept=".zip,application/zip"
+                      multiple={false}
+                      onChange={(e) => handleFileChangeSingle(e, setFile2)}
+                      style={{ display: "none" }}
+                    />
+                  </div>
+
+                  {file2 && (
+                    <div className="file-preview">
+                      <div className="file-item">
+                        <div className="file-info">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                          </svg>
+                          <div className="file-details">
+                            <span className="file-name">{file2.file.name}</span>
+                            <span className="file-size">{Math.round(file2.file.size / 1024)}KB</span>
+                            {file2.jobId && <span className="job-id">JobId: {file2.jobId}</span>}
+                          </div>
+                        </div>
+                        <div className="file-status">
+                          {file2.status === "uploading" ? (
+                            <div className="status-uploading">
+                              <div className="spinner"></div>
+                              <span>업로드 중... {file2.progress || 0}%</span>
+                            </div>
+                          ) : file2.status === "done" ? (
+                            <div className="status-done">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="20,6 9,17 4,12"></polyline>
+                              </svg>
+                              <span>완료</span>
+                            </div>
+                          ) : file2.status === "error" ? (
+                            <div className="status-error">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                              </svg>
+                              <span>실패</span>
+                            </div>
+                          ) : (
+                            <div className="status-ready">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                              </svg>
+                              <span>대기</span>
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          className="remove-file-btn"
+                          onClick={() => setFile2(null)}
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="action-section">
+                    <button
+                      onClick={() => handleTransform("버전 변환")}
+                      className={`transform-btn ${loadingType === "버전 변환" ? "loading" : ""} ${successType === "버전 변환" ? "success" : ""}`}
+                      disabled={!!loadingType}
+                    >
+                      {loadingType === "버전 변환" ? (
+                        <>
+                          <div className="btn-spinner"></div>
+                          변환중... ({progress}%)
+                        </>
+                      ) : successType === "버전 변환" ? (
+                        <>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="20,6 9,17 4,12"></polyline>
+                          </svg>
+                          변환 완료!
+                        </>
+                      ) : (
+                        <>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
+                            <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
+                            <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                          </svg>
+                          버전 변환 시작
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {loadingType === "버전 변환" && (
+                    <div className="progress-section">
+                      <EgovProgressBar progress={progress} />
+                    </div>
+                  )}
+
+                  {(loadingType === "버전 변환" || successType === "버전 변환") && (
+                    <div className="logs-section">
+                      <div className="logs-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14,2 14,8 20,8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        <h4>변환 로그</h4>
+                      </div>
+                      <div className="logs-content">
+                        {logs.length === 0 ? (
+                          <div className="logs-empty">
+                            <span>로그가 없습니다</span>
+                          </div>
+                        ) : (
+                          logs.map((log, i) => (
+                            <div key={i} className="log-entry">
+                              {log}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {file2 && file2.status === "done" && file2.jobId && (
+                    <div className="download-section">
+                      <button
+                        onClick={() => handleDownload(file2.jobId)}
+                        className="download-btn-action"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7,10 12,15 17,10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        결과 다운로드
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          </main>
         </div>
       </div>
+
+      <style>{`
+        /* Modern Transformation Page Styles */
+        .modern-page-container {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+
+        .modern-page-wrapper {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        .modern-breadcrumb {
+          margin-bottom: 2rem;
+        }
+
+        .breadcrumb-container {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+        }
+
+        .breadcrumb-home,
+        .breadcrumb-link {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--gray-600);
+          text-decoration: none;
+          padding: 0.5rem 0.75rem;
+          border-radius: var(--border-radius-md);
+          transition: all 0.2s ease;
+        }
+
+        .breadcrumb-home:hover,
+        .breadcrumb-link:hover {
+          background: var(--light-blue);
+          color: var(--primary-blue);
+        }
+
+        .breadcrumb-home svg,
+        .breadcrumb-separator {
+          width: 16px;
+          height: 16px;
+        }
+
+        .breadcrumb-current {
+          color: var(--primary-blue);
+          font-weight: 600;
+        }
+
+        .modern-layout {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 2rem;
+          align-items: start;
+        }
+
+        .modern-content {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .content-hero {
+          text-align: center;
+          padding: 3rem 0;
+        }
+
+        .hero-content {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .hero-icon {
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 1.5rem;
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          border-radius: var(--border-radius-2xl);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          box-shadow: var(--shadow-xl);
+        }
+
+        .hero-icon svg {
+          width: 40px;
+          height: 40px;
+        }
+
+        .hero-title {
+          margin: 0 0 1rem;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--gray-900);
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .hero-description {
+          margin: 0;
+          font-size: 1.125rem;
+          color: var(--gray-600);
+          line-height: 1.6;
+        }
+
+        .content-section {
+          background: white;
+          border-radius: var(--border-radius-2xl);
+          border: 1px solid var(--gray-200);
+          box-shadow: var(--shadow-sm);
+          overflow: hidden;
+        }
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.5rem 2rem;
+          background: linear-gradient(135deg, 
+            rgba(0, 0, 255, 0.05) 0%, 
+            rgba(255, 255, 255, 1) 100%);
+          border-bottom: 1px solid var(--gray-200);
+        }
+
+        .header-icon {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .header-icon svg {
+          width: 24px;
+          height: 24px;
+          color: var(--primary-blue);
+        }
+
+        .header-icon h2 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .card-content {
+          padding: 2rem;
+        }
+
+        /* Upload Section */
+        .upload-section {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .upload-info {
+          background: var(--gray-50);
+          border-radius: var(--border-radius-xl);
+          padding: 1.5rem;
+          border: 1px solid var(--gray-200);
+        }
+
+        .info-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .info-list li {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: var(--gray-700);
+          font-size: 0.95rem;
+        }
+
+        .info-list li svg {
+          width: 18px;
+          height: 18px;
+          color: var(--primary-blue);
+          flex-shrink: 0;
+        }
+
+        /* Version Selectors */
+        .version-selectors {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 2rem;
+          padding: 1.5rem;
+          background: var(--gray-50);
+          border-radius: var(--border-radius-xl);
+          border: 1px solid var(--gray-200);
+        }
+
+        .version-selector {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          align-items: center;
+        }
+
+        .version-selector label {
+          font-weight: 600;
+          color: var(--gray-700);
+          font-size: 0.875rem;
+        }
+
+        .version-select {
+          padding: 0.75rem 1rem;
+          border: 1px solid var(--gray-300);
+          border-radius: var(--border-radius-lg);
+          font-size: 0.95rem;
+          background: white;
+          color: var(--gray-900);
+          min-width: 120px;
+          text-align: center;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+
+        .version-select:focus {
+          outline: none;
+          border-color: var(--primary-blue);
+          box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.1);
+        }
+
+        .version-arrow {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          background: var(--primary-blue);
+          border-radius: 50%;
+          color: white;
+        }
+
+        .version-arrow svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        /* Upload Dropzone */
+        .upload-dropzone {
+          border: 2px dashed var(--gray-300);
+          border-radius: var(--border-radius-xl);
+          padding: 3rem 2rem;
+          text-align: center;
+          background: var(--gray-50);
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+        }
+
+        .upload-dropzone:hover {
+          border-color: var(--primary-blue);
+          background: rgba(0, 0, 255, 0.02);
+        }
+
+        .dropzone-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .dropzone-icon {
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          border-radius: var(--border-radius-2xl);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          box-shadow: var(--shadow-lg);
+        }
+
+        .dropzone-icon svg {
+          width: 32px;
+          height: 32px;
+        }
+
+        .dropzone-content h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .dropzone-content p {
+          margin: 0;
+          color: var(--gray-600);
+          font-size: 0.95rem;
+        }
+
+        .upload-btn {
+          padding: 0.75rem 1.5rem;
+          background: var(--primary-blue);
+          color: white;
+          border: none;
+          border-radius: var(--border-radius-lg);
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .upload-btn:hover {
+          background: var(--dark-blue);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-md);
+        }
+
+        /* File Preview */
+        .file-preview {
+          background: var(--gray-50);
+          border-radius: var(--border-radius-xl);
+          padding: 1.5rem;
+          border: 1px solid var(--gray-200);
+        }
+
+        .file-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          background: white;
+          padding: 1rem;
+          border-radius: var(--border-radius-lg);
+          border: 1px solid var(--gray-200);
+        }
+
+        .file-info {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          flex: 1;
+        }
+
+        .file-info svg {
+          width: 24px;
+          height: 24px;
+          color: var(--primary-blue);
+          flex-shrink: 0;
+        }
+
+        .file-details {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .file-name {
+          font-weight: 600;
+          color: var(--gray-900);
+          font-size: 0.95rem;
+        }
+
+        .file-size {
+          font-size: 0.8rem;
+          color: var(--gray-500);
+        }
+
+        .job-id {
+          font-size: 0.8rem;
+          color: var(--primary-blue);
+          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .file-status {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-right: 1rem;
+        }
+
+        .status-uploading,
+        .status-done,
+        .status-error,
+        .status-ready {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+
+        .status-uploading {
+          color: var(--primary-blue);
+        }
+
+        .status-done {
+          color: #10B981;
+        }
+
+        .status-error {
+          color: #EF4444;
+        }
+
+        .status-ready {
+          color: var(--gray-600);
+        }
+
+        .status-uploading svg,
+        .status-done svg,
+        .status-error svg,
+        .status-ready svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid var(--gray-200);
+          border-top: 2px solid var(--primary-blue);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .remove-file-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border: 1px solid var(--gray-300);
+          border-radius: var(--border-radius-md);
+          background: white;
+          color: var(--gray-500);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .remove-file-btn:hover {
+          background: #FEF2F2;
+          color: #EF4444;
+          border-color: #FECACA;
+        }
+
+        .remove-file-btn svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        /* Action Section */
+        .action-section {
+          display: flex;
+          justify-content: center;
+        }
+
+        .transform-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem 2rem;
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          color: white;
+          border: none;
+          border-radius: var(--border-radius-xl);
+          font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: var(--shadow-lg);
+          min-width: 200px;
+          justify-content: center;
+        }
+
+        .transform-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-xl);
+        }
+
+        .transform-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .transform-btn.loading {
+          background: var(--gray-400);
+        }
+
+        .transform-btn.success {
+          background: linear-gradient(135deg, #10B981, #059669);
+        }
+
+        .transform-btn svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .btn-spinner {
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-top: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        /* Progress Section */
+        .progress-section {
+          background: var(--gray-50);
+          border-radius: var(--border-radius-xl);
+          padding: 1.5rem;
+          border: 1px solid var(--gray-200);
+        }
+
+        /* Logs Section */
+        .logs-section {
+          background: var(--gray-50);
+          border-radius: var(--border-radius-xl);
+          border: 1px solid var(--gray-200);
+          overflow: hidden;
+        }
+
+        .logs-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem 1.5rem;
+          background: white;
+          border-bottom: 1px solid var(--gray-200);
+        }
+
+        .logs-header svg {
+          width: 20px;
+          height: 20px;
+          color: var(--primary-blue);
+        }
+
+        .logs-header h4 {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--gray-900);
+        }
+
+        .logs-content {
+          max-height: 300px;
+          overflow-y: auto;
+          padding: 1rem 1.5rem;
+          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+          font-size: 0.8rem;
+          line-height: 1.5;
+        }
+
+        .logs-empty {
+          text-align: center;
+          color: var(--gray-500);
+          padding: 2rem;
+        }
+
+        .log-entry {
+          margin-bottom: 0.5rem;
+          color: var(--gray-700);
+          padding: 0.25rem 0;
+          border-bottom: 1px solid var(--gray-100);
+        }
+
+        .log-entry:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+        }
+
+        /* Download Section */
+        .download-section {
+          display: flex;
+          justify-content: center;
+        }
+
+        .download-btn-action {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem 1.5rem;
+          background: #10B981;
+          color: white;
+          border: none;
+          border-radius: var(--border-radius-lg);
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .download-btn-action:hover {
+          background: #059669;
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-md);
+        }
+
+        .download-btn-action svg {
+          width: 18px;
+          height: 18px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+          .modern-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+
+          .version-selectors {
+            flex-direction: column;
+            gap: 1rem;
+          }
+
+          .version-arrow {
+            transform: rotate(90deg);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .modern-page-wrapper {
+            padding: 1rem;
+          }
+
+          .hero-title {
+            font-size: 2rem;
+          }
+
+          .card-content {
+            padding: 1.5rem;
+          }
+
+          .card-header {
+            padding: 1rem 1.5rem;
+          }
+
+          .dropzone-content {
+            padding: 2rem 1rem;
+          }
+
+          .transform-btn {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.95rem;
+            min-width: 180px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hero-title {
+            font-size: 1.75rem;
+          }
+
+          .hero-description {
+            font-size: 1rem;
+          }
+
+          .card-content {
+            padding: 1rem;
+          }
+
+          .card-header {
+            padding: 0.875rem 1rem;
+          }
+
+          .header-icon h2 {
+            font-size: 1.125rem;
+          }
+
+          .dropzone-content {
+            padding: 1.5rem 0.5rem;
+          }
+
+          .file-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+
+          .file-status {
+            margin-right: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
