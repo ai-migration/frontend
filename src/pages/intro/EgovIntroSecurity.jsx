@@ -332,26 +332,26 @@ function EgovIntroSecurity() {
         }
 
         .hero-icon {
-          width: 64px;
-          height: 64px;
-          margin: 0 auto 1.5rem;
+          width: 48px;
+          height: 48px;
+          margin: 0 auto 1rem;
           background: linear-gradient(135deg, #DC2626, #EF4444);
-          border-radius: var(--border-radius-2xl);
+          border-radius: var(--border-radius-xl);
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          box-shadow: var(--shadow-lg);
+          box-shadow: var(--shadow-md);
         }
 
         .hero-icon svg {
-          width: 28px;
-          height: 28px;
+          width: 20px;
+          height: 20px;
         }
 
         .hero-title {
-          margin: 0 0 1rem;
-          font-size: 2.25rem;
+          margin: 0 0 0.75rem;
+          font-size: 1.875rem;
           font-weight: 700;
           color: var(--gray-900);
           background: linear-gradient(135deg, #DC2626, #EF4444);
@@ -361,8 +361,8 @@ function EgovIntroSecurity() {
         }
 
         .hero-description {
-          margin: 0 0 2rem;
-          font-size: 1.125rem;
+          margin: 0 0 1.5rem;
+          font-size: 1rem;
           color: var(--gray-600);
           line-height: 1.6;
         }
@@ -370,17 +370,17 @@ function EgovIntroSecurity() {
         .cta-button {
           display: inline-flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 1rem 2rem;
+          gap: 0.5rem;
+          padding: 0.75rem 1.5rem;
           background: linear-gradient(135deg, #DC2626, #EF4444);
           color: white;
           border: none;
-          border-radius: var(--border-radius-xl);
-          font-size: 1rem;
-          font-weight: 700;
+          border-radius: var(--border-radius-lg);
+          font-size: 0.95rem;
+          font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: var(--shadow-lg);
+          box-shadow: var(--shadow-md);
         }
 
         .cta-button:hover {
@@ -390,8 +390,8 @@ function EgovIntroSecurity() {
         }
 
         .cta-button svg {
-          width: 18px;
-          height: 18px;
+          width: 14px;
+          height: 14px;
         }
 
         .content-section {
@@ -420,26 +420,26 @@ function EgovIntroSecurity() {
         }
 
         .header-icon svg {
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           color: #DC2626;
         }
 
         .header-icon h2 {
           margin: 0;
-          font-size: 1.25rem;
+          font-size: 1.125rem;
           font-weight: 700;
           color: var(--gray-900);
         }
 
         .card-content {
-          padding: 2rem;
+          padding: 1.5rem;
         }
 
         /* Overview Description */
         .overview-description p {
-          font-size: 1.125rem;
-          line-height: 1.7;
+          font-size: 1rem;
+          line-height: 1.6;
           color: var(--gray-700);
           margin: 0;
         }
@@ -447,16 +447,16 @@ function EgovIntroSecurity() {
         /* Features Grid */
         .features-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1rem;
         }
 
         .feature-item {
           display: flex;
-          gap: 1rem;
-          padding: 1.5rem;
+          gap: 0.75rem;
+          padding: 1.25rem;
           background: var(--gray-50);
-          border-radius: var(--border-radius-xl);
+          border-radius: var(--border-radius-lg);
           border: 1px solid var(--gray-200);
           transition: all 0.3s ease;
         }
@@ -468,10 +468,10 @@ function EgovIntroSecurity() {
         }
 
         .feature-icon {
-          width: 40px;
-          height: 40px;
+          width: 32px;
+          height: 32px;
           background: linear-gradient(135deg, #DC2626, #EF4444);
-          border-radius: var(--border-radius-lg);
+          border-radius: var(--border-radius-md);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -480,22 +480,22 @@ function EgovIntroSecurity() {
         }
 
         .feature-icon svg {
-          width: 18px;
-          height: 18px;
+          width: 14px;
+          height: 14px;
         }
 
         .feature-content h3 {
-          margin: 0 0 0.5rem;
-          font-size: 1.125rem;
+          margin: 0 0 0.375rem;
+          font-size: 1rem;
           font-weight: 700;
           color: var(--gray-900);
         }
 
         .feature-content p {
           margin: 0;
-          font-size: 0.95rem;
+          font-size: 0.875rem;
           color: var(--gray-600);
-          line-height: 1.5;
+          line-height: 1.4;
         }
 
         /* Standards Grid */
@@ -549,7 +549,7 @@ function EgovIntroSecurity() {
         .process-steps {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 0.75rem;
           justify-content: center;
           flex-wrap: wrap;
         }
@@ -559,12 +559,13 @@ function EgovIntroSecurity() {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          padding: 1.5rem;
+          padding: 1.25rem;
           background: var(--gray-50);
-          border-radius: var(--border-radius-xl);
+          border-radius: var(--border-radius-lg);
           border: 1px solid var(--gray-200);
           transition: all 0.3s ease;
-          min-width: 200px;
+          min-width: 180px;
+          max-width: 200px;
         }
 
         .step-item:hover {
@@ -574,8 +575,8 @@ function EgovIntroSecurity() {
         }
 
         .step-number {
-          width: 48px;
-          height: 48px;
+          width: 36px;
+          height: 36px;
           background: linear-gradient(135deg, #DC2626, #EF4444);
           border-radius: 50%;
           display: flex;
@@ -583,13 +584,13 @@ function EgovIntroSecurity() {
           justify-content: center;
           color: white;
           font-weight: 700;
-          font-size: 1.125rem;
-          margin-bottom: 1rem;
+          font-size: 0.95rem;
+          margin-bottom: 0.75rem;
         }
 
         .step-content h4 {
-          margin: 0 0 0.5rem;
-          font-size: 1.125rem;
+          margin: 0 0 0.375rem;
+          font-size: 1rem;
           font-weight: 700;
           color: var(--gray-900);
         }
@@ -597,8 +598,8 @@ function EgovIntroSecurity() {
         .step-content p {
           margin: 0;
           color: var(--gray-600);
-          line-height: 1.5;
-          font-size: 0.95rem;
+          line-height: 1.4;
+          font-size: 0.875rem;
         }
 
         .step-arrow {
@@ -606,11 +607,12 @@ function EgovIntroSecurity() {
           align-items: center;
           justify-content: center;
           color: var(--gray-400);
+          flex-shrink: 0;
         }
 
         .step-arrow svg {
-          width: 24px;
-          height: 24px;
+          width: 18px;
+          height: 18px;
         }
 
         /* Responsive Design */
