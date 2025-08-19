@@ -268,9 +268,7 @@ export default function EgovHeader() {
     if (!Array.isArray(actions) || actions.length === 0) return null;
     return (
       <div className="modern-action-bar" role="list" aria-label="빠른 이동">
-        <div className="action-bar-title">
-          관련 페이지
-        </div>
+
         <div className="action-buttons">
           {actions.map((a, idx) => {
             const theme = getActionTheme(a.url);
