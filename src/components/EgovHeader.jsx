@@ -270,7 +270,7 @@ export default function EgovHeader() {
       <div className="modern-action-bar" role="list" aria-label="빠른 이동">
         <div className="action-bar-title">
           <span className="action-icon">🔗</span>
-          관련 페이지로 이동
+          관련 페이지
         </div>
         <div className="action-buttons">
           {actions.map((a, idx) => {
@@ -290,7 +290,7 @@ export default function EgovHeader() {
                 >
                   <Icon theme={theme} />
                   <span className="chip-label">{a.label}</span>
-                  <svg className="external-icon" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg className="external-icon" viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                     <polyline points="15,3 21,3 21,9"></polyline>
                     <line x1="10" y1="14" x2="21" y2="3"></line>
@@ -312,7 +312,7 @@ export default function EgovHeader() {
               >
                 <Icon theme={theme} />
                 <span className="chip-label">{a.label}</span>
-                <svg className="arrow-icon" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="arrow-icon" viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="9,18 15,12 9,6"></polyline>
                 </svg>
               </button>
