@@ -267,46 +267,58 @@ export default function EgovHeader() {
   const ChatActionBar = ({ actions = [] }) => {
     if (!Array.isArray(actions) || actions.length === 0) return null;
     return (
-      <div className="action-bar" role="list" aria-label="빠른 이동">
-        {actions.map((a, idx) => {
-          const theme = getActionTheme(a.url);
-          const external = /^https?:\/\//i.test(a.url);
-          if (external) {
+      <div className="modern-action-bar" role="list" aria-label="빠른 이동">
+        <div className="action-bar-title">
+          <span className="action-icon">🔗</span>
+          관련 페이지로 이동
+        </div>
+        <div className="action-buttons">
+          {actions.map((a, idx) => {
+            const theme = getActionTheme(a.url);
+            const external = /^https?:\/\//i.test(a.url);
+            if (external) {
+              return (
+                <a
+                  key={idx}
+                  className={`action-chip ${theme}`}
+                  href={a.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  role="listitem"
+                  aria-label={`${a.label} (새 창)`}
+                  onClick={closeChat}
+                >
+                  <Icon theme={theme} />
+                  <span className="chip-label">{a.label}</span>
+                  <svg className="external-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15,3 21,3 21,9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+              );
+            }
             return (
-              <a
+              <button
                 key={idx}
-                className={`chip ${theme}`}
-                href={a.url}
-                target="_blank"
-                rel="noreferrer"
+                type="button"
+                className={`action-chip ${theme}`}
                 role="listitem"
-                aria-label={`${a.label} (새 창)`}
-                onClick={closeChat}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(a.url);
+                  closeChat();
+                }}
               >
                 <Icon theme={theme} />
-                <span className="label">{a.label}</span>
-                <span className="arrow" aria-hidden />
-              </a>
+                <span className="chip-label">{a.label}</span>
+                <svg className="arrow-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="9,18 15,12 9,6"></polyline>
+                </svg>
+              </button>
             );
-          }
-          return (
-            <button
-              key={idx}
-              type="button"
-              className={`chip ${theme}`}
-              role="listitem"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(a.url);
-                closeChat();
-              }}
-            >
-              <Icon theme={theme} />
-              <span className="label">{a.label}</span>
-              <span className="arrow" aria-hidden />
-            </button>
-          );
-        })}
+          })}
+        </div>
       </div>
     );
   };
@@ -733,18 +745,34 @@ export default function EgovHeader() {
           <div className="modern-chat-body" ref={chatListRef}>
             {messages.map((m) => (
               <div key={m.id} className={`modern-chat-msg ${m.role}`}>
-                <div className="modern-bubble">{m.text}</div>
-                {m.role === "bot" && <ChatActionBar actions={m.actions} />}
-                {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
-                  <details className="modern-citations">
-                    <summary>참고 근거</summary>
-                    <ul>
-                      {m.citations.map((c, i) => (
-                        <li key={i}><strong>{c.source}</strong>: {c.snippet}</li>
-                      ))}
-                    </ul>
-                  </details>
-                )}
+                <div className="chat-message-container">
+                  {/* 답변 텍스트 */}
+                  <div className="modern-bubble">{m.text}</div>
+                  
+                  {/* 네비게이션 버튼들 (봇 메시지에만 표시) */}
+                  {m.role === "bot" && <ChatActionBar actions={m.actions} />}
+                  
+                  {/* 참고 근거 (봇 메시지에만 표시) */}
+                  {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
+                    <div className="modern-citations">
+                      <details className="citations-details">
+                        <summary className="citations-summary">
+                          <span className="citations-icon">📚</span>
+                          참고 근거 ({m.citations.length}개)
+                          <span className="citations-toggle">▼</span>
+                        </summary>
+                        <div className="citations-content">
+                          {m.citations.map((c, i) => (
+                            <div key={i} className="citation-item">
+                              <div className="citation-source">{c.source}</div>
+                              <div className="citation-snippet">{c.snippet}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
             {pending && (

@@ -1263,12 +1263,16 @@
 /* Modern Chat Messages */
 .modern-chat-msg {
   display: flex;
-  margin: 16px 0;
+  margin: 20px 0;
   animation: messageSlideIn 0.4s ease-out;
 }
 
 .modern-chat-msg.me {
   justify-content: flex-end;
+}
+
+.modern-chat-msg.bot {
+  justify-content: flex-start;
 }
 
 .modern-bubble {
@@ -1338,31 +1342,168 @@
   }
 }
 
+/* Chat Message Container */
+.chat-message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Modern Action Bar */
+.modern-action-bar {
+  margin-top: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 255, 0.02) 0%, 
+    rgba(255, 255, 255, 0.8) 100%);
+  border: 1px solid rgba(0, 0, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.action-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.action-icon {
+  font-size: 16px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.action-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid rgba(0, 0, 255, 0.15);
+  border-radius: 24px;
+  color: var(--gray-700);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.action-chip:hover {
+  background: var(--light-blue);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 255, 0.15);
+}
+
+.action-chip.primary {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  border-color: var(--primary-blue);
+  color: white;
+}
+
+.action-chip.primary:hover {
+  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+  color: white;
+}
+
+.chip-label {
+  font-weight: 500;
+}
+
+.external-icon,
+.arrow-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
 /* Modern Citations */
 .modern-citations {
-  margin-top: 8px;
-  padding: 12px;
-  background: rgba(0, 0, 255, 0.03);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 255, 0.1);
+  margin-top: 12px;
 }
 
-.modern-citations summary {
+.citations-details {
+  background: linear-gradient(135deg, 
+    rgba(0, 0, 255, 0.02) 0%, 
+    rgba(255, 255, 255, 0.9) 100%);
+  border: 1px solid rgba(0, 0, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.citations-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(0, 0, 255, 0.03);
+  cursor: pointer;
+  font-size: 14px;
   font-weight: 600;
   color: var(--primary-blue);
-  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.citations-summary:hover {
+  background: rgba(0, 0, 255, 0.05);
+}
+
+.citations-icon {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.citations-toggle {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.citations-details[open] .citations-toggle {
+  transform: rotate(180deg);
+}
+
+.citations-content {
+  padding: 16px 18px;
+  background: white;
+}
+
+.citation-item {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--gray-50);
+  border-radius: 12px;
+  border-left: 3px solid var(--primary-blue);
+}
+
+.citation-item:last-child {
+  margin-bottom: 0;
+}
+
+.citation-source {
   font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  margin-bottom: 6px;
 }
 
-.modern-citations ul {
-  margin: 8px 0 0;
-  padding-left: 16px;
-}
-
-.modern-citations li {
-  margin-bottom: 4px;
+.citation-snippet {
   font-size: 13px;
   color: var(--gray-700);
+  line-height: 1.5;
 }
 
 /* Modern Chat Input */
