@@ -370,6 +370,7 @@ export default function EgovSupportDownload() {
                           <th className="table-header">동작</th>
                         </tr>
                       </thead>
+                      <tbody>
                         {/* Loading State */}
                         {loading ? (
                           Array.from({ length: pageSize }).map((_, i) => (
