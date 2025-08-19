@@ -186,8 +186,7 @@
 
 .nav-link:hover .nav-indicator,
 .nav-link.active .nav-indicator {
-  display: none !important;
-  width: 0 !important;
+  width: 0%;
 }
 
 /* Header Actions */
