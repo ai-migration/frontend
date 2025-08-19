@@ -42,17 +42,59 @@ function EgovAboutSite() {
                     <polyline points="9,22 9,12 15,12 15,22"></polyline>
                   </svg>
                 </div>
-                <h1 className="hero-title">프로젝트 소개</h1>
+                <h1 className="hero-title">AI CODE MIGRATION 소개</h1>
                 <p className="hero-description">
-                  표준프레임워크 경량환경의 개요와 연혁, 조직소개, 표준프레임워크센터의 약도 등의 정보를 제공하고 있습니다.
+                  AI 기반 코드 변환 및 보안 검사 서비스를 제공하는 플랫폼입니다. 
+                  전자정부표준프레임워크와 연계하여 안전하고 효율적인 개발 환경을 지원합니다.
                 </p>
+              </div>
+            </section>
+
+            {/* Service Introduction */}
+            <section className="content-section">
+              <div className="section-header">
+                <h2 className="section-title">서비스 소개</h2>
+                <div className="section-divider"></div>
+              </div>
+
+              <div className="features-grid">
+                <div className="feature-card">
+                  <div className="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                  </div>
+                  <h3 className="feature-title">AI 변환기</h3>
+                  <p className="feature-desc">Python, Java 등 다양한 언어 간 자동 변환 서비스</p>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                  </div>
+                  <h3 className="feature-title">AI 보안기</h3>
+                  <p className="feature-desc">코드 취약점 분석 및 보안 진단 서비스</p>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                    </svg>
+                  </div>
+                  <h3 className="feature-title">가이드 제공</h3>
+                  <p className="feature-desc">전자정부프레임워크 활용 가이드 및 지원</p>
+                </div>
               </div>
             </section>
 
             {/* Framework Introduction */}
             <section className="content-section">
               <div className="section-header">
-                <h2 className="section-title">전자정부표준프레임워크 소개</h2>
+                <h2 className="section-title">전자정부표준프레임워크 연계</h2>
                 <div className="section-divider"></div>
               </div>
 
@@ -65,13 +107,13 @@ function EgovAboutSite() {
                       <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
                   </div>
-                  <h3 className="card-title">개요</h3>
+                  <h3 className="card-title">표준 프레임워크 기반</h3>
                 </div>
                 <div className="card-content">
                   <p className="card-text">
-                    전자정부 표준 프레임워크는 응용SW의 구성기반이 되며 응용SW실행 시 필요한 기본 기능을 제공하는 환경입니다.
-                    전자정부 서비스의 품질향상 및 정보화 투자 효율성 향상을 위해 개발 프레임워크 표준을 정립하고, 
-                    개발 프레임워크 표준 적용을 통한 응용 SW의 표준화 및 품질과 재사용성 향상을 목표로 합니다.
+                    본 플랫폼은 전자정부 표준 프레임워크 기반으로 구축되어 안정성과 호환성을 보장합니다.
+                    AI 기술과 표준 프레임워크의 결합으로 효율적이고 안전한 개발 환경을 제공하며,
+                    정부 표준을 준수하는 고품질 소프트웨어 개발을 지원합니다.
                   </p>
                 </div>
               </div>
