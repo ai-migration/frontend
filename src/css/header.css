@@ -1091,3 +1091,5 @@
     border-bottom-right-radius: 16px;
   }
 }
+
+.nav-item.support-hover .nav-link { padding: 6px 10px; line-height: 1; }

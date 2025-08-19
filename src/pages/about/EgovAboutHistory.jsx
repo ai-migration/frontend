@@ -2,12 +2,12 @@ import { Link } from "react-router-dom";
 
 import URL from "@/constants/url";
 import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavAbout";
+import "@/css/modern-styles.css";
 
 function EgovAboutHistory() {
   return (
     <div className="container">
       <div className="c_wrap">
-        {/* <!-- Location --> */}
         <div className="location">
           <ul>
             <li>
@@ -21,12 +21,9 @@ function EgovAboutHistory() {
             <li>연혁</li>
           </ul>
         </div>
-        {/* <!--// Location --> */}
 
         <div className="layout">
-          {/* <!-- Navigation --> */}
-          <EgovLeftNav></EgovLeftNav>
-          {/* <!--// Navigation --> */}
+          <EgovLeftNav />
 
           <div className="contents SITE_INTRO" id="contents">
             {/* <!-- 본문 --> */}

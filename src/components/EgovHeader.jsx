@@ -267,46 +267,45 @@ export default function EgovHeader() {
   const ChatActionBar = ({ actions = [] }) => {
     if (!Array.isArray(actions) || actions.length === 0) return null;
     return (
-      <div className="action-bar" role="list" aria-label="빠른 이동">
-        {actions.map((a, idx) => {
-          const theme = getActionTheme(a.url);
-          const external = /^https?:\/\//i.test(a.url);
-          if (external) {
+      <div className="modern-action-bar" role="list" aria-label="빠른 이동">
+
+        <div className="action-buttons">
+          {actions.map((a, idx) => {
+            const theme = getActionTheme(a.url);
+            const external = /^https?:\/\//i.test(a.url);
+            if (external) {
+              return (
+                <a
+                  key={idx}
+                  className={`action-chip ${theme}`}
+                  href={a.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  role="listitem"
+                  aria-label={`${a.label} (새 창)`}
+                  onClick={closeChat}
+                >
+                  <span className="chip-label">{a.label}</span>
+                </a>
+              );
+            }
             return (
-              <a
+              <button
                 key={idx}
-                className={`chip ${theme}`}
-                href={a.url}
-                target="_blank"
-                rel="noreferrer"
+                type="button"
+                className={`action-chip ${theme}`}
                 role="listitem"
-                aria-label={`${a.label} (새 창)`}
-                onClick={closeChat}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(a.url);
+                  closeChat();
+                }}
               >
-                <Icon theme={theme} />
-                <span className="label">{a.label}</span>
-                <span className="arrow" aria-hidden />
-              </a>
+                <span className="chip-label">{a.label}</span>
+              </button>
             );
-          }
-          return (
-            <button
-              key={idx}
-              type="button"
-              className={`chip ${theme}`}
-              role="listitem"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(a.url);
-                closeChat();
-              }}
-            >
-              <Icon theme={theme} />
-              <span className="label">{a.label}</span>
-              <span className="arrow" aria-hidden />
-            </button>
-          );
-        })}
+          })}
+        </div>
       </div>
     );
   };
@@ -733,18 +732,33 @@ export default function EgovHeader() {
           <div className="modern-chat-body" ref={chatListRef}>
             {messages.map((m) => (
               <div key={m.id} className={`modern-chat-msg ${m.role}`}>
-                <div className="modern-bubble">{m.text}</div>
-                {m.role === "bot" && <ChatActionBar actions={m.actions} />}
-                {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
-                  <details className="modern-citations">
-                    <summary>참고 근거</summary>
-                    <ul>
-                      {m.citations.map((c, i) => (
-                        <li key={i}><strong>{c.source}</strong>: {c.snippet}</li>
-                      ))}
-                    </ul>
-                  </details>
-                )}
+                <div className="chat-message-container">
+                  {/* 답변 텍스트 */}
+                  <div className="modern-bubble">{m.text}</div>
+                  
+                  {/* 네비게이션 버튼들 (봇 메시지에만 표시) */}
+                  {m.role === "bot" && <ChatActionBar actions={m.actions} />}
+                  
+                  {/* 참고 근거 (봇 메시지에만 표시) */}
+                  {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
+                    <div className="modern-citations">
+                      <details className="citations-details">
+                        <summary className="citations-summary">
+                          참고 근거 ({m.citations.length}개)
+                          <span className="citations-toggle">▼</span>
+                        </summary>
+                        <div className="citations-content">
+                          {m.citations.map((c, i) => (
+                            <div key={i} className="citation-item">
+                              <div className="citation-source">{c.source}</div>
+                              <div className="citation-snippet">{c.snippet}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
             {pending && (

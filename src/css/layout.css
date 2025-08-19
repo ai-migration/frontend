@@ -248,7 +248,7 @@ body {
 
 .c_wrap .layout .contents {
   display: table-cell;
-  width: auto;
+  width: 80% !important;
   padding: 0 0 120px 70px;
   vertical-align: top;
 }
