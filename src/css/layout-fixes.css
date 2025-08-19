@@ -90,6 +90,40 @@
   border-bottom: none !important;
 }
 
+/* Remove all possible blue line indicators */
+.nav-indicator {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.nav-link:hover .nav-indicator,
+.nav-link.active .nav-indicator {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Remove blue underlines from all navigation links */
+.modern-left-nav .nav-link.active,
+.modern-left-nav .nav-link:hover,
+.nav .menu4 li a.cur,
+.nav .menu4 li a:hover {
+  border-bottom: none !important;
+  text-decoration: none !important;
+}
+
+/* Override any CSS that might add blue lines */
+.modern-nav-menu .nav-link.active::after,
+.modern-nav-menu .nav-link:hover::after,
+.menu4 li a.cur::after,
+.menu4 li a:hover::after {
+  display: none !important;
+  content: none !important;
+  border: none !important;
+  background: none !important;
+}
+
 /* Header Animations */
 .modern-header {
   animation: headerSlideDown 0.8s ease-out;
