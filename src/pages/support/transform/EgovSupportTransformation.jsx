@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
 import EgovProgressBar from "@/components/EgovProgressBar";
+import DinoGame from "@/components/DinoGame";
 import { getSessionItem } from "@/utils/storage";
 import "@/css/modern-styles.css";
 
@@ -34,6 +35,7 @@ function EgovSupportTransformation() {
   const [running, setRunning] = useState(false);
   const [logs, setLogs] = useState([]); // 수신 메시지 기록
   const [status, setStatus] = useState("IDLE"); // IDLE | RUNNING | DONE | ERROR
+  const [showDinoGame, setShowDinoGame] = useState(false);
 
   // 옵션 (변환 시 사용)
   const [lang, setLang] = useState("Python");
@@ -155,6 +157,7 @@ function EgovSupportTransformation() {
     setLogs([]);
     setRunning(true);
     setStatus("RUNNING");
+    setShowDinoGame(true);
 
     try {
       // ✅ 여기서 업로드 실행 (파일이 ready 상태였더라도 클릭 시 업로드)
