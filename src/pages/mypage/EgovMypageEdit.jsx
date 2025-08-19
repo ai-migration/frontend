@@ -19,7 +19,8 @@ function EgovMypageEdit() {
 
   console.log("EgovMypageEdit [location] : ", location);
   //const uniqId = location.state?.uniqId || "";
-  const [userDetail, setUserDetail] = useState({email:"", password:"", nickname:"", tokenIssued:false});
+  const [userDetail, setUserDetail] = useState({email:"", nickname:"", tokenIssued:false});
+  const [changePassword, setChangePassword] = useState({password:"", newPassword:""});
   const [passwordCheck, setPasswordCheck] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(false);
 
@@ -105,9 +106,17 @@ function EgovMypageEdit() {
   }
 
   const updateUser = () => {
-    // let modeStr = "PUT";
-
-    const requestUpdateUserURL = `/users/update`; // 임시URL
+    const msgs = getPasswordValidationMessage(changePassword.newPassword);
+    if (msgs.some(m => m.startsWith("❌"))) {
+      alert("새 비밀번호 형식을 확인해 주세요.");
+      return;
+    }
+    if (!passwordMatch) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+    
+    const requestUpdateUserURL = `/users/changePassword`; // 임시URL
 
     const requestOptions = {
       method: "PATCH",
@@ -115,25 +124,25 @@ function EgovMypageEdit() {
         "Content-type": "application/json",
         "Authorization": sessionToken
       },
-      body: JSON.stringify({ ...userDetail }),
+      body: JSON.stringify({ ...changePassword }),
     };
     
     EgovNet.requestFetch(requestUpdateUserURL, requestOptions, (resp) => {
-      if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
+      // if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) {
         alert("회원 정보가 수정되었습니다.");
         navigate({ pathname: URL.MAIN });
-      } else {
-        navigate(
-          { pathname: URL.ERROR },
-          { state: { msg: resp.resultMessage } }
-        );
-      }
+      // } else {
+      //   navigate(
+      //     { pathname: URL.ERROR },
+      //     { state: { msg: resp.resultMessage } }
+      //   );
+      // }
     });
   };
   
   useEffect(() => {
-    setPasswordMatch(userDetail.password !== "" && userDetail.password === passwordCheck);
-  }, [userDetail.password, passwordCheck]);
+    setPasswordMatch(changePassword.newPassword !== "" && changePassword.newPassword === passwordCheck);
+  }, [changePassword.newPassword, passwordCheck]);
 
   useEffect(() => {
     // initMode();
@@ -180,23 +189,11 @@ function EgovMypageEdit() {
                 </dt>
                 <dd>
                   {userDetail.email}
-                  {/* <input
-                    className="f_input2 w_full"
-                    type="text"
-                    name="mberId"
-                    title=""
-                    id="mberId"
-                    placeholder=""
-                    defaultValue={userDetail.email}
-                    ref={(el) => (checkRef.current[0] = el)}
-                    readOnly
-                    required
-                  /> */}
                 </dd>
               </dl>
               <dl>
                 <dt>
-                  <label htmlFor="password">암호변경</label>
+                  <label htmlFor="password">현재 비밀번호</label>
                 </dt>
                 <dd>
                   <input
@@ -205,31 +202,57 @@ function EgovMypageEdit() {
                     name="password"
                     title=""
                     id="password"
-                    placeholder="변경할 암호를 입력해 주세요. 비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다."
+                    placeholder="현재 암호를 입력해 주세요."
                     onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
+                      setChangePassword({
+                        ...changePassword,
                         password: e.target.value,
                       })
                     }
                     ref={(el) => (checkRef.current[1] = el)}
                     required
                   />
-                  <div>
-                    {getPasswordValidationMessage(userDetail.password)}
-                  </div>
                 </dd>
-              </dl><dl>
+              </dl>
+              <dl>
                 <dt>
-                  <label htmlFor="password">암호확인</label>
+                  <label htmlFor="newPassword">암호변경</label>
                 </dt>
                 <dd>
                   <input
                     className="f_input2 w_full"
                     type="password"
-                    name="passwordCheck"
+                    name="newPassword"
                     title=""
-                    id="passwordCheck"
+                    id="newPassword"
+                    placeholder="변경할 암호를 입력해 주세요. 비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다."
+                    onChange={(e) =>
+                      setChangePassword({
+                        ...changePassword,
+                        newPassword: e.target.value,
+                      })
+                    }
+                    ref={(el) => (checkRef.current[1] = el)}
+                    required
+                  />
+                  <div>
+                    {getPasswordValidationMessage(changePassword.newPassword).map((m, i) => (
+                      <div key={i}>{m}</div>
+                    ))}
+                  </div>
+                </dd>
+              </dl>
+              <dl>
+                <dt>
+                  <label htmlFor="newPasswordCheck">암호확인</label>
+                </dt>
+                <dd>
+                  <input
+                    className="f_input2 w_full"
+                    type="password"
+                    name="newPasswordCheck"
+                    title=""
+                    id="newPasswordCheck"
                     placeholder="동일한 암호를 한 번 더 입력해 확인해 주세요."
                     onChange={(e) => setPasswordCheck(e.target.value)}
                     ref={(el) => (checkRef.current[2] = el)}
@@ -250,23 +273,6 @@ function EgovMypageEdit() {
                 </dt>
                 <dd>
                   {userDetail.nickname}
-                  {/* <input
-                    className="f_input2 w_full"
-                    type="text"
-                    name="mberNm"
-                    title=""
-                    id="mberNm"
-                    placeholder=""
-                    defaultValue={userDetail.nickname}
-                    onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
-                        nickname: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[2] = el)}
-                    required
-                  /> */}
                 </dd>
               </dl>
               
@@ -287,23 +293,6 @@ function EgovMypageEdit() {
                       토큰요청
                     </button>
                   )}
-                  {/* <input
-                    className="f_input2 w_full"
-                    type="text"
-                    name="mberToken"
-                    title=""
-                    id="mberToken"
-                    placeholder="Token"
-                    defaultValue=""
-                    // onChange={(e) =>
-                    //   setMemberDetail({
-                    //     ...memberDetail,
-                    //     mberNm: e.target.value,
-                    //   })
-                    // }
-                    ref={(el) => (checkRef.current[2] = el)}
-                    required
-                  /> */}
                 </dd>
               </dl>
 
@@ -318,23 +307,10 @@ function EgovMypageEdit() {
                     저장
                   </button>
 
-                  {/* {modeInfo.mode === CODE.MODE_MODIFY && (
-                    <button
-                      className="btn btn_skyblue_h46 w_100"
-                      onClick={() => {
-                        deleteMember();
-                      }}
-                    >
-                      탈퇴
-                    </button>
-                  )} */}
-                  {/* memberDetail.uniqId 제거 서버단에서 토큰값 사용 */}
                 </div>
               </div>
-              {/* <!--// 버튼영역 --> */}
             </div>
 
-            {/* <!--// 본문 --> */}
           </div>
         </div>
       </div>

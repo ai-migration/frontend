@@ -19,7 +19,7 @@ const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
 // 그룹 라벨 ↔ API path 매핑
 const DL_GROUPS = [
   // { key: "origin",      label: "원본" },
-  // { key: "all",         label: "변환된 모든 파일" },
+  { key: "all",         label: "전체 파일" },
   { key: "controller",  label: "Controller" },
   { key: "service",     label: "Service" },
   { key: "serviceimpl", label: "ServiceImpl" },
@@ -87,8 +87,8 @@ export default function EgovSupportDownload() {
     switch (group) {
       // case "origin":
       //   return [base, `${base}/origin`]; // 원본 ZIP
-      // case "all":
-      //   return [base, `${base}/all`]; // 전체 ZIP (기존 호환)
+      case "all":
+        return [base, `${base}/conversion`]; // 전체 ZIP (기존 호환)
       case "controller":
         return [base, `${base}/conversion/controller`]; // Controller
       case "service":
