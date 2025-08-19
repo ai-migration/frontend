@@ -29,7 +29,7 @@ function EgovLeftNavAbout() {
                 </svg>
               </div>
               <span className="link-text">소개</span>
-              <div className="link-indicator"></div>
+
             </NavLink>
           </li>
           <li className="nav-item">
@@ -44,7 +44,7 @@ function EgovLeftNavAbout() {
                 </svg>
               </div>
               <span className="link-text">연혁</span>
-              <div className="link-indicator"></div>
+
             </NavLink>
           </li>
           <li className="nav-item">
@@ -61,7 +61,7 @@ function EgovLeftNavAbout() {
                 </svg>
               </div>
               <span className="link-text">조직소개</span>
-              <div className="link-indicator"></div>
+
             </NavLink>
           </li>
           <li className="nav-item">
@@ -76,7 +76,7 @@ function EgovLeftNavAbout() {
                 </svg>
               </div>
               <span className="link-text">찾아오시는 길</span>
-              <div className="link-indicator"></div>
+
             </NavLink>
           </li>
         </ul>
