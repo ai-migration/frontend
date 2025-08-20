@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 
 import * as EgovNet from "@/api/egovFetch";
@@ -17,9 +17,7 @@ const RAW_POST_BASE =
 const GET_BASE = (RAW_GET_BASE || "").replace(/\/+$/, "");
 const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
 
-/**
- * 유틸: 안전한 날짜 포맷 (UTC 문자열 -> 로컬 시간)
- */
+/** 날짜 포맷 (로컬) */
 const formatKST = (isoLike) => {
   if (!isoLike) return "-";
   try {
@@ -32,38 +30,73 @@ const formatKST = (isoLike) => {
       minute: "2-digit",
       second: "2-digit",
     });
-  } catch (e) {
+  } catch {
     return isoLike;
   }
 };
 
-/**
- * 유틸: s3 경로에서 파일명만 추출
- */
+/** s3 경로 -> 파일명 */
 const basename = (path) => (path ? path.split("/").pop() : "-");
 
+/** convVoReport에서 evaluation.S들을 추출해 평균 정확도(0~1) 반환 */
+function getAccuracy(item) {
+  // 1) 상위에 직접 evaluation.S가 있을 수도 있음
+  const direct = item?.evaluation?.S;
+  if (typeof direct === "number" && isFinite(direct)) return direct;
+
+  // 2) convVoReport 배열 내부 탐색
+  const reports = item?.convVoReport;
+  if (!Array.isArray(reports)) return null;
+
+  const scores = [];
+  for (const entry of reports) {
+    if (entry && typeof entry === "object") {
+      // 각 엔트리는 {"ClassName": { evaluation: {...} }} 형태
+      const key = Object.keys(entry)[0];
+      const ev = key && entry[key]?.evaluation;
+      const s = ev?.S;
+      if (typeof s === "number" && isFinite(s)) scores.push(s);
+    }
+  }
+  if (scores.length === 0) return null;
+  return scores.reduce((a, b) => a + b, 0) / scores.length;
+}
+
+const formatPercent = (v) =>
+  typeof v === "number" && isFinite(v) ? `${Math.round(v * 100)}%` : "-";
+
+/** 정확도 브레이크다운(툴팁용) */
+function getAccuracyBreakdown(item) {
+  const reports = item?.convVoReport;
+  if (!Array.isArray(reports) || reports.length === 0) return "";
+  const parts = [];
+  for (const entry of reports) {
+    const key = Object.keys(entry || {})[0];
+    if (!key) continue;
+    const s = entry[key]?.evaluation?.S;
+    if (typeof s === "number" && isFinite(s)) {
+      parts.push(`${key}: ${Math.round(s * 100)}%`);
+    }
+  }
+  return parts.join(", ");
+}
+
 /**
- * 개선된 변환 이력 조회 컴포넌트
- * - 검색(키워드)
- * - 날짜 범위 필터
- * - 정렬(저장일자 desc 기본)
- * - 페이지 크기 선택
- * - 다운로드 / 상세 / JobId 복사 액션
- * - 로딩 스켈레톤, 에러 배너, 빈 상태 UI
+ * 변환 이력 조회
  */
 export default function EgovSupportViewTransformation() {
-  const [all, setAll] = useState([]); // 원본
+  const [all, setAll] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 필터/정렬 상태
-  const [query, setQuery] = useState(""); // jobId, 파일명, 경로에 대해 포함 검색
-  const [fromDate, setFromDate] = useState(""); // yyyy-mm-dd
-  const [toDate, setToDate] = useState(""); // yyyy-mm-dd
+  // 필터/정렬
+  const [query, setQuery] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [sortKey, setSortKey] = useState("savedAt");
   const [sortDir, setSortDir] = useState("desc");
 
-  // 페이징 상태
+  // 페이징
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -86,7 +119,7 @@ export default function EgovSupportViewTransformation() {
       });
 
       const list = Array.isArray(data) ? data : [];
-      // 저장일자 내림차순 기본 정렬
+      // 저장일자 내림차순 기본
       list.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
       setAll(list);
       setPage(1);
@@ -102,7 +135,7 @@ export default function EgovSupportViewTransformation() {
     fetchList();
   }, [fetchList]);
 
-  // 필터링 + 정렬된 목록
+  // 필터 + 정렬
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const from = fromDate ? new Date(fromDate) : null;
@@ -112,11 +145,9 @@ export default function EgovSupportViewTransformation() {
       .filter((it) => {
         const hitQuery = !q
           ? true
-          : (
-              String(it.jobId || "").toLowerCase().includes(q) ||
-              String(it.s3OriginPath || "").toLowerCase().includes(q) ||
-              basename(it.s3OriginPath || "").toLowerCase().includes(q)
-            );
+          : String(it.jobId || "").toLowerCase().includes(q) ||
+            String(it.s3OriginPath || "").toLowerCase().includes(q) ||
+            basename(it.s3OriginPath || "").toLowerCase().includes(q);
         if (!hitQuery) return false;
         if (from || to) {
           const t = new Date(it.savedAt);
@@ -130,43 +161,51 @@ export default function EgovSupportViewTransformation() {
         if (sortKey === "jobId") {
           return (a.jobId - b.jobId) * dir;
         }
+        if (sortKey === "accuracy") {
+          const av = getAccuracy(a);
+          const bv = getAccuracy(b);
+          const an = typeof av === "number" ? av : -1; // null은 맨뒤
+          const bn = typeof bv === "number" ? bv : -1;
+          return (an - bn) * dir;
+        }
         // savedAt 기본
         return (new Date(a.savedAt) - new Date(b.savedAt)) * dir;
       });
   }, [all, query, fromDate, toDate, sortKey, sortDir]);
 
-  // 현재 페이지 슬라이싱
+  // 페이지 슬라이스
   const { pageItems, total } = useMemo(() => {
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     return { pageItems: filtered.slice(start, end), total: filtered.length };
   }, [filtered, page, pageSize]);
 
-  // EgovPaging에 맞춘 정보
   const paginationInfo = useMemo(
     () => ({ currentPageNo: page, pageSize, recordCountPerPage: pageSize, totalRecordCount: total }),
     [page, pageSize, total]
   );
 
-  // 액션: 프리사인 URL 받아 다운로드
-  const handleDownload = useCallback(async (jobId) => {
-    if (!sessionUser?.id) return;
-    try {
-      const url = `${GET_BASE}/download/${sessionUser.id}/${jobId}`;
-      const res = await fetch(url, { method: "GET" });
-      // 백엔드가 { url: "presigned" } 형태로 응답한다고 가정
-      const data = await res.json();
-      const presigned = data?.url || data?.presignedUrl || data?.location || data?.Location;
-      if (presigned) {
-        window.location.href = presigned;
-      } else {
-        alert("다운로드 URL을 받지 못했습니다.");
+  // 다운로드
+  const handleDownload = useCallback(
+    async (jobId) => {
+      if (!sessionUser?.id) return;
+      try {
+        const url = `${GET_BASE}/download/${sessionUser.id}/${jobId}`;
+        const res = await fetch(url, { method: "GET" });
+        const data = await res.json();
+        const presigned = data?.url || data?.presignedUrl || data?.location || data?.Location;
+        if (presigned) {
+          window.location.href = presigned;
+        } else {
+          alert("다운로드 URL을 받지 못했습니다.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("다운로드 중 오류가 발생했습니다.");
       }
-    } catch (e) {
-      console.error(e);
-      alert("다운로드 중 오류가 발생했습니다.");
-    }
-  }, [sessionUser?.id]);
+    },
+    [sessionUser?.id]
+  );
 
   const copyJobId = (jobId) => navigator.clipboard.writeText(String(jobId));
 
@@ -181,7 +220,7 @@ export default function EgovSupportViewTransformation() {
   return (
     <div className="modern-page-container">
       <div className="modern-page-wrapper">
-        {/* Breadcrumb Navigation */}
+        {/* Breadcrumb */}
         <nav className="modern-breadcrumb">
           <div className="breadcrumb-container">
             <Link to="/" className="breadcrumb-home">
@@ -206,7 +245,7 @@ export default function EgovSupportViewTransformation() {
           <EgovLeftNavTransform />
 
           <main className="modern-content" id="contents">
-            {/* Hero Section */}
+            {/* Hero */}
             <section className="content-hero">
               <div className="hero-content">
                 <div className="hero-icon">
@@ -224,10 +263,10 @@ export default function EgovSupportViewTransformation() {
               </div>
             </section>
 
-            {/* Data Section */}
+            {/* Data */}
             <section className="content-section modern-card">
               <div className="card-content">
-                {/* Filter Controls */}
+                {/* Filters */}
                 <div className="filter-controls">
                   <div className="search-input-group">
                     <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -288,7 +327,7 @@ export default function EgovSupportViewTransformation() {
                   </div>
                 )}
 
-                {/* Data Table */}
+                {/* Table */}
                 <div className="modern-table-container">
                   <div className="table-wrapper">
                     <table className="modern-table">
@@ -312,14 +351,26 @@ export default function EgovSupportViewTransformation() {
                               </svg>
                             )}
                           </th>
+
+                          {/* ✅ 추가: 정확도 */}
+                          <th className="table-header sortable" onClick={() => toggleSort("accuracy")}>
+                            <span>정확도</span>
+                            {sortKey === "accuracy" && (
+                              <svg className={`sort-icon ${sortDir === "asc" ? "asc" : "desc"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="6,9 12,15 18,9"></polyline>
+                              </svg>
+                            )}
+                          </th>
+
                           <th className="table-header">동작</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {/* Loading State */}
+                        {/* Loading */}
                         {loading ? (
                           Array.from({ length: pageSize }).map((_, i) => (
                             <tr key={i} className="skeleton-row">
+                              <td><div className="skeleton-item"></div></td>
                               <td><div className="skeleton-item"></div></td>
                               <td><div className="skeleton-item"></div></td>
                               <td><div className="skeleton-item"></div></td>
@@ -329,7 +380,7 @@ export default function EgovSupportViewTransformation() {
                           ))
                         ) : pageItems.length === 0 ? (
                           <tr>
-                            <td colSpan="5" className="empty-state">
+                            <td colSpan="6" className="empty-state">
                               <div className="empty-content">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                   <circle cx="11" cy="11" r="8"></circle>
@@ -341,66 +392,84 @@ export default function EgovSupportViewTransformation() {
                             </td>
                           </tr>
                         ) : (
-                          /* Data Rows */
-                          pageItems.map((item, idx) => (
-                            <tr key={item.jobId} className="table-row">
-                              <td className="table-cell">{(page - 1) * pageSize + idx + 1}</td>
-                              <td className="table-cell">
-                                <div className="job-id-cell">
-                                  <span className="job-id" title={String(item.jobId)}>{item.jobId}</span>
-                                  <button 
-                                    className="copy-btn" 
-                                    onClick={() => copyJobId(item.jobId)} 
-                                    title="JobId 복사"
-                                  >
+                          pageItems.map((item, idx) => {
+                            const acc = getAccuracy(item);
+                            const pct = typeof acc === "number" ? Math.round(acc * 100) : null;
+                            const breakdown = getAccuracyBreakdown(item);
+                            return (
+                              <tr key={item.jobId} className="table-row">
+                                <td className="table-cell">{(page - 1) * pageSize + idx + 1}</td>
+                                <td className="table-cell">
+                                  <div className="job-id-cell">
+                                    <span className="job-id" title={String(item.jobId)}>{item.jobId}</span>
+                                    <button
+                                      className="copy-btn"
+                                      onClick={() => copyJobId(item.jobId)}
+                                      title="JobId 복사"
+                                    >
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                      </svg>
+                                    </button>
+                                  </div>
+                                </td>
+                                <td className="table-cell">
+                                  <div className="file-name" title={item.s3OriginPath}>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                      <polyline points="14,2 14,8 20,8"></polyline>
+                                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                                      <polyline points="10,9 9,9 8,9"></polyline>
                                     </svg>
-                                  </button>
-                                </div>
-                              </td>
-                              <td className="table-cell">
-                                <div className="file-name" title={item.s3OriginPath}>
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14,2 14,8 20,8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10,9 9,9 8,9"></polyline>
-                                  </svg>
-                                  <span>{basename(item.s3OriginPath)}</span>
-                                </div>
-                              </td>
-                              <td className="table-cell">
-                                <div className="date-cell">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                  </svg>
-                                  <span>{formatKST(item.savedAt)}</span>
-                                </div>
-                              </td>
-                              <td className="table-cell">
-                                <div className="action-cell">
-                                  <Link
-                                    to={{ pathname: URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL }}
-                                    state={{ jobId: item.jobId }}
-                                    className="detail-btn"
-                                    title="상세 보기"
-                                  >
+                                    <span>{basename(item.s3OriginPath)}</span>
+                                  </div>
+                                </td>
+                                <td className="table-cell">
+                                  <div className="date-cell">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                      <circle cx="12" cy="12" r="3"></circle>
+                                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                                      <line x1="3" y1="10" x2="21" y2="10"></line>
                                     </svg>
-                                    상세 보기
-                                  </Link>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
+                                    <span>{formatKST(item.savedAt)}</span>
+                                  </div>
+                                </td>
+
+                                {/* ✅ 정확도 셀 */}
+                                <td className="table-cell">
+                                  <div className="accuracy-cell" title={breakdown || ""}>
+                                    <div className="accuracy-pill">{formatPercent(acc)}</div>
+                                    <div className="accuracy-track" aria-label="accuracy">
+                                      <div
+                                        className="accuracy-fill"
+                                        style={{ width: pct != null ? `${pct}%` : "0%" }}
+                                      />
+                                    </div>
+                                  </div>
+                                </td>
+
+                                <td className="table-cell">
+                                  <div className="action-cell">
+                                    <Link
+                                      to={{ pathname: URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL }}
+                                      state={{ jobId: item.jobId }}
+                                      className="detail-btn"
+                                      title="상세 보기"
+                                    >
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                      </svg>
+                                      상세 보기
+                                    </Link>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })
                         )}
                       </tbody>
                     </table>
@@ -423,536 +492,113 @@ export default function EgovSupportViewTransformation() {
       </div>
 
       <style>{`
-        /* Modern Page Styles */
+        /* 기존 스타일 ... (생략 없음, 그대로 유지) */
+
         .modern-page-container {
           min-height: 100vh;
           background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
         }
+        .modern-page-wrapper { max-width: 1440px; margin: 0 auto; padding: 2rem; }
+        .modern-breadcrumb { margin-bottom: 2rem; }
+        .breadcrumb-container { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; }
+        .breadcrumb-home, .breadcrumb-link { display: flex; align-items: center; gap: 0.5rem; color: var(--gray-600); text-decoration: none; padding: 0.5rem 0.75rem; border-radius: var(--border-radius-md); transition: all 0.2s ease; }
+        .breadcrumb-home:hover, .breadcrumb-link:hover { background: var(--light-blue); color: var(--primary-blue); }
+        .breadcrumb-home svg, .breadcrumb-separator { width: 16px; height: 16px; }
+        .breadcrumb-current { color: var(--primary-blue); font-weight: 600; }
+
+        .modern-layout { display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: start; }
+        .modern-content { display: flex; flex-direction: column; gap: 2rem; }
+
+        .content-hero { text-align: center; padding: 3rem 0; }
+        .hero-content { max-width: 600px; margin: 0 auto; }
+        .hero-icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); border-radius: var(--border-radius-2xl); display: flex; align-items: center; justify-content: center; color: white; box-shadow: var(--shadow-xl); }
+        .hero-icon svg { width: 40px; height: 40px; }
+        .hero-title { margin: 0 0 1rem; font-size: 2.5rem; font-weight: 700; color: var(--gray-900); background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-description { margin: 0; font-size: 1.125rem; color: var(--gray-600); line-height: 1.6; }
+
+        .content-section { background: white; border-radius: var(--border-radius-2xl); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-content { padding: 2rem; }
+
+        .filter-controls { display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; margin-bottom: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-xl); border: 1px solid var(--gray-200); }
+        .search-input-group { position: relative; display: flex; align-items: center; }
+        .search-icon { position: absolute; left: 1rem; width: 20px; height: 20px; color: var(--gray-400); z-index: 1; }
+        .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem; border: 1px solid var(--gray-300); border-radius: var(--border-radius-lg); font-size: 0.95rem; background: white; transition: all 0.2s ease; }
+        .search-input:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.1); }
+        .filter-group { display: flex; gap: 0.75rem; align-items: center; }
+        .date-input, .select-input { padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: var(--border-radius-lg); font-size: 0.95rem; background: white; transition: all 0.2s ease; }
+        .date-input:focus, .select-input:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.1); }
+        .refresh-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: var(--primary-blue); color: white; border: none; border-radius: var(--border-radius-lg); font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .refresh-btn:hover { background: var(--dark-blue); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .refresh-btn svg { width: 16px; height: 16px; }
+
+        .error-alert { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--border-radius-lg); color: #DC2626; margin-bottom: 1.5rem; }
+        .error-alert svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        .modern-table-container { border-radius: var(--border-radius-xl); overflow: hidden; border: 1px solid var(--gray-200); }
+        .table-wrapper { overflow-x: auto; }
+        .modern-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .table-header { background: linear-gradient(135deg, rgba(0, 0, 255, 0.05) 0%, rgba(255, 255, 255, 1) 100%); padding: 1rem 1.5rem; text-align: left; font-weight: 600; color: var(--gray-900); border-bottom: 1px solid var(--gray-200); position: relative; }
+        .table-header.sortable { cursor: pointer; user-select: none; transition: background 0.2s ease; display: flex; align-items: center; justify-content: space-between; }
+        .table-header.sortable:hover { background: rgba(0, 0, 255, 0.08); }
+        .sort-icon { width: 16px; height: 16px; color: var(--primary-blue); transition: transform 0.2s ease; }
+        .sort-icon.asc { transform: rotate(180deg); }
+        .table-row { transition: all 0.2s ease; }
+        .table-row:hover { background: var(--light-blue); }
+        .table-cell { padding: 1rem 1.5rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+        .job-id-cell { display: flex; align-items: center; gap: 0.75rem; }
+        .job-id { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 0.875rem; color: var(--primary-blue); font-weight: 600; }
+        .copy-btn { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--gray-300); border-radius: var(--border-radius-md); background: white; color: var(--gray-500); cursor: pointer; transition: all 0.2s ease; }
+        .copy-btn:hover { background: var(--gray-50); color: var(--primary-blue); border-color: var(--primary-blue); }
+        .copy-btn svg { width: 14px; height: 14px; }
+        .file-name { display: flex; align-items: center; gap: 0.75rem; }
+        .file-name svg { width: 20px; height: 20px; color: var(--gray-400); flex-shrink: 0; }
+        .file-name span { font-weight: 500; color: var(--gray-700); }
+        .date-cell { display: flex; align-items: center; gap: 0.75rem; }
+        .date-cell svg { width: 18px; height: 18px; color: var(--gray-400); flex-shrink: 0; }
+        .date-cell span { color: var(--gray-600); font-size: 0.875rem; }
+
+        /* ✅ 정확도 UI */
+        .accuracy-cell { display: flex; flex-direction: column; gap: 0.5rem; min-width: 140px; }
+        .accuracy-pill { display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem 0.5rem; font-weight: 600; border-radius: 999px; border: 1px solid var(--gray-200); background: #fff; width: max-content; }
+        .accuracy-track { position: relative; width: 100%; height: 8px; background: var(--gray-100); border-radius: 999px; overflow: hidden; }
+        .accuracy-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue)); transition: width 300ms ease; }
+
+        .action-cell { display: flex; justify-content: center; }
+        .detail-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: all 0.2s ease; }
+        .detail-btn:hover { background: var(--dark-blue); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .detail-btn svg { width: 16px; height: 16px; }
+
+        .skeleton-row td { padding: 1rem 1.5rem; }
+        .skeleton-item { height: 20px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; border-radius: 4px; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .empty-state { padding: 3rem 1.5rem; text-align: center; }
+        .empty-content { display: flex; flex-direction: column; align-items: center; gap: 1rem; color: var(--gray-500); }
+        .empty-content svg { width: 48px; height: 48px; color: var(--gray-300); }
+        .empty-content p { margin: 0; font-size: 1.125rem; font-weight: 600; color: var(--gray-600); }
+        .empty-content span { font-size: 0.875rem; }
+
+        .pagination-container { display: flex; justify-content: center; padding-top: 2rem; border-top: 1px solid var(--gray-200); margin-top: 2rem; }
 
-        .modern-page-wrapper {
-          max-width: 1440px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-
-        .modern-breadcrumb {
-          margin-bottom: 2rem;
-        }
-
-        .breadcrumb-container {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.875rem;
-        }
-
-        .breadcrumb-home,
-        .breadcrumb-link {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          color: var(--gray-600);
-          text-decoration: none;
-          padding: 0.5rem 0.75rem;
-          border-radius: var(--border-radius-md);
-          transition: all 0.2s ease;
-        }
-
-        .breadcrumb-home:hover,
-        .breadcrumb-link:hover {
-          background: var(--light-blue);
-          color: var(--primary-blue);
-        }
-
-        .breadcrumb-home svg,
-        .breadcrumb-separator {
-          width: 16px;
-          height: 16px;
-        }
-
-        .breadcrumb-current {
-          color: var(--primary-blue);
-          font-weight: 600;
-        }
-
-        .modern-layout {
-          display: grid;
-          grid-template-columns: auto 1fr;
-          gap: 2rem;
-          align-items: start;
-        }
-
-        .modern-content {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-
-        .content-hero {
-          text-align: center;
-          padding: 3rem 0;
-        }
-
-        .hero-content {
-          max-width: 600px;
-          margin: 0 auto;
-        }
-
-        .hero-icon {
-          width: 80px;
-          height: 80px;
-          margin: 0 auto 1.5rem;
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: var(--border-radius-2xl);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          box-shadow: var(--shadow-xl);
-        }
-
-        .hero-icon svg {
-          width: 40px;
-          height: 40px;
-        }
-
-        .hero-title {
-          margin: 0 0 1rem;
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: var(--gray-900);
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .hero-description {
-          margin: 0;
-          font-size: 1.125rem;
-          color: var(--gray-600);
-          line-height: 1.6;
-        }
-
-        .content-section {
-          background: white;
-          border-radius: var(--border-radius-2xl);
-          border: 1px solid var(--gray-200);
-          box-shadow: var(--shadow-sm);
-          overflow: hidden;
-        }
-
-        .card-content {
-          padding: 2rem;
-        }
-
-        /* Filter Controls */
-        .filter-controls {
-          display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 1.5rem;
-          margin-bottom: 2rem;
-          padding: 1.5rem;
-          background: var(--gray-50);
-          border-radius: var(--border-radius-xl);
-          border: 1px solid var(--gray-200);
-        }
-
-        .search-input-group {
-          position: relative;
-          display: flex;
-          align-items: center;
-        }
-
-        .search-icon {
-          position: absolute;
-          left: 1rem;
-          width: 20px;
-          height: 20px;
-          color: var(--gray-400);
-          z-index: 1;
-        }
-
-        .search-input {
-          width: 100%;
-          padding: 0.75rem 1rem 0.75rem 3rem;
-          border: 1px solid var(--gray-300);
-          border-radius: var(--border-radius-lg);
-          font-size: 0.95rem;
-          background: white;
-          transition: all 0.2s ease;
-        }
-
-        .search-input:focus {
-          outline: none;
-          border-color: var(--primary-blue);
-          box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.1);
-        }
-
-        .filter-group {
-          display: flex;
-          gap: 0.75rem;
-          align-items: center;
-        }
-
-        .date-input,
-        .select-input {
-          padding: 0.75rem 1rem;
-          border: 1px solid var(--gray-300);
-          border-radius: var(--border-radius-lg);
-          font-size: 0.95rem;
-          background: white;
-          transition: all 0.2s ease;
-        }
-
-        .date-input:focus,
-        .select-input:focus {
-          outline: none;
-          border-color: var(--primary-blue);
-          box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.1);
-        }
-
-        .refresh-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          background: var(--primary-blue);
-          color: white;
-          border: none;
-          border-radius: var(--border-radius-lg);
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .refresh-btn:hover {
-          background: var(--dark-blue);
-          transform: translateY(-1px);
-          box-shadow: var(--shadow-md);
-        }
-
-        .refresh-btn svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        /* Error Alert */
-        .error-alert {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 1rem 1.5rem;
-          background: #FEF2F2;
-          border: 1px solid #FECACA;
-          border-radius: var(--border-radius-lg);
-          color: #DC2626;
-          margin-bottom: 1.5rem;
-        }
-
-        .error-alert svg {
-          width: 20px;
-          height: 20px;
-          flex-shrink: 0;
-        }
-
-        /* Modern Table */
-        .modern-table-container {
-          border-radius: var(--border-radius-xl);
-          overflow: hidden;
-          border: 1px solid var(--gray-200);
-        }
-
-        .table-wrapper {
-          overflow-x: auto;
-        }
-
-        .modern-table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 0.95rem;
-        }
-
-        .table-header {
-          background: linear-gradient(135deg, 
-            rgba(0, 0, 255, 0.05) 0%, 
-            rgba(255, 255, 255, 1) 100%);
-          padding: 1rem 1.5rem;
-          text-align: left;
-          font-weight: 600;
-          color: var(--gray-900);
-          border-bottom: 1px solid var(--gray-200);
-          position: relative;
-        }
-
-        .table-header.sortable {
-          cursor: pointer;
-          user-select: none;
-          transition: background 0.2s ease;
-        }
-
-        .table-header.sortable:hover {
-          background: rgba(0, 0, 255, 0.08);
-        }
-
-        .table-header.sortable {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .sort-icon {
-          width: 16px;
-          height: 16px;
-          color: var(--primary-blue);
-          transition: transform 0.2s ease;
-        }
-
-        .sort-icon.asc {
-          transform: rotate(180deg);
-        }
-
-        .table-row {
-          transition: all 0.2s ease;
-        }
-
-        .table-row:hover {
-          background: var(--light-blue);
-        }
-
-        .table-cell {
-          padding: 1rem 1.5rem;
-          border-bottom: 1px solid var(--gray-100);
-          vertical-align: middle;
-        }
-
-        /* Job ID Cell */
-        .job-id-cell {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .job-id {
-          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-          font-size: 0.875rem;
-          color: var(--primary-blue);
-          font-weight: 600;
-        }
-
-        .copy-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          border: 1px solid var(--gray-300);
-          border-radius: var(--border-radius-md);
-          background: white;
-          color: var(--gray-500);
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .copy-btn:hover {
-          background: var(--gray-50);
-          color: var(--primary-blue);
-          border-color: var(--primary-blue);
-        }
-
-        .copy-btn svg {
-          width: 14px;
-          height: 14px;
-        }
-
-        /* File Name Cell */
-        .file-name {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .file-name svg {
-          width: 20px;
-          height: 20px;
-          color: var(--gray-400);
-          flex-shrink: 0;
-        }
-
-        .file-name span {
-          font-weight: 500;
-          color: var(--gray-700);
-        }
-
-        /* Date Cell */
-        .date-cell {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .date-cell svg {
-          width: 18px;
-          height: 18px;
-          color: var(--gray-400);
-          flex-shrink: 0;
-        }
-
-        .date-cell span {
-          color: var(--gray-600);
-          font-size: 0.875rem;
-        }
-
-        /* Action Cell */
-        .action-cell {
-          display: flex;
-          justify-content: center;
-        }
-
-        .detail-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1rem;
-          background: var(--primary-blue);
-          color: white;
-          text-decoration: none;
-          border-radius: var(--border-radius-md);
-          font-weight: 500;
-          transition: all 0.2s ease;
-        }
-
-        .detail-btn:hover {
-          background: var(--dark-blue);
-          transform: translateY(-1px);
-          box-shadow: var(--shadow-md);
-        }
-
-        .detail-btn svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        /* Loading States */
-        .skeleton-row td {
-          padding: 1rem 1.5rem;
-        }
-
-        .skeleton-item {
-          height: 20px;
-          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-          background-size: 200% 100%;
-          border-radius: 4px;
-          animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-          0% {
-            background-position: 200% 0;
-          }
-          100% {
-            background-position: -200% 0;
-          }
-        }
-
-        /* Empty State */
-        .empty-state {
-          padding: 3rem 1.5rem;
-          text-align: center;
-        }
-
-        .empty-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1rem;
-          color: var(--gray-500);
-        }
-
-        .empty-content svg {
-          width: 48px;
-          height: 48px;
-          color: var(--gray-300);
-        }
-
-        .empty-content p {
-          margin: 0;
-          font-size: 1.125rem;
-          font-weight: 600;
-          color: var(--gray-600);
-        }
-
-        .empty-content span {
-          font-size: 0.875rem;
-        }
-
-        /* Pagination */
-        .pagination-container {
-          display: flex;
-          justify-content: center;
-          padding-top: 2rem;
-          border-top: 1px solid var(--gray-200);
-          margin-top: 2rem;
-        }
-
-        /* Responsive Design */
         @media (max-width: 1024px) {
-          .modern-layout {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-          }
-
-          .filter-controls {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-          }
-
-          .filter-group {
-            flex-wrap: wrap;
-          }
+          .modern-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+          .filter-controls { grid-template-columns: 1fr; gap: 1rem; }
+          .filter-group { flex-wrap: wrap; }
         }
-
         @media (max-width: 768px) {
-          .modern-page-wrapper {
-            padding: 1rem;
-          }
-
-          .hero-title {
-            font-size: 2rem;
-          }
-
-          .card-content {
-            padding: 1.5rem;
-          }
-
-          .filter-controls {
-            padding: 1rem;
-          }
-
-          .table-cell {
-            padding: 0.75rem 1rem;
-          }
+          .modern-page-wrapper { padding: 1rem; }
+          .hero-title { font-size: 2rem; }
+          .card-content { padding: 1.5rem; }
+          .filter-controls { padding: 1rem; }
+          .table-cell { padding: 0.75rem 1rem; }
         }
-
         @media (max-width: 640px) {
-          .hero-title {
-            font-size: 1.75rem;
-          }
-
-          .hero-description {
-            font-size: 1rem;
-          }
-
-          .card-content {
-            padding: 1rem;
-          }
-
-          .filter-controls {
-            padding: 0.75rem;
-          }
+          .hero-title { font-size: 1.75rem; }
+          .hero-description { font-size: 1rem; }
+          .card-content { padding: 1rem; }
+          .filter-controls { padding: 0.75rem; }
         }
       `}</style>
     </div>
   );
 }
-
