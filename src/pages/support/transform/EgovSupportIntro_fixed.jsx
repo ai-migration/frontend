@@ -240,7 +240,7 @@ function EgovSupportIntro() {
       </div>
 
       <style>{`
-        /* Modern Page Styles - Compact and Clean */
+        /* Modern Page Styles - Fixed Layout */
         .modern-page-container {
           min-height: 100vh;
           background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
@@ -271,7 +271,7 @@ function EgovSupportIntro() {
           color: var(--gray-600);
           text-decoration: none;
           padding: 0.5rem 0.75rem;
-          border-radius: var(--border-radius-md);
+          border-radius: 6px;
           transition: all 0.2s ease;
         }
 
@@ -316,21 +316,21 @@ function EgovSupportIntro() {
         }
 
         .hero-icon {
-          width: 48px;
-          height: 48px;
+          width: 56px;
+          height: 56px;
           margin: 0 auto 1rem;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: var(--border-radius-xl);
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .hero-icon svg {
-          width: 20px;
-          height: 20px;
+          width: 24px;
+          height: 24px;
         }
 
         .hero-title {
@@ -353,9 +353,9 @@ function EgovSupportIntro() {
 
         .content-section {
           background: white;
-          border-radius: var(--border-radius-xl);
+          border-radius: 12px;
           border: 1px solid var(--gray-200);
-          box-shadow: var(--shadow-sm);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           overflow: hidden;
         }
 
@@ -393,42 +393,35 @@ function EgovSupportIntro() {
           padding: 1.5rem;
         }
 
-        /* Overview Description */
-        .overview-description p {
-          font-size: 1rem;
-          line-height: 1.6;
-          color: var(--gray-700);
-          margin: 0;
-        }
-
-        /* Features Grid - Compact */
+        /* Features Grid - Horizontal Layout */
         .features-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1rem;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.25rem;
         }
 
         .feature-item {
           display: flex;
-          gap: 0.75rem;
+          align-items: flex-start;
+          gap: 1rem;
           padding: 1.25rem;
           background: var(--gray-50);
-          border-radius: var(--border-radius-lg);
+          border-radius: 12px;
           border: 1px solid var(--gray-200);
           transition: all 0.3s ease;
         }
 
         .feature-item:hover {
           background: white;
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           transform: translateY(-2px);
         }
 
         .feature-icon {
-          width: 32px;
-          height: 32px;
+          width: 36px;
+          height: 36px;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: var(--border-radius-md);
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -437,8 +430,8 @@ function EgovSupportIntro() {
         }
 
         .feature-icon svg {
-          width: 14px;
-          height: 14px;
+          width: 16px;
+          height: 16px;
         }
 
         .feature-content h3 {
@@ -455,13 +448,11 @@ function EgovSupportIntro() {
           line-height: 1.4;
         }
 
-        /* Process Steps - Compact */
-        .process-steps {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          justify-content: center;
-          flex-wrap: wrap;
+        /* Getting Started Steps - Grid Layout */
+        .getting-started-steps {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 1.25rem;
         }
 
         .step-item {
@@ -471,16 +462,14 @@ function EgovSupportIntro() {
           text-align: center;
           padding: 1.25rem;
           background: var(--gray-50);
-          border-radius: var(--border-radius-lg);
+          border-radius: 12px;
           border: 1px solid var(--gray-200);
           transition: all 0.3s ease;
-          min-width: 180px;
-          max-width: 200px;
         }
 
         .step-item:hover {
           background: white;
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           transform: translateY(-2px);
         }
 
@@ -494,8 +483,9 @@ function EgovSupportIntro() {
           justify-content: center;
           color: white;
           font-weight: 700;
-          font-size: 0.95rem;
+          font-size: 0.875rem;
           margin-bottom: 0.75rem;
+          flex-shrink: 0;
         }
 
         .step-content h4 {
@@ -512,17 +502,59 @@ function EgovSupportIntro() {
           font-size: 0.875rem;
         }
 
-        .step-arrow {
+        /* Resources Grid - Horizontal Layout */
+        .resources-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.25rem;
+        }
+
+        .resource-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 1rem;
+          padding: 1.25rem;
+          background: var(--gray-50);
+          border-radius: 12px;
+          border: 1px solid var(--gray-200);
+          transition: all 0.3s ease;
+        }
+
+        .resource-item:hover {
+          background: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+
+        .resource-icon {
+          width: 36px;
+          height: 36px;
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--gray-400);
+          color: white;
           flex-shrink: 0;
         }
 
-        .step-arrow svg {
-          width: 18px;
-          height: 18px;
+        .resource-icon svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .resource-content h4 {
+          margin: 0 0 0.375rem;
+          font-size: 1rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .resource-content p {
+          margin: 0;
+          font-size: 0.875rem;
+          color: var(--gray-600);
+          line-height: 1.4;
         }
 
         /* Responsive Design */
@@ -536,13 +568,8 @@ function EgovSupportIntro() {
             grid-template-columns: 1fr;
           }
 
-          .process-steps {
-            flex-direction: column;
-            gap: 1rem;
-          }
-
-          .step-arrow {
-            transform: rotate(90deg);
+          .getting-started-steps {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           }
         }
 
@@ -567,16 +594,16 @@ function EgovSupportIntro() {
             padding: 1rem 1.25rem;
           }
 
-          .feature-item {
-            flex-direction: column;
-            text-align: center;
-            padding: 1rem;
+          .features-grid {
+            grid-template-columns: 1fr;
           }
 
-          .step-item {
-            min-width: auto;
-            width: 100%;
-            padding: 1rem;
+          .getting-started-steps {
+            grid-template-columns: 1fr;
+          }
+
+          .resources-grid {
+            grid-template-columns: 1fr;
           }
         }
 
@@ -601,12 +628,10 @@ function EgovSupportIntro() {
             font-size: 1rem;
           }
 
-          .feature-item {
-            padding: 0.875rem;
-          }
-
-          .step-item {
-            padding: 0.875rem;
+          .feature-item,
+          .step-item,
+          .resource-item {
+            padding: 1rem;
           }
         }
       `}</style>
