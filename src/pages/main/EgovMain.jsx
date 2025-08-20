@@ -7,6 +7,7 @@ import URL from "@/constants/url";
 // ✅ 동적 효과/겹침 해결용 스타일 (기존 파일 재사용)
 import "@/css/mainMotion.css";
 import "@/css/modern-styles.css";
+import FloatingElements from "@/components/FloatingElements";
 
 /** 접근성/성능: 사용자 환경 설정 확인 */
 function usePrefersReducedMotion() {
@@ -405,7 +406,9 @@ function EgovMain(props) {
   console.groupEnd("EgovMain");
 
   return (
-    <main className="modern-main">
+    <>
+      <FloatingElements />
+      <main className="modern-main">
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-container">
@@ -581,7 +584,8 @@ function EgovMain(props) {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
 

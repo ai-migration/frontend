@@ -1,0 +1,269 @@
+/* Header Dynamic Animations */
+
+.modern-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+}
+
+.modern-header:hover::before {
+  left: 100%;
+}
+
+/* Logo hover effects */
+.logo-link {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.logo-link::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 8px;
+}
+
+.logo-link:hover::after {
+  opacity: 1;
+}
+
+.logo-link:hover {
+  transform: scale(1.05);
+}
+
+/* Navigation items with stagger animation */
+.nav-item {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #06b6d4);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-item:hover::before {
+  width: 100%;
+}
+
+.nav-item:hover {
+  color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+/* Menu items cascade animation */
+.all_menu.Web .depth1 > li {
+  animation: slideInFromTop 0.4s ease forwards;
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.all_menu.Web .depth1 > li:nth-child(1) { animation-delay: 0.1s; }
+.all_menu.Web .depth1 > li:nth-child(2) { animation-delay: 0.2s; }
+.all_menu.Web .depth1 > li:nth-child(3) { animation-delay: 0.3s; }
+.all_menu.Web .depth1 > li:nth-child(4) { animation-delay: 0.4s; }
+.all_menu.Web .depth1 > li:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideInFromTop {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scroll progress bar enhancement */
+.scroll-progress {
+  background: linear-gradient(90deg, #3b82f6, #06b6d4, #8b5cf6);
+  background-size: 200% 100%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Header container glow effect on scroll */
+.modern-header.is-scrolled .header-container {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* Chat button floating animation */
+.chat-fab {
+  position: relative;
+  animation: chatPulse 2s ease-in-out infinite;
+}
+
+.chat-fab::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #3b82f6, #06b6d4, #8b5cf6);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.chat-fab:hover::before {
+  opacity: 1;
+}
+
+@keyframes chatPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Mobile menu slide animation */
+.all_menu.Mobile {
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.all_menu.Mobile:not(.closed) {
+  transform: translateX(0);
+}
+
+.all_menu.Mobile .depth1 > li {
+  animation: slideInFromRight 0.3s ease forwards;
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.all_menu.Mobile .depth1 > li:nth-child(1) { animation-delay: 0.1s; }
+.all_menu.Mobile .depth1 > li:nth-child(2) { animation-delay: 0.15s; }
+.all_menu.Mobile .depth1 > li:nth-child(3) { animation-delay: 0.2s; }
+.all_menu.Mobile .depth1 > li:nth-child(4) { animation-delay: 0.25s; }
+.all_menu.Mobile .depth1 > li:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes slideInFromRight {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Hover effects for buttons */
+.btn, .action-chip {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn::before, .action-chip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+}
+
+.btn:hover::before, .action-chip:hover::before {
+  width: 200%;
+  height: 200%;
+}
+
+.btn:hover, .action-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Header search animation */
+.search-input {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.search-input:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Accessibility: Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .modern-header::before,
+  .logo-link::after,
+  .nav-item,
+  .scroll-progress,
+  .chat-fab,
+  .all_menu.Web .depth1 > li,
+  .all_menu.Mobile .depth1 > li,
+  .btn::before,
+  .action-chip::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .logo-link:hover,
+  .nav-item:hover,
+  .btn:hover,
+  .action-chip:hover {
+    transform: none !important;
+  }
+}
+
+/* Performance optimizations */
+.modern-header * {
+  will-change: auto;
+}
+
+.modern-header:hover * {
+  will-change: transform;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .modern-header::before {
+    display: none;
+  }
+  
+  .logo-link:hover {
+    transform: none;
+  }
+  
+  .nav-item:hover {
+    transform: none;
+  }
+}

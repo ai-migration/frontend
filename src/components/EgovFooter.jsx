@@ -20,8 +20,17 @@ function EgovFooter() {
               <img className="logo-mobile" src={logoFooterImgMobile} alt="AIVLE Mobile" />
             </Link>
             <div className="mission-statement">
-              <h3>AI CODE MIGRATION</h3>
-              <p>전자정부표준프레임워크 기반 코드 자동 변환 서비스</p>
+              <div className="brand-title">
+                <span className="brand-ai">AI</span>
+                <span className="brand-code">CODE</span>
+                <span className="brand-migration">MIGRATION</span>
+              </div>
+              <p className="brand-subtitle">전자정부표준프레임워크 기반 코드 자동 변환 서비스</p>
+              <div className="brand-features">
+                <span className="feature-tag">AI 기반</span>
+                <span className="feature-tag">자동화</span>
+                <span className="feature-tag">표준화</span>
+              </div>
               <p className="mission-desc">디지털 혁신을 통한 공공서비스 품질 향상</p>
             </div>
           </div>
@@ -180,24 +189,77 @@ function EgovFooter() {
           display: none;
         }
 
-        .mission-statement h3 {
-          margin: 0 0 0.75rem;
+        .brand-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+          flex-wrap: wrap;
+        }
+
+        .brand-ai {
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #2563eb;
+          background: linear-gradient(135deg, #2563eb, #3b82f6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        .brand-code {
           font-size: 1.25rem;
           font-weight: 700;
           color: #1f2937;
-          letter-spacing: -0.025em;
+          letter-spacing: 0.05em;
         }
 
-        .mission-statement p {
-          margin: 0 0 0.5rem;
+        .brand-migration {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #059669;
+          background: linear-gradient(135deg, #059669, #10b981);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .brand-subtitle {
+          margin: 0 0 0.75rem;
           color: #4b5563;
           font-size: 0.875rem;
           line-height: 1.5;
         }
 
+        .brand-features {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+          flex-wrap: wrap;
+        }
+
+        .feature-tag {
+          padding: 0.25rem 0.75rem;
+          background: linear-gradient(135deg, #eff6ff, #dbeafe);
+          border: 1px solid #bfdbfe;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #1d4ed8;
+          transition: all 0.2s ease;
+        }
+
+        .feature-tag:hover {
+          background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+          transform: translateY(-1px);
+        }
+
         .mission-desc {
           font-weight: 600;
           color: #2563eb !important;
+          font-size: 0.875rem;
+          margin: 0;
         }
 
         /* Links Section */

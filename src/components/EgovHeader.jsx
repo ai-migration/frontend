@@ -5,9 +5,11 @@ import * as EgovNet2 from "@/api/egovFetch";
 import URL2 from "@/constants/url";
 import "@/css/header.css";
 import "@/css/modern-styles.css";
+import "@/css/headerAnimations.css";
 import logoImg from "/assets/images/logo_bigp.png";
 import logoImgMobile from "/assets/images/logo_bigp.png";
 import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
+import DynamicBackground from "./DynamicBackground";
 
 // Removed chatIconPng import - using SVG icon instead
 
@@ -373,6 +375,7 @@ export default function EgovHeader() {
 
   return (
     <>
+      <DynamicBackground />
       <header
         ref={headerRef}
         className={`modern-header ${scrolled ? "is-scrolled" : ""} ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}
