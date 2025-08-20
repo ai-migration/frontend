@@ -201,11 +201,11 @@ function EgovSignupAgree() {
               </div>
             </div>
 
-      {/* <!--// 본문 --> */}
+            {/* <!--// 본문 --> */}
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-</div>
   );
 }
 
