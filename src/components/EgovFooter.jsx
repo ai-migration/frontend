@@ -125,10 +125,11 @@ function EgovFooter() {
       <style>{`
         /* Modern Footer Styles */
         .modern-footer {
-          background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-          color: #e2e8f0;
-          border-top: 1px solid #334155;
+          background: #ffffff;
+          color: #374151;
+          border-top: 1px solid #e5e7eb;
           margin-top: auto;
+          box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .footer-container {
@@ -191,25 +192,25 @@ function EgovFooter() {
 
         .contact-label {
           font-weight: 600;
-          color: #cbd5e1;
+          color: #6b7280;
           min-width: 60px;
         }
 
         .contact-value {
-          color: #e2e8f0;
+          color: #374151;
         }
 
         .contact-link {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          color: #60a5fa;
+          color: #2563eb;
           text-decoration: none;
           transition: color 0.2s ease;
         }
 
         .contact-link:hover {
-          color: #93c5fd;
+          color: #1d4ed8;
         }
 
         .contact-link svg {
@@ -224,27 +225,27 @@ function EgovFooter() {
           gap: 1rem;
           flex-wrap: wrap;
           padding-top: 1rem;
-          border-top: 1px solid #475569;
+          border-top: 1px solid #e5e7eb;
         }
 
         .policy-link {
-          color: #cbd5e1;
+          color: #6b7280;
           text-decoration: none;
           transition: color 0.2s ease;
           font-size: 0.875rem;
         }
 
         .policy-link:hover {
-          color: #60a5fa;
+          color: #2563eb;
         }
 
         .policy-link.primary {
           font-weight: 600;
-          color: #e2e8f0;
+          color: #374151;
         }
 
         .separator {
-          color: #64748b;
+          color: #9ca3af;
         }
 
         /* Banner Section */
@@ -258,30 +259,27 @@ function EgovFooter() {
         .banner-link {
           display: block;
           padding: 0.75rem;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
           border-radius: 8px;
           transition: all 0.3s ease;
-          backdrop-filter: blur(5px);
         }
 
         .banner-link:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(96, 165, 250, 0.3);
+          background: #f3f4f6;
+          border-color: #d1d5db;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .banner-desktop {
           display: block;
           height: 40px;
           width: auto;
-          filter: brightness(1.2) contrast(0.8) hue-rotate(200deg) saturate(0.7);
           transition: all 0.3s ease;
         }
 
         .banner-link:hover .banner-desktop {
-          filter: brightness(1.4) contrast(0.9) hue-rotate(200deg) saturate(0.8);
           transform: scale(1.05);
         }
 
@@ -292,7 +290,7 @@ function EgovFooter() {
         /* Footer Bottom */
         .footer-bottom {
           padding-top: 1.5rem;
-          border-top: 1px solid #475569;
+          border-top: 1px solid #e5e7eb;
         }
 
         .copyright {
@@ -301,7 +299,7 @@ function EgovFooter() {
 
         .copyright p {
           margin: 0;
-          color: #94a3b8;
+          color: #6b7280;
           font-size: 0.875rem;
         }
 
@@ -347,7 +345,6 @@ function EgovFooter() {
           .banner-mobile {
             height: 35px;
             width: auto;
-            filter: brightness(1.2) contrast(0.8) hue-rotate(200deg) saturate(0.7);
             transition: all 0.3s ease;
           }
 
