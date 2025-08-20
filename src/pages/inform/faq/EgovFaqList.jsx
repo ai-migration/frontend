@@ -11,6 +11,8 @@ import EgovPaging from "@/components/EgovPaging";
 import { itemIdxByPage } from "@/utils/calc";
 import { getSessionItem } from "@/utils/storage";
 
+import "@/css/modern-pages.css";
+
 function EgovFaqList(props) {
   console.group("EgovFaqList");
   console.log("[Start] EgovFaqList ------------------------------");
@@ -110,86 +112,117 @@ function EgovFaqList(props) {
   console.log("------------------------------EgovFaqList [End]");
   console.groupEnd("EgovFaqList");
   return (
-    <div className="container">
-      <div className="c_wrap">
-        {/* <!-- Location --> */}
-        <div className="location">
+    <div className="modern-container">
+      <div className="modern-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb" aria-label="페이지 위치">
           <ul>
             <li>
-              <Link to={URL.MAIN} className="home">
-                Home
+              <Link to={URL.MAIN} className="breadcrumb-home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9,22 9,12 15,12 15,22"/>
+                </svg>
+                홈
               </Link>
             </li>
             <li>
               <Link to={URL.INFORM}>알림마당</Link>
             </li>
-            <li> FAQ </li>
+            <li>FAQ</li>
           </ul>
-        </div>
-        {/* <!--// Location --> */}
+        </nav>
 
-        <div className="layout">
-          {/* <!-- Navigation --> */}
-          <EgovLeftNav></EgovLeftNav>
+        <div className="modern-layout">
+          {/* Left Navigation */}
+          <aside className="modern-sidebar">
+            <EgovLeftNav />
+          </aside>
 
-          <div className="contents NOTICE_LIST" id="contents">
-            {/* <!-- 본문 --> */}
-
-            <div className="top_tit">
-              <h1 className="tit_1">알림마당</h1>
-            </div>
-
-            <h2 className="tit_2"> FAQ </h2>
-
-            <div className="condition">
-           
-            </div>
-
-            {/* <!-- 게시판목록 --> */}
-            <div className="board_list BRD002">
-              <div className="head">
-                <span>번호</span>
-                <span>제목</span>
+          {/* Main Content */}
+          <main className="modern-content">
+            {/* Page Header */}
+            <header className="modern-page-header">
+              <div className="page-header-content">
+                <div className="page-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9 9h6v6"/>
+                    <path d="M9 15l6-6"/>
+                  </svg>
+                </div>
+                <div className="page-titles">
+                  <h1>알림마당</h1>
+                  <h2>FAQ</h2>
+                </div>
               </div>
-              <ul className="result">
+            </header>
+
+            {/* FAQ List */}
+            <section className="modern-faq-section">
+              <div className="faq-list">
                 {allList
                   .slice(
                     (paginationInfo.currentPageNo - 1) * paginationInfo.recordCountPerPage,
                     paginationInfo.currentPageNo * paginationInfo.recordCountPerPage
                   )
                   .map((item, index) => {
-                    const listIdx =
-                      index + 1 + (paginationInfo.currentPageNo - 1) * paginationInfo.pageSize;
+                    const listIdx = index + 1 + (paginationInfo.currentPageNo - 1) * paginationInfo.pageSize;
+                    const isOpen = openSet.has(item.postId);
+                    
                     return (
-                      <li key={item.postId} className="list_wrapper">
-                        <div className="list_item" onClick={() => toggleContent(item.postId)}>
-                          <div>{listIdx}</div>
-                          <div className="al">{item.title}</div>
-                        </div>
-                        {openSet.has(item.postId) && (
-                          <div className="list_item">
-                            <div className="al">{item.content}</div>
+                      <div key={item.postId} className={`faq-item ${isOpen ? 'open' : ''}`}>
+                        <button 
+                          className="faq-question"
+                          onClick={() => toggleContent(item.postId)}
+                          aria-expanded={isOpen}
+                        >
+                          <div className="question-content">
+                            <span className="question-number">Q{listIdx}</span>
+                            <span className="question-text">{item.title}</span>
                           </div>
-                        )}
-                      </li>
+                          <div className="question-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="6,9 12,15 18,9"/>
+                            </svg>
+                          </div>
+                        </button>
+                        
+                        <div className="faq-answer">
+                          <div className="answer-content">
+                            <span className="answer-label">A</span>
+                            <div className="answer-text">
+                              {item.content || "답변 내용이 없습니다."}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     );
                   })}
-              </ul>
-            </div>
-            {/* <!--// 게시판목록 --> */}
+                
+                {allList.length === 0 && (
+                  <div className="no-data">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M9 9h6v6"/>
+                      <path d="M9 15l6-6"/>
+                    </svg>
+                    <p>등록된 FAQ가 없습니다.</p>
+                  </div>
+                )}
+              </div>
+            </section>
 
-            <div className="board_bot">
-              {/* <!-- Paging --> */}
+            {/* Pagination */}
+            <section className="modern-pagination-section">
               <EgovPaging
                 pagination={paginationInfo}
                 moveToPage={(pageNum) => {
-                  retrieveList(pageNum); // 페이지 이동 시 리스트 다시 자르기
+                  retrieveList(pageNum);
                 }}
               />
-            </div>
-
-            {/* <!--// 본문 --> */}
-          </div>
+            </section>
+          </main>
         </div>
       </div>
     </div>

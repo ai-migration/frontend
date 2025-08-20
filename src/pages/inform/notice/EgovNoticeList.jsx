@@ -12,6 +12,8 @@ import EgovPaging from "@/components/EgovPaging";
 import { itemIdxByPage } from "@/utils/calc";
 import { getSessionItem } from "@/utils/storage";
 
+import "@/css/modern-pages.css";
+
 function EgovNoticeList(props) {
   console.group("EgovNoticeList");
   console.log("[Start] EgovNoticeList ------------------------------");
@@ -93,6 +95,7 @@ function EgovNoticeList(props) {
           );
         } else {
           slicedList.forEach((item, index) => {
+            const listIndex = startIndex + index + 1;
             mutListTag.push(
               <Link
                 to={{ pathname: URL.INFORM_NOTICE_DETAIL }}
@@ -101,13 +104,16 @@ function EgovNoticeList(props) {
                   searchCondition: searchCondition,
                 }}
                 key={item.postId}
-                className="list_item"
+                className="modern-board-row"
               >
-                <div>{item.postId}</div>
-                <div className="al">{item.title}</div>
-                <div>{item.frstRegisterNm || "관리자"}</div>
-                <div>{item.createdAt.substring(0, 10)}</div>
-                <div>{item.viewCount}</div>
+                <div className="cell number">{listIndex}</div>
+                <div className="cell title">
+                  <span className="title-text">{item.title}</span>
+                  {item.isNew && <span className="new-badge">NEW</span>}
+                </div>
+                <div className="cell author">{item.frstRegisterNm || "관리자"}</div>
+                <div className="cell date">{item.createdAt.substring(0, 10)}</div>
+                <div className="cell views">{item.viewCount || 0}</div>
               </Link>
             );
           });
@@ -132,46 +138,61 @@ function EgovNoticeList(props) {
   console.log("------------------------------EgovNoticeList [End]");
   console.groupEnd("EgovNoticeList");
   return (
-    <div className="container">
-      <div className="c_wrap">
-        {/* <!-- Location --> */}
-        <div className="location">
+    <div className="modern-container">
+      <div className="modern-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb" aria-label="페이지 위치">
           <ul>
             <li>
-              <Link to={URL.MAIN} className="home">
-                Home
+              <Link to={URL.MAIN} className="breadcrumb-home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9,22 9,12 15,12 15,22"/>
+                </svg>
+                홈
               </Link>
             </li>
             <li>
               <Link to={URL.INFORM}>알림마당</Link>
             </li>
-            <li> 공지사항 </li>
+            <li>공지사항</li>
           </ul>
-        </div>
-        {/* <!--// Location --> */}
+        </nav>
 
-        <div className="layout">
-          {/* <!-- Navigation --> */}
-          <EgovLeftNav></EgovLeftNav>
-          {/* <!--// Navigation --> */}
+        <div className="modern-layout">
+          {/* Left Navigation */}
+          <aside className="modern-sidebar">
+            <EgovLeftNav />
+          </aside>
 
-          <div className="contents NOTICE_LIST" id="contents">
-            {/* <!-- 본문 --> */}
+          {/* Main Content */}
+          <main className="modern-content">
+            {/* Page Header */}
+            <header className="modern-page-header">
+              <div className="page-header-content">
+                <div className="page-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10,9 9,9 8,9"/>
+                  </svg>
+                </div>
+                <div className="page-titles">
+                  <h1>알림마당</h1>
+                  <h2>공지사항</h2>
+                </div>
+              </div>
+            </header>
 
-            <div className="top_tit">
-              <h1 className="tit_1">알림마당</h1>
-            </div>
-
-            <h2 className="tit_2">공지사항</h2>
-
-            {/* <!-- 검색조건 --> */}
-            <div className="condition">
-              <ul>
-                <li className="third_1 L">
-                  <label className="f_select" htmlFor="sel1">
+            {/* Search Section */}
+            <section className="modern-search-section">
+              <div className="search-controls">
+                <div className="search-group">
+                  <label className="modern-select-wrapper">
                     <select
-                      id="sel1"
-                      title="조건"
+                      id="searchCondition"
                       defaultValue={searchCondition.searchCnd}
                       ref={cndRef}
                       onChange={(e) => {
@@ -183,14 +204,12 @@ function EgovNoticeList(props) {
                       <option value="2">작성자</option>
                     </select>
                   </label>
-                </li>
-                <li className="third_2 R">
-                  <span className="f_search w_500">
+                  
+                  <div className="modern-search-input">
                     <input
                       type="text"
-                      name=""
                       defaultValue={searchCondition.searchWrd}
-                      placeholder=""
+                      placeholder="검색어를 입력하세요"
                       ref={wrdRef}
                       onChange={(e) => {
                         wrdRef.current.value = e.target.value;
@@ -198,6 +217,7 @@ function EgovNoticeList(props) {
                     />
                     <button
                       type="button"
+                      className="search-btn"
                       onClick={() => {
                         retrieveList({
                           ...searchCondition,
@@ -207,52 +227,66 @@ function EgovNoticeList(props) {
                         });
                       }}
                     >
-                      조회
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                      </svg>
+                      검색
                     </button>
-                  </span>
-                </li>
-                {/* user.id 대신 권한그룹 세션값 사용 */}
-                {user &&
-                  sessionUserSe === "ADM" && (
-                    <li>
-                      <Link
-                        to={URL.INFORM_NOTICE_CREATE}
-                        state={{ postId: null, mode:CODE.MODE_CREATE }}
-                        className="btn btn_blue_h46 pd35"
-                      >
-                        등록
-                      </Link>
-                    </li>
-                  )}
-              </ul>
-            </div>
-            {/* <!--// 검색조건 --> */}
-
-            {/* <!-- 게시판목록 --> */}
-            <div className="board_list BRD002">
-              <div className="head">
-                <span>번호</span>
-                <span>제목</span>
-                <span>작성자</span>
-                <span>작성일</span>
-                <span>조회수</span>
+                  </div>
+                </div>
+                
+                {sessionUserSe === "ADM" && (
+                  <Link
+                    to={URL.INFORM_NOTICE_CREATE}
+                    state={{ postId: null, mode: CODE.MODE_CREATE }}
+                    className="modern-create-btn"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"/>
+                      <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    등록
+                  </Link>
+                )}
               </div>
-              <div className="result">{listTag}</div>
-            </div>
-            {/* <!--// 게시판목록 --> */}
+            </section>
 
-            <div className="board_bot">
-              {/* <!-- Paging --> */}
+            {/* Board List */}
+            <section className="modern-board-section">
+              <div className="modern-board-list">
+                <div className="board-header">
+                  <div className="header-cell number">번호</div>
+                  <div className="header-cell title">제목</div>
+                  <div className="header-cell author">작성자</div>
+                  <div className="header-cell date">작성일</div>
+                  <div className="header-cell views">조회수</div>
+                </div>
+                
+                <div className="board-body">
+                  {listTag.length > 0 ? listTag : (
+                    <div className="no-data">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M8 12l4 4 4-4"/>
+                      </svg>
+                      <p>등록된 공지사항이 없습니다.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Pagination */}
+            <section className="modern-pagination-section">
               <EgovPaging
                 pagination={paginationInfo}
                 moveToPage={(pageNum) => {
-                  retrieveList(pageNum); // 페이지 이동 시 리스트 다시 자르기
+                  retrieveList(pageNum);
                 }}
               />
-            </div>
-
-            {/* <!--// 본문 --> */}
-          </div>
+            </section>
+          </main>
         </div>
       </div>
     </div>
