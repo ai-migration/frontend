@@ -257,17 +257,32 @@ function EgovFooter() {
 
         .banner-link {
           display: block;
-          transition: opacity 0.2s ease;
+          padding: 0.75rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          backdrop-filter: blur(10px);
         }
 
         .banner-link:hover {
-          opacity: 0.8;
+          background: rgba(255, 255, 255, 0.15);
+          border-color: rgba(96, 165, 250, 0.5);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .banner-desktop {
           display: block;
           height: 40px;
           width: auto;
+          filter: brightness(0) invert(1);
+          opacity: 0.9;
+          transition: opacity 0.3s ease;
+        }
+
+        .banner-link:hover .banner-desktop {
+          opacity: 1;
         }
 
         .banner-mobile {
@@ -305,7 +320,7 @@ function EgovFooter() {
           .footer-banners {
             flex-direction: row;
             justify-content: center;
-            gap: 1.5rem;
+            gap: 1rem;
           }
         }
 
@@ -332,6 +347,9 @@ function EgovFooter() {
           .banner-mobile {
             height: 35px;
             width: auto;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
           }
 
           .contact-info {
