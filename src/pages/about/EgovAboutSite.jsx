@@ -379,21 +379,21 @@ function EgovAboutSite() {
         }
 
         .hero-icon {
-          width: 48px;
-          height: 48px;
-          margin: 0 auto 1rem;
+          width: 64px;
+          height: 64px;
+          margin: 0 auto 1.5rem;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
           border-radius: var(--border-radius-xl);
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          box-shadow: var(--shadow-md);
+          box-shadow: var(--shadow-lg);
         }
 
         .hero-icon svg {
-          width: 20px;
-          height: 20px;
+          width: 28px;
+          height: 28px;
         }
 
         .hero-title {
@@ -440,8 +440,8 @@ function EgovAboutSite() {
         }
 
         .header-icon svg {
-          width: 16px;
-          height: 16px;
+          width: 18px;
+          height: 18px;
           color: var(--primary-blue);
         }
 
@@ -488,8 +488,8 @@ function EgovAboutSite() {
         }
 
         .feature-icon {
-          width: 32px;
-          height: 32px;
+          width: 40px;
+          height: 40px;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
           border-radius: var(--border-radius-md);
           display: flex;
@@ -500,8 +500,8 @@ function EgovAboutSite() {
         }
 
         .feature-icon svg {
-          width: 14px;
-          height: 14px;
+          width: 18px;
+          height: 18px;
         }
 
         .feature-content h3 {
@@ -548,8 +548,8 @@ function EgovAboutSite() {
         }
 
         .step-number {
-          width: 36px;
-          height: 36px;
+          width: 40px;
+          height: 40px;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
           border-radius: 50%;
           display: flex;
@@ -557,8 +557,9 @@ function EgovAboutSite() {
           justify-content: center;
           color: white;
           font-weight: 700;
-          font-size: 0.95rem;
-          margin-bottom: 0.75rem;
+          font-size: 1rem;
+          margin-bottom: 1rem;
+          box-shadow: var(--shadow-sm);
         }
 
         .step-content h4 {
