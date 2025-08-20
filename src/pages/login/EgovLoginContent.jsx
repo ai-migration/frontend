@@ -154,15 +154,13 @@ function EgovLoginContent(props) {
   console.groupEnd("EgovLoginContent");
 
   return (
-    <div className="contents" id="contents">
-      {/* <!-- 본문 --> */}
+    <div className="board_view">
       <div className="Plogin">
-        <h1>로그인</h1>
-        {/* <p className="txt">
-          전자정부표준프레임워크 경량환경 홈페이지 로그인 페이지입니다.
+        <p className="txt">
+          시스템을 이용하시려면 로그인이 필요합니다.
           <br />
           로그인을 하시면 모든 서비스를 제한없이 이용하실 수 있습니다.
-        </p> */}
+        </p>
 
         <div className="login_box">
           <form name="" method="" action="">
@@ -228,7 +226,6 @@ function EgovLoginContent(props) {
           <SnsKakaoBt /> */}
         </div>
       </div>
-      {/* <!--// 본문 --> */}
     </div>
   );
 }

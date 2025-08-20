@@ -29,19 +29,33 @@ function EgovSignupAgree() {
   console.groupEnd("EgovSignupAgree");
 
   return (
-    <div className="contents" id="contents">
-      {/* <!-- 본문 --> */}
-      <div className="Plogin">
-        <h1>회원가입</h1>
-        {/* <p className="txt">
-          전자정부표준프레임워크 경량환경 홈페이지 로그인 페이지입니다.
-          <br />
-          로그인을 하시면 모든 서비스를 제한없이 이용하실 수 있습니다.
-        </p> */}
+    <div className="container">
+      <div className="c_wrap">
+        {/* <!-- Location --> */}
+        <div className="location">
+          <ul>
+            <li>
+              <a href="/" className="home">
+                Home
+              </a>
+            </li>
+            <li>회원가입</li>
+          </ul>
+        </div>
+        {/* <!--// Location --> */}
 
+        <div className="layout">
+          <div className="contents" id="contents">
+            {/* <!-- 본문 --> */}
 
-        <div className="signup_inner">
-          <h2>개인정보 수집 및 이용 동의</h2>
+            <div className="top_tit">
+              <h1 className="tit_1">회원가입</h1>
+            </div>
+
+            <h2 className="tit_2">개인정보 수집 및 이용 동의</h2>
+
+            <div className="board_view">
+              <div className="signup_inner">
           <div className="agree_form">
             <div className="agree_article">
               <p>
@@ -175,6 +189,10 @@ function EgovSignupAgree() {
             >
               <span>다음</span>
             </button>
+              </div>
+            </div>
+
+            {/* <!--// 본문 --> */}
           </div>
         </div>
       </div>

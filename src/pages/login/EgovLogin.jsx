@@ -33,7 +33,19 @@ function EgovLogin(props) {
         {/* <!--// Location --> */}
 
         <div className="layout">
-          <EgovLoginContent onChangeLogin={onChangeLogin}></EgovLoginContent>
+          <div className="contents" id="contents">
+            {/* <!-- 본문 --> */}
+
+            <div className="top_tit">
+              <h1 className="tit_1">로그인</h1>
+            </div>
+
+            <h2 className="tit_2">사용자 로그인</h2>
+
+            <EgovLoginContent onChangeLogin={onChangeLogin}></EgovLoginContent>
+            
+            {/* <!--// 본문 --> */}
+          </div>
         </div>
       </div>
     </div>

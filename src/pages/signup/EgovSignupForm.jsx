@@ -160,6 +160,18 @@ function EgovSignupForm({ onBack }) {
   return (
     <div className="container">
       <div className="c_wrap">
+        {/* <!-- Location --> */}
+        <div className="location">
+          <ul>
+            <li>
+              <a href="/" className="home">
+                Home
+              </a>
+            </li>
+            <li>회원가입</li>
+          </ul>
+        </div>
+        {/* <!--// Location --> */}
 
         <div className="layout">
           {/* <!-- Navigation --> */}
@@ -171,7 +183,7 @@ function EgovSignupForm({ onBack }) {
               <h1 className="tit_1">회원가입</h1>
             </div>
 
-            <h2 className="tit_2"></h2>
+            <h2 className="tit_2">회원정보 입력</h2>
 
             <div className="board_view2">
               <dl>
