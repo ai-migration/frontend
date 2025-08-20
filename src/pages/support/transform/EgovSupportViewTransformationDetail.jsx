@@ -1,5 +1,9 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import * as EgovNet from "@/api/egovFetch";
+
+import URL from "@/constants/url";
+import CODE from "@/constants/code";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
 import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
@@ -16,6 +20,198 @@ const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
 SyntaxHighlighter.registerLanguage("java", java);
 SyntaxHighlighter.registerLanguage("json", jsonLang);
 
+// 각 탭별 정확도 계산 함수
+function getTabAccuracy(detail, tabType) {
+  if (!detail) return null;
+  
+  let reportKey = '';
+  switch (tabType) {
+    case 'controller':
+      reportKey = 'convControllerReport';
+      break;
+    case 'service':
+      reportKey = 'convServiceReport';
+      break;
+    case 'serviceimpl':
+      reportKey = 'convServiceimplReport';
+      break;
+    case 'vo':
+      reportKey = 'convVoReport';
+      break;
+    default:
+      return null;
+  }
+  
+  const reports = detail[reportKey];
+  if (!Array.isArray(reports) || reports.length === 0) return null;
+  
+  const scores = [];
+  for (const entry of reports) {
+    if (entry && typeof entry === "object") {
+      const key = Object.keys(entry)[0];
+      const ev = key && entry[key]?.evaluation;
+      const s = ev?.S;
+      if (typeof s === "number" && isFinite(s)) {
+        scores.push(s);
+      }
+    }
+  }
+  
+  if (scores.length === 0) return null;
+  return scores.reduce((a, b) => a + b, 0) / scores.length;
+}
+
+// 각 탭별 평가 데이터 추출 함수
+function getTabEvaluationData(detail, tabType) {
+  if (!detail) return null;
+  
+  let reportKey = '';
+  switch (tabType) {
+    case 'controller':
+      reportKey = 'convControllerReport';
+      break;
+    case 'service':
+      reportKey = 'convServiceReport';
+      break;
+    case 'serviceimpl':
+      reportKey = 'convServiceimplReport';
+      break;
+    case 'vo':
+      reportKey = 'convVoReport';
+      break;
+    default:
+      return null;
+  }
+  
+  const reports = detail[reportKey];
+  if (!Array.isArray(reports) || reports.length === 0) return null;
+  
+  const evaluationData = [];
+  for (const entry of reports) {
+    if (entry && typeof entry === "object") {
+      const key = Object.keys(entry)[0];
+      const ev = key && entry[key]?.evaluation;
+      if (ev) {
+        // violations 배열에서 missing과 hint 정보 추출
+        const violations = ev.violations || [];
+        
+        evaluationData.push({
+          className: key,
+          violations: violations.map(violation => ({
+            rule: violation.rule || violation.title || 'Unknown rule',
+            title: violation.title || violation.rule || 'Unknown violation',
+            missing: violation.missing || '',
+            hint: violation.hint || ''
+          }))
+        });
+      }
+    }
+  }
+  
+  return evaluationData;
+}
+
+// 게이지바 컴포넌트
+function AccuracyGauge({ accuracy, size = 60, tabType = '' }) {
+  const [animatedPercentage, setAnimatedPercentage] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  
+  if (accuracy === null || accuracy === undefined) return null;
+  
+  const targetPercentage = Math.round(accuracy * 100);
+  const strokeWidth = size * 0.1;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (animatedPercentage / 100) * circumference;
+  const gradientId = `gradient-${tabType}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  // 애니메이션 효과
+  useEffect(() => {
+    if (accuracy !== null && accuracy !== undefined) {
+      setIsAnimating(true);
+      setAnimatedPercentage(0);
+      
+      const duration = 1500; // 1.5초
+      const steps = 60; // 60프레임
+      const stepDuration = duration / steps;
+      
+      let currentStep = 0;
+      
+      const timer = setInterval(() => {
+        currentStep++;
+        // Easing 함수: easeOutQuart
+        const progress = currentStep / steps;
+        const easedProgress = 1 - Math.pow(1 - progress, 4);
+        const newPercentage = Math.round(targetPercentage * easedProgress);
+        
+        setAnimatedPercentage(newPercentage);
+        
+        if (currentStep >= steps) {
+          clearInterval(timer);
+          setIsAnimating(false);
+        }
+      }, stepDuration);
+      
+      return () => clearInterval(timer);
+    }
+  }, [accuracy, targetPercentage]);
+  
+  return (
+    <div className="accuracy-gauge" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {/* 배경 원 */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="#e5e7eb"
+          strokeWidth={strokeWidth}
+        />
+        {/* 진행 원 */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={`url(#${gradientId})`}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          style={{
+            transition: isAnimating ? 'none' : 'stroke-dashoffset 0.3s ease-in-out'
+          }}
+        />
+        {/* 그라데이션 정의 */}
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#1d4ed8" />
+          </linearGradient>
+        </defs>
+        {/* 중앙 텍스트 */}
+        <text
+          x={size / 2}
+          y={size / 2}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fontSize={size * 0.2}
+          fontWeight="bold"
+          fill="#374151"
+          style={{
+            transition: isAnimating ? 'none' : 'all 0.3s ease-in-out'
+          }}
+        >
+          {animatedPercentage}%
+        </text>
+      </svg>
+    </div>
+  );
+}
+
 export default function EgovSupportViewTransformationDetail() {
   const location = useLocation();
   const [detail, setDetail] = useState(null);
@@ -25,8 +221,20 @@ export default function EgovSupportViewTransformationDetail() {
 
   // ── 데이터 로드: jobId만으로 상세 조회 (백엔드에 맞춤) ────────────────
   useEffect(() => {
-    const jobId = location.state?.jobId;
-    if (!jobId) return;
+    // location.state에서 jobId를 먼저 확인
+    let jobId = location.state?.jobId;
+    
+    // location.state에 없으면 URL 파라미터에서 확인
+    if (!jobId) {
+      const urlParams = new URLSearchParams(location.search);
+      jobId = urlParams.get('jobId');
+    }
+    
+    if (!jobId) {
+      setLoading(false);
+      setErr("Job ID가 없습니다. 올바른 경로로 접근해주세요.");
+      return;
+    }
     setLoading(true);
     setErr("");
 
@@ -35,7 +243,7 @@ export default function EgovSupportViewTransformationDetail() {
       .then((d) => setDetail(d))
       .catch((e) => setErr(String(e)))
       .finally(() => setLoading(false));
-  }, [location.state?.jobId]);
+  }, [location.state?.jobId, location.search]);
 
   // 리포트 탭에서 JSON 보기용 (필요시)
   const reportText = useMemo(() => {
@@ -128,7 +336,15 @@ export default function EgovSupportViewTransformationDetail() {
                         <line x1="15" y1="9" x2="9" y2="15"></line>
                         <line x1="9" y1="9" x2="15" y2="15"></line>
                       </svg>
-                      <span>에러: {err}</span>
+                      <div className="error-content">
+                        <span>에러: {err}</span>
+                        <Link to={URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON} className="back-btn">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="15,18 9,12 15,6"></polyline>
+                          </svg>
+                          변환 이력으로 돌아가기
+                        </Link>
+                      </div>
                     </div>
                   )}
                   
@@ -383,6 +599,36 @@ export default function EgovSupportViewTransformationDetail() {
           color: #dc2626;
         }
 
+        .error-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .back-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1.5rem;
+          background: var(--primary-blue);
+          color: white;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+          background: var(--dark-blue);
+          transform: translateY(-1px);
+        }
+
+        .back-btn svg {
+          width: 16px;
+          height: 16px;
+        }
+
         /* Overview Styles */
         .overview-container {
           padding: 1rem 0;
@@ -438,6 +684,73 @@ export default function EgovSupportViewTransformationDetail() {
         }
 
         /* Path List Styles */
+        .path-list-layout {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 2rem;
+          align-items: start;
+        }
+
+        .path-list-main {
+          flex: 1;
+        }
+
+        .path-list-sidebar {
+          width: 280px;
+          position: sticky;
+          top: 2rem;
+        }
+
+        .accuracy-card {
+          background: white;
+          border: 1px solid var(--gray-200);
+          border-radius: 12px;
+          padding: 1.5rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          text-align: center;
+        }
+
+        .accuracy-header {
+          margin-bottom: 1.5rem;
+        }
+
+        .accuracy-header h4 {
+          margin: 0 0 0.5rem;
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .accuracy-header p {
+          margin: 0;
+          font-size: 0.875rem;
+          color: var(--gray-600);
+        }
+
+        .accuracy-gauge-large {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 1rem;
+        }
+
+        .accuracy-score {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.25rem;
+        }
+
+        .score-value {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--primary-blue);
+        }
+
+        .score-label {
+          font-size: 0.875rem;
+          color: var(--gray-600);
+        }
+
         .empty-path-list {
           display: flex;
           align-items: center;
@@ -782,6 +1095,16 @@ export default function EgovSupportViewTransformationDetail() {
             gap: 1.5rem;
           }
 
+          .path-list-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+
+          .path-list-sidebar {
+            width: 100%;
+            position: static;
+          }
+
           .tab-navigation {
             flex-direction: column;
             align-items: stretch;
@@ -838,7 +1161,281 @@ export default function EgovSupportViewTransformationDetail() {
             text-align: center;
           }
         }
+
+        /* Accuracy Gauge Styles */
+        .accuracy-gauge {
+          display: inline-block;
+          position: relative;
+        }
+
+        .accuracy-gauge svg {
+          display: block;
+        }
+
+        .accuracy-gauge circle {
+          transition: stroke-dashoffset 0.8s ease-in-out;
+        }
+
+        .accuracy-gauge text {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .score-value {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--primary-blue);
+          transition: all 0.3s ease-in-out;
+        }
+
+        /* Evaluation Card Styles */
+        .evaluation-card {
+          background: white;
+          border: 1px solid var(--gray-200);
+          border-radius: 12px;
+          padding: 1.5rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          margin-top: 1rem;
+        }
+
+        .evaluation-header {
+          margin-bottom: 1rem;
+          text-align: center;
+        }
+
+        .evaluation-header h4 {
+          margin: 0 0 0.5rem;
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .evaluation-header p {
+          margin: 0;
+          font-size: 0.875rem;
+          color: var(--gray-600);
+        }
+
+        .evaluation-empty {
+          text-align: center;
+          padding: 1rem;
+          color: var(--gray-500);
+          font-size: 0.875rem;
+        }
+
+                 .evaluation-data-list {
+           display: flex;
+           flex-direction: column;
+           gap: 0.75rem;
+         }
+
+         .evaluation-item {
+           background: white;
+           border: 1px solid var(--gray-200);
+           border-radius: 8px;
+           padding: 1rem;
+           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+         }
+
+         .evaluation-class-name {
+           font-weight: 600;
+           color: var(--gray-900);
+           margin-bottom: 0.75rem;
+           font-size: 0.875rem;
+           padding-bottom: 0.5rem;
+           border-bottom: 1px solid var(--gray-100);
+         }
+
+                   .evaluation-list-container {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            background: white;
+          }
+
+          .evaluation-list-container::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          .evaluation-list-container::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 4px;
+          }
+
+          .evaluation-list-container::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 4px;
+            transition: background 0.2s ease;
+          }
+
+          .evaluation-list-container::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+          }
+
+          .evaluation-list {
+            margin: 0;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            line-height: 1.6;
+          }
+
+          .evaluation-list li {
+            margin-bottom: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            position: relative;
+            transition: all 0.2s ease;
+          }
+
+          .evaluation-list li:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-color: var(--primary-blue);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+
+          .evaluation-list li:last-child {
+            margin-bottom: 0;
+          }
+
+                     .evaluation-list li::before {
+             content: "";
+             position: absolute;
+             left: 0;
+             top: 0;
+             bottom: 0;
+             width: 4px;
+             background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+             border-radius: 8px 0 0 8px;
+           }
+
+           .violation-item {
+             margin-bottom: 1rem;
+             padding: 1rem;
+             background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+             border: 1px solid #fecaca;
+             border-radius: 8px;
+             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+             position: relative;
+             transition: all 0.2s ease;
+           }
+
+           .violation-item:hover {
+             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+             border-color: #f87171;
+             transform: translateY(-1px);
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+           }
+
+           .violation-item:last-child {
+             margin-bottom: 0;
+           }
+
+           .violation-item::before {
+             content: "";
+             position: absolute;
+             left: 0;
+             top: 0;
+             bottom: 0;
+             width: 4px;
+             background: linear-gradient(135deg, #ef4444, #dc2626);
+             border-radius: 8px 0 0 8px;
+           }
+
+           .violation-rule {
+             margin-bottom: 0.75rem;
+             font-size: 0.85rem;
+             color: #991b1b;
+             line-height: 1.5;
+           }
+
+           .violation-hint {
+             font-size: 0.85rem;
+             color: #7c2d12;
+             line-height: 1.5;
+             padding-top: 0.75rem;
+             border-top: 1px solid #fecaca;
+           }
+
+           .violation-rule strong,
+           .violation-hint strong {
+             color: #dc2626;
+             font-weight: 600;
+           }
+
+                     .evaluation-success {
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             gap: 0.75rem;
+             padding: 1rem 1.25rem;
+             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+             border: 1px solid #bbf7d0;
+             border-radius: 8px;
+             color: #166534;
+             font-size: 0.85rem;
+             font-weight: 500;
+             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+             text-align: center;
+             white-space: nowrap;
+             flex-wrap: nowrap;
+           }
+
+           .evaluation-success svg {
+             width: 18px;
+             height: 18px;
+             color: #16a34a;
+             flex-shrink: 0;
+           }
       `}</style>
+    </div>
+  );
+}
+
+// 평가 데이터 표시 컴포넌트
+function EvaluationDataList({ evaluationData }) {
+  if (!evaluationData || evaluationData.length === 0) {
+    return (
+      <div className="evaluation-empty">
+        <span>평가 데이터가 없습니다.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="evaluation-data-list">
+      {evaluationData.map((data, index) => (
+        <div key={index} className="evaluation-item">
+          {data.violations.length > 0 ? (
+            <div className="evaluation-list-container">
+              {data.violations.map((violation, idx) => (
+                <div key={idx} className="violation-item">
+                  <div className="violation-rule">
+                    <strong>규칙 미준수:</strong> {violation.missing}
+                  </div>
+                  {violation.hint && (
+                    <div className="violation-hint">
+                      <strong>추천 수정 사항:</strong> {violation.hint}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="evaluation-success">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9 12l2 2 4-4"></path>
+              </svg>
+              <span>✓ 위반 사항이 없습니다.</span>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -1003,31 +1600,155 @@ function getOverviewIcon(type) {
  */
 function PathList({ title, list, detail }) {
   const arr = Array.isArray(list) ? list : [];
+  const [animatedScore, setAnimatedScore] = useState(0);
+  const [isScoreAnimating, setIsScoreAnimating] = useState(false);
+  
+  // 탭 타입에 따른 정확도 계산
+  const getTabTypeFromTitle = (title) => {
+    if (title.includes('Controller')) return 'controller';
+    if (title.includes('Service') && !title.includes('Impl')) return 'service';
+    if (title.includes('ServiceImpl')) return 'serviceimpl';
+    if (title.includes('VO')) return 'vo';
+    return null;
+  };
+  
+  const tabType = getTabTypeFromTitle(title);
+  const accuracy = tabType ? getTabAccuracy(detail, tabType) : null;
+  const evaluationData = tabType ? getTabEvaluationData(detail, tabType) : null;
+  
+  // 점수 애니메이션 효과
+  useEffect(() => {
+    if (accuracy !== null && accuracy !== undefined) {
+      setIsScoreAnimating(true);
+      setAnimatedScore(0);
+      
+      const targetScore = Math.round(accuracy * 100);
+      const duration = 1500; // 1.5초
+      const steps = 60; // 60프레임
+      const stepDuration = duration / steps;
+      
+      let currentStep = 0;
+      
+      const timer = setInterval(() => {
+        currentStep++;
+        // Easing 함수: easeOutQuart
+        const progress = currentStep / steps;
+        const easedProgress = 1 - Math.pow(1 - progress, 4);
+        const newScore = Math.round(targetScore * easedProgress);
+        
+        setAnimatedScore(newScore);
+        
+        if (currentStep >= steps) {
+          clearInterval(timer);
+          setIsScoreAnimating(false);
+        }
+      }, stepDuration);
+      
+      return () => clearInterval(timer);
+    }
+  }, [accuracy]);
+  
   if (!arr.length) {
     return (
-      <div className="empty-path-list">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="M21 21l-4.35-4.35"></path>
-        </svg>
-        <span>{title}가 없습니다.</span>
+      <div className="path-list-layout">
+        <div className="path-list-main">
+          <div className="empty-path-list">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="M21 21l-4.35-4.35"></path>
+            </svg>
+            <span>{title}가 없습니다.</span>
+          </div>
+        </div>
+        {accuracy !== null && (
+          <div className="path-list-sidebar">
+            <div className="accuracy-card">
+              <div className="accuracy-header">
+                <h4>변환 정확도</h4>
+                <p>AI 변환 품질 평가</p>
+              </div>
+              <div className="accuracy-gauge-large">
+                <AccuracyGauge accuracy={accuracy} size={120} tabType={tabType} />
+              </div>
+              <div className="accuracy-score">
+                <span 
+                  className="score-value"
+                  style={{
+                    transition: isScoreAnimating ? 'none' : 'all 0.3s ease-in-out'
+                  }}
+                >
+                  {animatedScore}%
+                </span>
+                <span className="score-label">정확도</span>
+              </div>
+            </div>
+            
+            {evaluationData && (
+              <div className="evaluation-card">
+                <div className="evaluation-header">
+                  <h4>위반사항</h4>
+                  <p>변환 품질 분석 결과</p>
+                </div>
+                <EvaluationDataList evaluationData={evaluationData} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   }
   
   return (
-    <div className="path-list-container">
-      <div className="path-list-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <h4>{title}</h4>
+    <div className="path-list-layout">
+      <div className="path-list-main">
+        <div className="path-list-container">
+          <div className="path-list-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <h4>{title}</h4>
+          </div>
+          <div className="path-list-grid">
+            {arr.map((s3Path, idx) => (
+              <FileItem key={idx} s3Path={s3Path} detail={detail} />
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="path-list-grid">
-        {arr.map((s3Path, idx) => (
-          <FileItem key={idx} s3Path={s3Path} detail={detail} />
-        ))}
-      </div>
+              {accuracy !== null && (
+          <div className="path-list-sidebar">
+            <div className="accuracy-card">
+              <div className="accuracy-header">
+                <h4>변환 정확도</h4>
+                <p>AI 변환 품질 평가</p>
+              </div>
+              <div className="accuracy-gauge-large">
+                <AccuracyGauge accuracy={accuracy} size={120} tabType={tabType} />
+              </div>
+              <div className="accuracy-score">
+                <span 
+                  className="score-value"
+                  style={{
+                    transition: isScoreAnimating ? 'none' : 'all 0.3s ease-in-out'
+                  }}
+                >
+                  {animatedScore}%
+                </span>
+                <span className="score-label">정확도</span>
+              </div>
+            </div>
+            
+            {evaluationData && (
+              <div className="evaluation-card">
+                <div className="evaluation-header">
+                  <h4>위반사항</h4>
+                  <p>변환 품질 분석 결과</p>
+                </div>
+                <EvaluationDataList evaluationData={evaluationData} />
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 }
@@ -1051,6 +1772,7 @@ function FileItem({ s3Path, detail }) {
       const text = await resp.text();
       setPreview(text);
     } catch (e) {
+      console.error("Error fetching preview:", e);
       alert(String(e));
     } finally {
       setLoading(false);
@@ -1075,6 +1797,7 @@ function FileItem({ s3Path, detail }) {
       a.click();
       a.remove();
     } catch (e) {
+      console.error("Error downloading file:", e);
       alert(String(e));
     }
   }, [s3Path]);
