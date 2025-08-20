@@ -155,72 +155,90 @@ function EgovLoginContent(props) {
 
   return (
     <div className="board_view">
-      <div className="Plogin">
-        <p className="txt">
+      <div className="login_content">
+        <p className="login_description">
           시스템을 이용하시려면 로그인이 필요합니다.
           <br />
           로그인을 하시면 모든 서비스를 제한없이 이용하실 수 있습니다.
         </p>
 
-        <div className="login_box">
-          <form name="" method="" action="">
+        <div className="login_form_wrapper">
+          <form className="login_form" name="" method="" action="">
             <fieldset>
-              <legend>로그인</legend>
-              <span className="group">
-                <input
-                  type="text"
-                  name=""
-                  title="아이디"
-                  placeholder="아이디"
-                  value={userInfo?.email}
-                  onChange={(e) =>
-                    setUserInfo({ ...userInfo, email: e.target.value })
-                  }
-                  ref={idRef}
-                  onKeyDown={activeEnter}
-                />
-                <input
-                  type="password"
-                  name=""
-                  title="비밀번호"
-                  placeholder="비밀번호"
-                  onChange={(e) =>
-                    setUserInfo({ ...userInfo, password: e.target.value })
-                  }
-                  ref={passwordRef}
-                  onKeyDown={activeEnter}
-                />
-              </span>
-              <div className="chk">
-                <label className="f_chk" htmlFor="saveid" ref={checkRef}>
+              <legend className="blind">로그인</legend>
+              
+              <div className="input_group">
+                <div className="input_item">
+                  <label htmlFor="userEmail" className="input_label">이메일</label>
+                  <input
+                    type="email"
+                    id="userEmail"
+                    name="userEmail"
+                    className="f_input2 w_full"
+                    title="이메일"
+                    placeholder="이메일을 입력하세요"
+                    value={userInfo?.email || ''}
+                    onChange={(e) =>
+                      setUserInfo({ ...userInfo, email: e.target.value })
+                    }
+                    ref={idRef}
+                    onKeyDown={activeEnter}
+                  />
+                </div>
+                
+                <div className="input_item">
+                  <label htmlFor="userPassword" className="input_label">비밀번호</label>
+                  <input
+                    type="password"
+                    id="userPassword"
+                    name="userPassword"
+                    className="f_input2 w_full"
+                    title="비밀번호"
+                    placeholder="비밀번호를 입력하세요"
+                    onChange={(e) =>
+                      setUserInfo({ ...userInfo, password: e.target.value })
+                    }
+                    ref={passwordRef}
+                    onKeyDown={activeEnter}
+                  />
+                </div>
+              </div>
+
+              <div className="login_options">
+                <label className="checkbox_wrapper">
                   <input
                     type="checkbox"
-                    name=""
                     id="saveid"
+                    className="checkbox_input"
                     onChange={handleSaveIDFlag}
                     checked={saveIDFlag}
-                  />{" "}
-                  <em>ID저장</em>
+                  />
+                  <span className="checkbox_text">아이디 저장</span>
                 </label>
-                
               </div>
-              <button type="button" onClick={submitFormHandler}>
-                <span>LOGIN</span>
-              </button>
+
+              <div className="login_button_area">
+                <button type="button" className="btn btn_blue_h46 w_full" onClick={submitFormHandler}>
+                  <span>로그인</span>
+                </button>
+              </div>
             </fieldset>
           </form>
         </div>
 
-        <ul className="list">
-          <li>
-            비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서
-            사용하실 수 있습니다.
-          </li>
-          <li>
-            쉬운 비밀번호나 자주 쓰는 사이트의 비밀번호가 같을 경우, 도용되기
-            쉬우므로 주기적으로 변경하셔서 사용하는 것이 좋습니다.
-          </li>
-        </ul>
+        <div className="login_info">
+          <ul className="info_list">
+            <li>비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다.</li>
+            <li>쉬운 비밀번호나 자주 쓰는 사이트의 비밀번호가 같을 경우, 도용되기 쉬우므로 주기적으로 변경하셔서 사용하는 것이 좋습니다.</li>
+          </ul>
+        </div>
+
+        <div className="login_actions">
+          <div className="action_links">
+            <a href="/signup/agree" className="link_signup">회원가입</a>
+          </div>
+        </div>
+
         <div className="btn_social">
           {/* <SnsNaverBt />
           <SnsKakaoBt /> */}

@@ -5,6 +5,7 @@ import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
 import CODE from "@/constants/code";
 import { getLocalItem, setLocalItem, setSessionItem } from "@/utils/storage";
+import "@/css/auth.css";
 
 function EgovSignupAgree() {
   console.group("EgovSignupAgree");
@@ -55,15 +56,16 @@ function EgovSignupAgree() {
             <h2 className="tit_2">개인정보 수집 및 이용 동의</h2>
 
             <div className="board_view">
-              <div className="signup_inner">
-          <div className="agree_form">
-            <div className="agree_article">
-              <p>
-                개인정보보호법에 따라 AI Code Migration에 회원가입 신청하시는 분께 수집하는 개인정보의 항목, 개인정보의 수집 및 이용목적, 개인정보의 보유 및 이용기간, 동의 거부권 및 동의 거부 시 불이익에 관한 사항을 안내 드리오니 자세히 읽은 후 동의하여 주시기 바랍니다.
-              </p>
-              <p><br/></p>
-            </div>
-            <div className="agree_article">
+              <div className="signup_content">
+                <div className="signup_description">
+                  <p className="desc_main">
+                    개인정보보호법에 따라 AI Code Migration에 회원가입 신청하시는 분께 수집하는 개인정보의 항목, 개인정보의 수집 및 이용목적, 개인정보의 보유 및 이용기간, 동의 거부권 및 동의 거부 시 불이익에 관한 사항을 안내 드리오니 자세히 읽은 후 동의하여 주시기 바랍니다.
+                  </p>
+                </div>
+                
+                <div className="agreement_wrapper">
+                  <div className="agreement_content">
+                    <div className="agree_article">
               <h3>1. 수집하는 개인정보</h3>
               <p>
                 이용자는 회원가입을 하지 않아도 코드 변환, 보안 검사, 챗봇 등 대부분의 AI Code Migration 서비스를 회원과 동일하게 이용할 수 있습니다. 이용자가 서비스 이용 내역 확인, 기존 이력 확인 등과 같이 개인화 서비스를 이용하기 위해 회원가입을 할 경우, AI Code Migration은는 서비스 이용을 위해 필요한 최소한의 개인정보를 수집합니다.
@@ -160,38 +162,44 @@ function EgovSignupAgree() {
               </p>
               <p><br/></p>
             </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: "20px",
-              gap: "12px", // 버튼 간 간격
-              flexWrap: "wrap", // 작은 화면에서 줄바꿈
-            }}
-          >
-            <label className="agree_checkbox">
-              <input
-                className="agree_checkbtn"
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-              />
-              <span style={{ fontSize: "16px", color: "#333" }}>동의합니다</span>
-            </label>
+                    </div>
+                  </div>
+                </div>
 
-            <button
-              className="btn_skyblue_h46 w_100"
-              style={{ marginRight:"10px" }}
-              type="button"
-              onClick={handleNextClick}
-            >
-              <span>다음</span>
-            </button>
-          </div>
-        </div>
-      </div>
+                <div className="agreement_actions">
+                  <div className="agreement_check">
+                    <label className="checkbox_wrapper">
+                      <input
+                        type="checkbox"
+                        className="checkbox_input"
+                        checked={agreed}
+                        onChange={(e) => setAgreed(e.target.checked)}
+                      />
+                      <span className="checkbox_text">개인정보 수집 및 이용에 동의합니다</span>
+                    </label>
+                  </div>
+
+                  <div className="button_area">
+                    <div className="btn_group">
+                      <button
+                        className="btn btn_gray_h46"
+                        type="button"
+                        onClick={() => window.history.back()}
+                      >
+                        <span>이전</span>
+                      </button>
+                      <button
+                        className="btn btn_blue_h46"
+                        type="button"
+                        onClick={handleNextClick}
+                      >
+                        <span>다음</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
       {/* <!--// 본문 --> */}
     </div>

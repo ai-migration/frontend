@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import EgovLoginContent from "@/pages/login/EgovLoginContent";
 
 import URL from "@/constants/url";
+import "@/css/auth.css";
 
 function EgovLogin(props) {
   console.group("EgovLogin");

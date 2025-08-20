@@ -7,6 +7,7 @@ import URL from "@/constants/url";
 import CODE from "@/constants/code";
 
 import { setSessionItem } from "@/utils/storage";
+import "@/css/auth.css";
 
 function EgovSignupForm({ onBack }) {
   console.group("EgovSignupForm");
@@ -185,134 +186,142 @@ function EgovSignupForm({ onBack }) {
 
             <h2 className="tit_2">회원정보 입력</h2>
 
-            <div className="board_view2">
-              <dl>
-                <dt>
-                  <label htmlFor="userEmail">Email</label>
-                  <span className="req">필수</span>
-                </dt>
-                <dd>
-                  <input
-                    className="f_input2 w_full"
-                    type="text"
-                    name="userEmail"
-                    title=""
-                    id="userEmail"
-                    placeholder="이메일 형식으로 입력해 주세요"
-                    onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
-                        email: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[0] = el)}
-                    required
-                  />
-                  <div>
-                    {getEmailValidationMessage(userDetail.email)}
-                  </div>
-                </dd>
-              </dl>
-              <dl>
-                <dt>
-                  <label htmlFor="password">회원암호</label>
-                  <span className="req">필수</span>
-                </dt>
-                <dd>
-                  <input
-                    className="f_input2 w_full"
-                    type="password"
-                    name="password"
-                    title=""
-                    id="password"
-                    placeholder="비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 혼합해서 사용하실 수 있습니다."
-                    onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
-                        password: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[1] = el)}
-                    required
-                  />
-                  <div>
-                    {getPasswordValidationMessage(userDetail.password).map((m, i) => (
-                      <div key={i}>{m}</div>
-                    ))}
-                  </div>
-                </dd>
-              </dl>
-              <dl>
-                <dt>
-                  <label htmlFor="password">암호확인</label>
-                  <span className="req">필수</span>
-                </dt>
-                <dd>
-                  <input
-                    className="f_input2 w_full"
-                    type="password"
-                    name="passwordCheck"
-                    title=""
-                    id="passwordCheck"
-                    placeholder="동일한 암호를 한 번 더 입력해 확인해 주세요."
-                    onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
-                        passwordCheck: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[2] = el)}
-                    required
-                  />
-                  <div>
-                    {userDetail.passwordCheck
-                      ? passwordMatch
-                        ? "✅ 비밀번호가 일치합니다."
-                        : "❌ 비밀번호가 일치하지 않습니다."
-                      : ""}
-                  </div>
-                </dd>
-              </dl>
-              <dl>
-                <dt>
-                  <label htmlFor="bbsNm">닉네임</label>
-                  <span className="req">필수</span>
-                </dt>
-                <dd>
-                  <input
-                    className="f_input2 w_full"
-                    type="text"
-                    name="nickname"
-                    title=""
-                    id="nickname"
-                    placeholder="닉네임을 입력해 주세요."
-                    onChange={(e) =>
-                      setUserDetail({
-                        ...userDetail,
-                        nickname: e.target.value,
-                      })
-                    }
-                    ref={(el) => (checkRef.current[3] = el)}
-                    required
-                  />
-                </dd>
-              </dl>
-
-              {/* <!-- 버튼영역 --> */}
-              <div className="board_btn_area">
-                <div className="left_col btn1">
-
-                  <button
-                    className="btn_skyblue_h46 w_100"
-                    onClick={() => submitForm()}
-                  >
-                    가입하기
-                  </button>
-
-                  {/* memberDetail.uniqId 제거 서버단에서 토큰값 사용 */}
+            <div className="board_view">
+              <div className="signup_form_content">
+                <div className="form_description">
+                  <p>회원가입을 위해 아래 정보를 입력해 주세요. 모든 항목은 필수입니다.</p>
                 </div>
+
+                <form className="signup_form">
+                  <div className="form_section">
+                    <div className="input_group">
+                      <div className="input_item">
+                        <label htmlFor="userEmail" className="input_label">
+                          이메일 <span className="required_mark">*</span>
+                        </label>
+                        <input
+                          className="f_input2 w_full"
+                          type="email"
+                          name="userEmail"
+                          id="userEmail"
+                          placeholder="이메일을 입력해 주세요"
+                          value={userDetail.email}
+                          onChange={(e) =>
+                            setUserDetail({
+                              ...userDetail,
+                              email: e.target.value,
+                            })
+                          }
+                          ref={(el) => (checkRef.current[0] = el)}
+                          required
+                        />
+                        <div className="validation_message">
+                          {userDetail.email && getEmailValidationMessage(userDetail.email)}
+                        </div>
+                      </div>
+
+                      <div className="input_item">
+                        <label htmlFor="password" className="input_label">
+                          비밀번호 <span className="required_mark">*</span>
+                        </label>
+                        <input
+                          className="f_input2 w_full"
+                          type="password"
+                          name="password"
+                          id="password"
+                          placeholder="8~16자의 영문, 숫자, 특수문자를 혼합하여 입력하세요"
+                          value={userDetail.password}
+                          onChange={(e) =>
+                            setUserDetail({
+                              ...userDetail,
+                              password: e.target.value,
+                            })
+                          }
+                          ref={(el) => (checkRef.current[1] = el)}
+                          required
+                        />
+                        <div className="validation_message">
+                          {userDetail.password && getPasswordValidationMessage(userDetail.password).map((m, i) => (
+                            <div key={i} className="validation_item">{m}</div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="input_item">
+                        <label htmlFor="passwordCheck" className="input_label">
+                          비밀번호 확인 <span className="required_mark">*</span>
+                        </label>
+                        <input
+                          className="f_input2 w_full"
+                          type="password"
+                          name="passwordCheck"
+                          id="passwordCheck"
+                          placeholder="비밀번호를 다시 입력해 주세요"
+                          value={userDetail.passwordCheck}
+                          onChange={(e) =>
+                            setUserDetail({
+                              ...userDetail,
+                              passwordCheck: e.target.value,
+                            })
+                          }
+                          ref={(el) => (checkRef.current[2] = el)}
+                          required
+                        />
+                        <div className="validation_message">
+                          {userDetail.passwordCheck && (
+                            <div className={`validation_item ${passwordMatch ? 'success' : 'error'}`}>
+                              {passwordMatch ? "✅ 비밀번호가 일치합니다." : "❌ 비밀번호가 일치하지 않습니다."}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="input_item">
+                        <label htmlFor="nickname" className="input_label">
+                          닉네임 <span className="required_mark">*</span>
+                        </label>
+                        <input
+                          className="f_input2 w_full"
+                          type="text"
+                          name="nickname"
+                          id="nickname"
+                          placeholder="닉네임을 입력해 주세요"
+                          value={userDetail.nickname}
+                          onChange={(e) =>
+                            setUserDetail({
+                              ...userDetail,
+                              nickname: e.target.value,
+                            })
+                          }
+                          ref={(el) => (checkRef.current[3] = el)}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form_actions">
+                    <div className="button_area">
+                      <div className="btn_group">
+                        <button
+                          type="button"
+                          className="btn btn_gray_h46"
+                          onClick={() => window.history.back()}
+                        >
+                          <span>이전</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn_blue_h46"
+                          onClick={() => submitForm()}
+                        >
+                          <span>가입하기</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
-              {/* <!--// 버튼영역 --> */}
             </div>
 
             {/* <!--// 본문 --> */}
