@@ -36,6 +36,8 @@ export default function EgovHeader() {
   const [scrolled, setScrolled] = useState2(false);
   const [scrollPct, setScrollPct] = useState2(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState2(false);
+  const [mousePos, setMousePos] = useState2({ x: 0, y: 0 });
+  const [isLoaded, setIsLoaded] = useState2(false);
 
   // === Chat (전역 FAB + 드로어) ===
   const [isChatOpen, setIsChatOpen] = useState2(false);
@@ -385,20 +387,35 @@ export default function EgovHeader() {
             <h1 className="logo">
               <HLink to={URL2.MAIN} className="logo-link" aria-label="홈으로 이동">
                 <div className="logo-icon">
-                  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" rx="8" fill="url(#logoGradient)"/>
-                    <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h12v2H8v-2z" fill="white"/>
+                  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                      <linearGradient id="logoGradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#0000FF"/>
-                        <stop offset="1" stopColor="#4169E1"/>
+                      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#667eea"/>
+                        <stop offset="50%" stopColor="#764ba2"/>
+                        <stop offset="100%" stopColor="#f093fb"/>
                       </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge> 
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
                     </defs>
+                    <rect width="40" height="40" rx="12" fill="url(#logoGradient)" filter="url(#glow)"/>
+                    <g fill="white" fillOpacity="0.9">
+                      <circle cx="12" cy="15" r="2"/>
+                      <circle cx="20" cy="15" r="2"/>
+                      <circle cx="28" cy="15" r="2"/>
+                      <path d="M8 25h24v3H8z" rx="1.5"/>
+                      <path d="M10 20h20v2H10z" rx="1"/>
+                    </g>
+                    <rect width="40" height="40" rx="12" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
                   </svg>
                 </div>
                 <div className="logo-text">
                   <span className="logo-title">AI CODE MIGRATION</span>
-                  <span className="logo-subtitle">KT AIVLE AI</span>
+                  <span className="logo-subtitle">Powered by KT AIVLE</span>
                 </div>
               </HLink>
             </h1>
@@ -409,8 +426,6 @@ export default function EgovHeader() {
             className="desktop-nav"
             role="navigation"
             aria-label="주요 메뉴"
-            onMouseEnter={openAllMenuByHover}
-            onMouseLeave={closeAllMenuByHover}
           >
             <ul className="nav-list">
               <li className="nav-item">
@@ -504,6 +519,8 @@ export default function EgovHeader() {
               aria-expanded={isMenuOpen}
               aria-controls="allmenu-web"
               onClick={toggleAllMenu}
+              onMouseEnter={openAllMenuByHover}
+              onMouseLeave={closeAllMenuByHover}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="3" y1="6" x2="21" y2="6"></line>

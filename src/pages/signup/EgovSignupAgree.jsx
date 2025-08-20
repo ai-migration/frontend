@@ -33,12 +33,9 @@ function EgovSignupAgree() {
       {/* <!-- 본문 --> */}
       <div className="Plogin">
         <h1>회원가입</h1>
-        {/* <p className="txt">
-          전자정부표준프레임워크 경량환경 홈페이지 로그인 페이지입니다.
-          <br />
-          로그인을 하시면 모든 서비스를 제한없이 이용하실 수 있습니다.
-        </p> */}
-
+        <p className="txt">
+          개인정보보호법에 따라 AI Code Migration에 회원가입 신청하시는 분께 수집하는 개인정보의 항목, 개인정보의 수집 및 이용목적, 개인정보의 보유 및 이용기간, 동의 거부권 및 동의 거부 시 불이익에 관한 사항을 안내 드리오니 자세히 읽은 후 동의하여 주시기 바랍니다.
+        </p>
 
         <div className="signup_inner">
           <h2>개인정보 수집 및 이용 동의</h2>
@@ -178,6 +175,7 @@ function EgovSignupAgree() {
           </div>
         </div>
       </div>
+      {/* <!--// 본문 --> */}
     </div>
   );
 }
