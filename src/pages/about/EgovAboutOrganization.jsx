@@ -253,44 +253,294 @@ function TeamShowcase() {
 
 function EgovAboutOrganization() {
   return (
-    <div className="container">
-      <div className="c_wrap">
-        {/* Location */}
-        <div className="location">
-          <ul>
-            <li>
-              <Link to={URL.MAIN} className="home">Home</Link>
-            </li>
-            <li>
-              <Link to={URL.ABOUT}>사이트 소개</Link>
-            </li>
-            <li>조직소개</li>
-          </ul>
-        </div>
+    <div className="modern-page-container">
+      <div className="modern-page-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb">
+          <div className="breadcrumb-container">
+            <Link to={URL.MAIN} className="breadcrumb-home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+              </svg>
+              Home
+            </Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <Link to={URL.ABOUT} className="breadcrumb-link">사이트 소개</Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <span className="breadcrumb-current">조직소개</span>
+          </div>
+        </nav>
 
-        <div className="layout">
-          {/* Navigation */}
+        <div className="modern-layout">
           <EgovLeftNav />
 
-          <div className="contents SITE_INTRO" id="contents">
-            <h1 className="tit_3">사이트 소개</h1>
-            <p className="txt_1">표준프레임워크 경량환경 포털사이트를 소개합니다.</p>
+          <main className="modern-content" id="contents">
+            {/* Hero Section */}
+            <section className="content-hero">
+              <div className="hero-content">
+                <div className="hero-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <h1 className="hero-title">조직소개</h1>
+                <p className="hero-description">
+                  표준프레임워크 개발과 운영을 담당하는 전문가 팀을 소개합니다.
+                </p>
+              </div>
+            </section>
 
-            <h2 className="tit_4">조직소개</h2>
+            {/* Organization Overview Section */}
+            <section className="content-section modern-card">
+              <div className="card-header">
+                <div className="header-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  <h2>조직 구성</h2>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="organization-description">
+                  <p>
+                    오픈커뮤니티의 초기 정착을 위해 표준프레임워크 개발 참여자와 국내 주요 오픈커뮤니티의 
+                    운영자·전문가를 리딩 그룹(PMC, 커미터)으로 구성하고, 지속적인 확대·발전을 위해 
+                    프로젝트 활동에 적극적으로 참여하는 커뮤니티 회의사결정 체계를 수립합니다.
+                  </p>
+                </div>
+              </div>
+            </section>
 
-            <h3 className="tit_5">조직</h3>
-            <p className="msg_1">
-              오픈커뮤니티의 초기 정착을 위해 표준프레임워크 개발 참여자와 국내 주요 오픈커뮤니티의 운영자·전문가를 리딩 그룹(PMC, 커미터)으로 구성하고,
-              지속적인 확대·발전을 위해 프로젝트 활동에 적극적으로 참여하는 커뮤니티 회의사결정 체계를 수립합니다.
-            </p>
-
-            {/* ✅ 팀 섹션 v4 (Apple-2025 스타일, 필터 없음, 모달 + 리빌 + 포커스트랩) */}
-            <TeamSection />
-            {/* Tailwind Showcase (Flowbite-inspired) */}
-            <TeamShowcase />
-          </div>
+            {/* Team Section */}
+            <section className="content-section modern-card">
+              <div className="card-content">
+                <TeamSection />
+              </div>
+            </section>
+          </main>
         </div>
       </div>
+
+      <style>{`
+        /* Modern Page Styles */
+        .modern-page-container {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+
+        .modern-page-wrapper {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        .modern-breadcrumb {
+          margin-bottom: 2rem;
+        }
+
+        .breadcrumb-container {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+        }
+
+        .breadcrumb-home,
+        .breadcrumb-link {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--gray-600);
+          text-decoration: none;
+          padding: 0.5rem 0.75rem;
+          border-radius: var(--border-radius-md);
+          transition: all 0.2s ease;
+        }
+
+        .breadcrumb-home:hover,
+        .breadcrumb-link:hover {
+          background: var(--light-blue);
+          color: var(--primary-blue);
+        }
+
+        .breadcrumb-home svg,
+        .breadcrumb-separator {
+          width: 16px;
+          height: 16px;
+        }
+
+        .breadcrumb-current {
+          color: var(--primary-blue);
+          font-weight: 600;
+        }
+
+        .modern-layout {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 2rem;
+          align-items: start;
+        }
+
+        .modern-content {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .content-hero {
+          text-align: center;
+          padding: 3rem 0;
+        }
+
+        .hero-content {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .hero-icon {
+          width: 64px;
+          height: 64px;
+          margin: 0 auto 1.5rem;
+          background: linear-gradient(135deg, #8B5CF6, #A855F7);
+          border-radius: var(--border-radius-2xl);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          box-shadow: var(--shadow-lg);
+        }
+
+        .hero-icon svg {
+          width: 28px;
+          height: 28px;
+        }
+
+        .hero-title {
+          margin: 0 0 1rem;
+          font-size: 2.25rem;
+          font-weight: 700;
+          color: var(--gray-900);
+          background: linear-gradient(135deg, #8B5CF6, #A855F7);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .hero-description {
+          margin: 0;
+          font-size: 1.125rem;
+          color: var(--gray-600);
+          line-height: 1.6;
+        }
+
+        .content-section {
+          background: white;
+          border-radius: var(--border-radius-2xl);
+          border: 1px solid var(--gray-200);
+          box-shadow: var(--shadow-sm);
+          overflow: hidden;
+        }
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.5rem 2rem;
+          background: linear-gradient(135deg, 
+            rgba(139, 92, 246, 0.05) 0%, 
+            rgba(255, 255, 255, 1) 100%);
+          border-bottom: 1px solid var(--gray-200);
+        }
+
+        .header-icon {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .header-icon svg {
+          width: 20px;
+          height: 20px;
+          color: #8B5CF6;
+        }
+
+        .header-icon h2 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .card-content {
+          padding: 2rem;
+        }
+
+        /* Organization Description */
+        .organization-description p {
+          font-size: 1.125rem;
+          line-height: 1.7;
+          color: var(--gray-700);
+          margin: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+          .modern-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .modern-page-wrapper {
+            padding: 1rem;
+          }
+
+          .hero-title {
+            font-size: 1.875rem;
+          }
+
+          .card-content {
+            padding: 1.5rem;
+          }
+
+          .card-header {
+            padding: 1rem 1.5rem;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hero-title {
+            font-size: 1.75rem;
+          }
+
+          .hero-description {
+            font-size: 1rem;
+          }
+
+          .card-content {
+            padding: 1rem;
+          }
+
+          .card-header {
+            padding: 0.875rem 1rem;
+          }
+
+          .header-icon h2 {
+            font-size: 1.125rem;
+          }
+        }
+      `}</style>
     </div>
   );
 }

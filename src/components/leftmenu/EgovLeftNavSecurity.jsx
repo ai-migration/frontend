@@ -27,7 +27,7 @@ function EgovLeftNavSecurity() {
                 <span className="link-title">기능 소개</span>
                 <span className="link-desc">AI 보안기의 주요 기능을 확인합니다</span>
               </div>
-              <div className="link-indicator"></div>
+      
             </NavLink>
           </li>
           <li className="nav-item">
@@ -42,7 +42,7 @@ function EgovLeftNavSecurity() {
                 <span className="link-title">AI 보안 검사</span>
                 <span className="link-desc">코드의 보안을 분석합니다</span>
               </div>
-              <div className="link-indicator"></div>
+   
             </NavLink>
           </li>
           <li className="nav-item">
@@ -58,7 +58,7 @@ function EgovLeftNavSecurity() {
                 <span className="link-title">보안 취약점탐지</span>
                 <span className="link-desc">탐지된 취약점을 확인합니다</span>
               </div>
-              <div className="link-indicator"></div>
+           
             </NavLink>
           </li>
           <li className="nav-item">
@@ -76,7 +76,7 @@ function EgovLeftNavSecurity() {
                 <span className="link-title">보안 점검결과</span>
                 <span className="link-desc">보안 분석 결과를 확인합니다</span>
               </div>
-              <div className="link-indicator"></div>
+   
             </NavLink>
           </li>
           <li className="nav-item">

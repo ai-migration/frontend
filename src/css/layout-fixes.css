@@ -4,18 +4,124 @@
 .modern-layout {
   display: grid !important;
   grid-template-columns: 280px 1fr !important;
-  gap: 1rem !important;
+  gap: 1.5rem !important;
   align-items: start !important;
 }
 
-/* Hide LeftNav Blue Line Indicators */
+/* About Pages Layout Optimization */
+.layout {
+  display: grid !important;
+  grid-template-columns: 280px 1fr !important;
+  gap: 1.5rem !important;
+  align-items: start !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+}
+
+/* About Pages Content Spacing */
+.contents.SITE_INTRO,
+.contents.SITE_CONTACT_US,
+.contents.SITE_GALLARY_VIEW {
+  padding: 1.5rem !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  margin: 0 !important;
+}
+
+.modern-content {
+  padding: 1.5rem !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  margin: 0 !important;
+}
+
+/* About Pages Container Background */
+.modern-page-container,
+.container {
+  background: #f8fafc !important;
+  min-height: 100vh !important;
+}
+
+.modern-page-wrapper,
+.c_wrap {
+  padding: 2rem 0 !important;
+}
+
+/* Hide LeftNav Blue Line Indicators - Complete Removal */
 .link-indicator {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .nav-link:hover .link-indicator,
 .nav-link.active .link-indicator {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Remove any blue line effects from navigation */
+.nav-link::after,
+.nav-link::before {
+  display: none !important;
+}
+
+.nav-link.active::after,
+.nav-link.active::before,
+.nav-link:hover::after,
+.nav-link:hover::before {
+  display: none !important;
+}
+
+/* Remove border bottom blue lines */
+.nav ul li a.cur {
+  border-bottom: none !important;
+}
+
+.c_wrap .layout .nav ul li a.cur {
+  border-bottom: none !important;
+}
+
+/* Remove all possible blue line indicators */
+.nav-indicator {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.nav-link:hover .nav-indicator,
+.nav-link.active .nav-indicator {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Remove blue underlines from all navigation links */
+.modern-left-nav .nav-link.active,
+.modern-left-nav .nav-link:hover,
+.nav .menu4 li a.cur,
+.nav .menu4 li a:hover {
+  border-bottom: none !important;
+  text-decoration: none !important;
+}
+
+/* Override any CSS that might add blue lines */
+.modern-nav-menu .nav-link.active::after,
+.modern-nav-menu .nav-link:hover::after,
+.menu4 li a.cur::after,
+.menu4 li a:hover::after {
+  display: none !important;
+  content: none !important;
+  border: none !important;
+  background: none !important;
 }
 
 /* Header Animations */
@@ -306,23 +412,37 @@
 
 /* Responsive Layout Adjustments */
 @media (max-width: 1200px) {
-  .modern-layout {
+  .modern-layout,
+  .layout {
     grid-template-columns: 260px 1fr !important;
-    gap: 0.75rem !important;
+    gap: 1.25rem !important;
+    padding: 0 1.5rem !important;
   }
 }
 
 @media (max-width: 1024px) {
-  .modern-layout {
+  .modern-layout,
+  .layout {
     grid-template-columns: 240px 1fr !important;
-    gap: 0.5rem !important;
+    gap: 1rem !important;
+    padding: 0 1rem !important;
   }
 }
 
 @media (max-width: 768px) {
-  .modern-layout {
+  .modern-layout,
+  .layout {
     grid-template-columns: 1fr !important;
-    gap: 1.5rem !important;
+    gap: 1rem !important;
+    padding: 0 1rem !important;
+  }
+  
+  .contents.SITE_INTRO,
+  .contents.SITE_CONTACT_US,
+  .contents.SITE_GALLARY_VIEW,
+  .modern-content {
+    padding: 1rem !important;
+    border-radius: 8px !important;
   }
 }
 

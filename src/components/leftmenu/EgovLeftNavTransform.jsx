@@ -30,7 +30,7 @@ function EgovLeftNavTransform() {
                 <span className="link-title">기능 소개</span>
                 <span className="link-desc">AI 변환기의 주요 기능을 확인합니다</span>
               </div>
-              <div className="link-indicator"></div>
+           
             </NavLink>
           </li>
           <li className="nav-item">
@@ -45,7 +45,7 @@ function EgovLeftNavTransform() {
                 <span className="link-title">변환 하기</span>
                 <span className="link-desc">전자정부표준프레임워크로 변환합니다</span>
               </div>
-              <div className="link-indicator"></div>
+      
             </NavLink>
           </li>
           <li className="nav-item">
@@ -62,7 +62,7 @@ function EgovLeftNavTransform() {
                 <span className="link-title">변환 이력 조회</span>
                 <span className="link-desc">변환 이력을 확인합니다</span>
               </div>
-              <div className="link-indicator"></div>
+          
             </NavLink>
           </li>
           <li className="nav-item">
@@ -76,7 +76,7 @@ function EgovLeftNavTransform() {
                 <span className="link-title">테스트 이력 조회</span>
                 <span className="link-desc">테스트 이력을 확인합니다</span>
               </div>
-              <div className="link-indicator"></div>
+        
             </NavLink>
           </li>
           <li className="nav-item">
@@ -92,7 +92,7 @@ function EgovLeftNavTransform() {
                 <span className="link-title">다운로드</span>
                 <span className="link-desc">변환된 코드 파일을 다운로드합니다</span>
               </div>
-              <div className="link-indicator"></div>
+        
             </NavLink>
           </li>
         </ul>
