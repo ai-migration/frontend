@@ -189,14 +189,15 @@ function EgovSignupAgree() {
             >
               <span>다음</span>
             </button>
-              </div>
-            </div>
-
-            {/* <!--// 본문 --> */}
           </div>
         </div>
       </div>
+
+      {/* <!--// 본문 --> */}
     </div>
+  </div>
+</div>
+</div>
   );
 }
 
