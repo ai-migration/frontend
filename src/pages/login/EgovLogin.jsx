@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import EgovLoginContent from "@/pages/login/EgovLoginContent";
 
 import URL from "@/constants/url";
-import "@/css/auth.css";
 
 function EgovLogin(props) {
   console.group("EgovLogin");
@@ -34,19 +33,7 @@ function EgovLogin(props) {
         {/* <!--// Location --> */}
 
         <div className="layout">
-          <div className="contents" id="contents">
-            {/* <!-- 본문 --> */}
-
-            <div className="top_tit">
-              <h1 className="tit_1">로그인</h1>
-            </div>
-
-            <h2 className="tit_2">사용자 로그인</h2>
-
-            <EgovLoginContent onChangeLogin={onChangeLogin}></EgovLoginContent>
-            
-            {/* <!--// 본문 --> */}
-          </div>
+          <EgovLoginContent onChangeLogin={onChangeLogin}></EgovLoginContent>
         </div>
       </div>
     </div>
