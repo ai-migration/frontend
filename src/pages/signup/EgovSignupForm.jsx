@@ -224,7 +224,9 @@ function EgovSignupForm({ onBack }) {
                     required
                   />
                   <div>
-                    {getPasswordValidationMessage(userDetail.password)}
+                    {getPasswordValidationMessage(userDetail.password).map((m, i) => (
+                      <div key={i}>{m}</div>
+                    ))}
                   </div>
                 </dd>
               </dl>
