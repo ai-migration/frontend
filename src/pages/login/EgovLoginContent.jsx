@@ -111,29 +111,42 @@ function EgovLoginContent(props) {
       setSessionItem("jToken", jToken);
       setSessionItem("loginUser", obj);
 
-      alert('로그인 성공!');
-      if (saveIDFlag) setLocalItem(KEY_ID, userInfo.email);
-      navigate(URL.MAIN);
-      
-      // document.querySelector(".all_menu.WEB").classList.add("closed");
-      // document.querySelector(".btnAllMenu").classList.remove("active");
-      // document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-      // document.querySelector(".all_menu.Mobile").classList.add("closed");
+    if (saveIDFlag) setLocalItem(KEY_ID, userInfo.email);
 
-      // if (Number(resp.resultCode) === Number(CODE.RCV_SUCCESS)) { // 로그인 성공
-      //   //setLoginVO(resultVO);
-      //   // setSessionItem("loginUser", resultVO);
-      //   props.onChangeLogin(resultVO);
-      //   if (saveIDFlag) setLocalItem(KEY_ID, resultVO?.id);
-      //   navigate(URL.MAIN);
-      //   // PC와 Mobile 열린메뉴 닫기
-      //   document.querySelector(".all_menu.WEB").classList.add("closed");
-      //   document.querySelector(".btnAllMenu").classList.remove("active");
-      //   document.querySelector(".btnAllMenu").title = "전체메뉴 닫힘";
-      //   document.querySelector(".all_menu.Mobile").classList.add("closed");
-      // } else {
-      //   alert(resp.resultMessage);
-      // }
+    // 3) 만료/임박 처리
+    const isExpired = !resp?.isExpired;         // 백엔드에서 true/false
+    // const daysLeft  = Number(resp?.daysLeft ?? NaN); // 선택: 남은 일수 제공 시
+    console.log(isExpired);
+    if (isExpired) {
+      const goChange = window.confirm(
+        "마지막으로 비밀번호를 변경하신지 60일이 지났습니다.\n지금 바로 변경하시겠습니까?"
+      );
+      if (goChange) {
+        // 비밀번호 변경 화면(라우팅 상수에 맞춰 수정하세요)
+        navigate(URL.MYPAGE); // 예: '/mypage/password' 등
+        return;
+      } else {
+        alert("보안을 위해 가능한 빨리 비밀번호를 변경해 주세요.");
+        // 원하는 정책에 따라: 메인으로 보낼지, 로그인 유지 막을지 결정
+        navigate(URL.MAIN);
+        return;
+      }
+    }
+
+    // (선택) 만료 임박 경고: 7일 이하 남았을 때 알림
+    // if (!isExpired && !isNaN(daysLeft) && daysLeft <= 7 && daysLeft >= 0) {
+    //   const goEarly = window.confirm(
+    //     `비밀번호 만료가 ${daysLeft}일 남았습니다.\n지금 변경하시겠습니까?`
+    //   );
+    //   if (goEarly) {
+    //     navigate(URL.MYPAGE_PASSWORD);
+    //     return;
+    //   }
+    // }
+
+    // 4) 정상 로그인 플로우
+    alert("로그인 성공!");
+    navigate(URL.MAIN);
     });
   };
 

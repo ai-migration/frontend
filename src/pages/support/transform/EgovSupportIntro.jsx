@@ -51,10 +51,17 @@ function EgovSupportIntro() {
               </div>
             </section>
 
-            {/* Features Section */}
+            {/* Key Features Section */}
             <section className="content-section modern-card">
+              <div className="card-header">
+                <div className="header-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                  </svg>
+                  <h2>주요 기능</h2>
+                </div>
+              </div>
               <div className="card-content">
-                <h2 className="section-title">주요 기능</h2>
                 <div className="features-grid">
                   <div className="feature-item">
                     <div className="feature-icon">
@@ -106,37 +113,503 @@ function EgovSupportIntro() {
                       <p>단위 테스트 코드를 함께 변환하거나, JUnit 기반으로 변환된 테스트 코드를 제공합니다.</p>
                     </div>
                   </div>
+                </div>
+              </div>
+            </section>
 
-                  <div className="feature-item">
-                    <div className="feature-icon">
+            {/* How to Use Section */}
+            <section className="content-section modern-card">
+              <div className="card-header">
+                <div className="header-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                  </svg>
+                  <h2>사용 방법</h2>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="getting-started-steps">
+                  <div className="step-item">
+                    <div className="step-number">1</div>
+                    <div className="step-content">
+                      <h4>파일 업로드</h4>
+                      <p>변환할 소스코드를 ZIP 파일 형태로 업로드합니다.</p>
+                    </div>
+                  </div>
+
+                  <div className="step-item">
+                    <div className="step-number">2</div>
+                    <div className="step-content">
+                      <h4>AI 분석 및 변환</h4>
+                      <p>AI 모델이 코드 구조를 분석하고 eGovFrame 구조로 자동 변환합니다.</p>
+                    </div>
+                  </div>
+
+                  <div className="step-item">
+                    <div className="step-number">3</div>
+                    <div className="step-content">
+                      <h4>결과 확인 및 다운로드</h4>
+                      <p>변환된 결과를 확인하고 ZIP 파일로 다운로드합니다.</p>
+                    </div>
+                  </div>
+
+                  <div className="step-item">
+                    <div className="step-number">4</div>
+                    <div className="step-content">
+                      <h4>품질 검증</h4>
+                      <p>변환된 코드의 품질과 동작을 테스트하여 검증합니다.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Tips Section */}
+            <section className="content-section modern-card">
+              <div className="card-header">
+                <div className="header-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  <h2>사용 팁</h2>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="resources-grid">
+                  <div className="resource-item">
+                    <div className="resource-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                      </svg>
+                    </div>
+                    <div className="resource-content">
+                      <h4>정확한 코드 업로드</h4>
+                      <p>변환 품질을 높이기 위해 완전하고 정확한 소스코드를 업로드해주세요.</p>
+                    </div>
+                  </div>
+
+                  <div className="resource-item">
+                    <div className="resource-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                    </div>
+                    <div className="resource-content">
+                      <h4>기능 명세 작성</h4>
+                      <p>코드의 주요 기능과 목적을 명확히 기술하면 더 정확한 변환이 가능합니다.</p>
+                    </div>
+                  </div>
+
+                  <div className="resource-item">
+                    <div className="resource-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </div>
+                    <div className="resource-content">
+                      <h4>테스트 코드 포함</h4>
+                      <p>기존 테스트 코드를 함께 업로드하면 변환된 코드의 검증이 용이합니다.</p>
+                    </div>
+                  </div>
+
+                  <div className="resource-item">
+                    <div className="resource-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7,10 12,15 17,10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                       </svg>
                     </div>
-                    <div className="feature-content">
-                      <h3>결과 다운로드</h3>
-                      <p>변환된 결과물은 .zip 파일로 압축되어 제공되며, 다운로드 및 이력 확인이 가능합니다.</p>
+                    <div className="resource-content">
+                      <h4>결과 검토</h4>
+                      <p>변환 결과를 다운로드한 후 반드시 코드 검토와 테스트를 수행해주세요.</p>
                     </div>
                   </div>
-                </div>
-
-                <div className="notice-box">
-                  <div className="notice-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                  </div>
-                  <p>※ 변환 품질을 높이기 위해 정확한 코드 업로드와 기능 명세 입력을 권장합니다.</p>
                 </div>
               </div>
             </section>
           </main>
         </div>
       </div>
+
+      <style>{`
+        /* Modern Page Styles - Compact and Clean */
+        .modern-page-container {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+
+        .modern-page-wrapper {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        .modern-breadcrumb {
+          margin-bottom: 2rem;
+        }
+
+        .breadcrumb-container {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+        }
+
+        .breadcrumb-home,
+        .breadcrumb-link {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--gray-600);
+          text-decoration: none;
+          padding: 0.5rem 0.75rem;
+          border-radius: var(--border-radius-md);
+          transition: all 0.2s ease;
+        }
+
+        .breadcrumb-home:hover,
+        .breadcrumb-link:hover {
+          background: var(--light-blue);
+          color: var(--primary-blue);
+        }
+
+        .breadcrumb-home svg,
+        .breadcrumb-separator {
+          width: 16px;
+          height: 16px;
+        }
+
+        .breadcrumb-current {
+          color: var(--primary-blue);
+          font-weight: 600;
+        }
+
+        .modern-layout {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 2rem;
+          align-items: start;
+        }
+
+        .modern-content {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .content-hero {
+          text-align: center;
+          padding: 2rem 0;
+        }
+
+        .hero-content {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .hero-icon {
+          width: 48px;
+          height: 48px;
+          margin: 0 auto 1rem;
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          border-radius: var(--border-radius-xl);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          box-shadow: var(--shadow-md);
+        }
+
+        .hero-icon svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .hero-title {
+          margin: 0 0 0.75rem;
+          font-size: 1.875rem;
+          font-weight: 700;
+          color: var(--gray-900);
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .hero-description {
+          margin: 0;
+          font-size: 1rem;
+          color: var(--gray-600);
+          line-height: 1.6;
+        }
+
+        .content-section {
+          background: white;
+          border-radius: var(--border-radius-xl);
+          border: 1px solid var(--gray-200);
+          box-shadow: var(--shadow-sm);
+          overflow: hidden;
+        }
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1.25rem 1.5rem;
+          background: linear-gradient(135deg, 
+            rgba(0, 0, 255, 0.05) 0%, 
+            rgba(255, 255, 255, 1) 100%);
+          border-bottom: 1px solid var(--gray-200);
+        }
+
+        .header-icon {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .header-icon svg {
+          width: 16px;
+          height: 16px;
+          color: var(--primary-blue);
+        }
+
+        .header-icon h2 {
+          margin: 0;
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .card-content {
+          padding: 1.5rem;
+        }
+
+        /* Overview Description */
+        .overview-description p {
+          font-size: 1rem;
+          line-height: 1.6;
+          color: var(--gray-700);
+          margin: 0;
+        }
+
+        /* Features Grid - Compact */
+        .features-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1rem;
+        }
+
+        .feature-item {
+          display: flex;
+          gap: 0.75rem;
+          padding: 1.25rem;
+          background: var(--gray-50);
+          border-radius: var(--border-radius-lg);
+          border: 1px solid var(--gray-200);
+          transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+          background: white;
+          box-shadow: var(--shadow-md);
+          transform: translateY(-2px);
+        }
+
+        .feature-icon {
+          width: 32px;
+          height: 32px;
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          border-radius: var(--border-radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+          width: 14px;
+          height: 14px;
+        }
+
+        .feature-content h3 {
+          margin: 0 0 0.375rem;
+          font-size: 1rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .feature-content p {
+          margin: 0;
+          font-size: 0.875rem;
+          color: var(--gray-600);
+          line-height: 1.4;
+        }
+
+        /* Process Steps - Compact */
+        .process-steps {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .step-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 1.25rem;
+          background: var(--gray-50);
+          border-radius: var(--border-radius-lg);
+          border: 1px solid var(--gray-200);
+          transition: all 0.3s ease;
+          min-width: 180px;
+          max-width: 200px;
+        }
+
+        .step-item:hover {
+          background: white;
+          box-shadow: var(--shadow-md);
+          transform: translateY(-2px);
+        }
+
+        .step-number {
+          width: 36px;
+          height: 36px;
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 700;
+          font-size: 0.95rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .step-content h4 {
+          margin: 0 0 0.375rem;
+          font-size: 1rem;
+          font-weight: 700;
+          color: var(--gray-900);
+        }
+
+        .step-content p {
+          margin: 0;
+          color: var(--gray-600);
+          line-height: 1.4;
+          font-size: 0.875rem;
+        }
+
+        .step-arrow {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--gray-400);
+          flex-shrink: 0;
+        }
+
+        .step-arrow svg {
+          width: 18px;
+          height: 18px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+          .modern-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+
+          .features-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .process-steps {
+            flex-direction: column;
+            gap: 1rem;
+          }
+
+          .step-arrow {
+            transform: rotate(90deg);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .modern-page-wrapper {
+            padding: 1rem;
+          }
+
+          .content-hero {
+            padding: 1.5rem 0;
+          }
+
+          .hero-title {
+            font-size: 1.625rem;
+          }
+
+          .card-content {
+            padding: 1.25rem;
+          }
+
+          .card-header {
+            padding: 1rem 1.25rem;
+          }
+
+          .feature-item {
+            flex-direction: column;
+            text-align: center;
+            padding: 1rem;
+          }
+
+          .step-item {
+            min-width: auto;
+            width: 100%;
+            padding: 1rem;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hero-title {
+            font-size: 1.5rem;
+          }
+
+          .hero-description {
+            font-size: 0.95rem;
+          }
+
+          .card-content {
+            padding: 1rem;
+          }
+
+          .card-header {
+            padding: 0.875rem 1rem;
+          }
+
+          .header-icon h2 {
+            font-size: 1rem;
+          }
+
+          .feature-item {
+            padding: 0.875rem;
+          }
+
+          .step-item {
+            padding: 0.875rem;
+          }
+        }
+      `}</style>
     </div>
   );
 }

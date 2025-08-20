@@ -5,6 +5,7 @@ import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
 import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
 import java from "react-syntax-highlighter/dist/esm/languages/hljs/java";
 import jsonLang from "react-syntax-highlighter/dist/esm/languages/hljs/json";
+import "@/css/modern-styles.css";
 
 // ── Base URLs ────────────────────────────────────────────────────────────────
 const RAW_GET_BASE  = import.meta.env.VITE_API_BASE      || "http://localhost:8088";
@@ -48,75 +49,130 @@ export default function EgovSupportViewTransformationDetail() {
   }, [detail]);
 
   return (
-    <div className="container">
-      <div className="c_wrap">
-        <div className="location">
-          <ul>
-            <li><Link to="/" className="home">Home</Link></li>
-            <li><Link to="/support">AI 변환기</Link></li>
-            <li>변환 이력 조회</li>
-          </ul>
-        </div>
+    <div className="modern-page-container">
+      <div className="modern-page-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb">
+          <div className="breadcrumb-container">
+            <Link to="/" className="breadcrumb-home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+              </svg>
+              Home
+            </Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <Link to="/support" className="breadcrumb-link">AI 변환기</Link>
+            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+            <span className="breadcrumb-current">작업 상세</span>
+          </div>
+        </nav>
 
-        <div className="layout">
+        <div className="modern-layout">
           <EgovLeftNavTransform />
-          <div className="contents SITE_GALLARY_VIEW" id="contents" style={{ width: "100%" }}>
-            <div className="top_tit"><h1 className="tit_1">AI 변환기</h1></div>
-            <h2 className="tit_2">작업 상세 (Job {detail?.jobId ?? location.state?.jobId})</h2>
+          
+          <main className="modern-content" id="contents">
+            {/* Hero Section */}
+            <section className="content-hero">
+              <div className="hero-content">
+                <div className="hero-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </div>
+                <h1 className="hero-title">작업 상세</h1>
+                <p className="hero-description">
+                  Job {detail?.jobId ?? location.state?.jobId} 변환 작업의 상세 정보와 결과를 확인할 수 있습니다.
+                </p>
+              </div>
+            </section>
 
-            {/* 탭 */}
-            <div style={{ display: "flex", gap: 6, borderBottom: "1px solid #eee", paddingBottom: 6, marginTop: 10 }}>
-              {["overview","controller","service","serviceimpl","vo","reports","reports_json"].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  disabled={!detail || !!err}
-                  style={{
-                    padding: "6px 10px",
-                    borderRadius: 8,
-                    border: "1px solid transparent",
-                    background: tab === t ? "#f5f7fb" : "transparent",
-                    cursor: !detail || !!err ? "not-allowed" : "pointer"
-                  }}
-                >
-                  {labelOf(t)}
-                </button>
-              ))}
-            </div>
+            {/* Main Content */}
+            <section className="content-section modern-card">
+              <div className="card-content">
+                {/* Tab Navigation */}
+                <div className="tab-navigation">
+                  {["overview","controller","service","serviceimpl","vo","reports","reports_json"].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setTab(t)}
+                      disabled={!detail || !!err}
+                      className={`tab-button ${tab === t ? "active" : ""} ${!detail || !!err ? "disabled" : ""}`}
+                    >
+                      <span className="tab-icon">
+                        {getTabIcon(t)}
+                      </span>
+                      {labelOf(t)}
+                    </button>
+                  ))}
+                </div>
 
-            {/* 내용 */}
-            <div style={{ minHeight: 420, overflow: "auto", marginTop: 8 }}>
-              {loading && <div style={{ padding: 12 }}>불러오는 중…</div>}
-              {err && <div style={{ padding: 12, color: "crimson" }}>에러: {err}</div>}
-              {!loading && !err && detail && (
-                <>
-                  {tab === "overview"     && <Overview data={detail} />}
-                  {tab === "controller"   && <PathList title="Controller 변환본" list={detail?.s3ConvControllerPath} detail={detail} />}
-                  {tab === "service"      && <PathList title="Service 변환본" list={detail?.s3ConvServicePath} detail={detail} />}
-                  {tab === "serviceimpl"  && <PathList title="ServiceImpl 변환본" list={detail?.s3ConvServiceimplPath} detail={detail} />}
-                  {tab === "vo"           && <PathList title="VO 변환본" list={detail?.s3ConvVoPath} detail={detail} />}
-
-                  {tab === "reports"      && (
-                    <div style={{ display: "grid", gap: 16 }}>
-                      <ReportGroup title="Controller 리포트" items={detail?.convControllerReport} />
-                      <ReportGroup title="Service 리포트" items={detail?.convServiceReport} />
-                      <ReportGroup title="ServiceImpl 리포트" items={detail?.convServiceimplReport} />
-                      <ReportGroup title="VO 리포트" items={detail?.convVoReport} />
+                {/* Tab Content */}
+                <div className="tab-content">
+                  {loading && (
+                    <div className="loading-state">
+                      <div className="loading-spinner"></div>
+                      <span>불러오는 중...</span>
                     </div>
                   )}
-
-                  {tab === "reports_json" && (
+                  
+                  {err && (
+                    <div className="error-state">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                      </svg>
+                      <span>에러: {err}</span>
+                    </div>
+                  )}
+                  
+                  {!loading && !err && detail && (
                     <>
-                      <h4 style={{ margin: "8px 0" }}>리포트 (원본 JSON)</h4>
-                      <SyntaxHighlighter language="json" style={github} wrapLongLines>
-                        {reportText}
-                      </SyntaxHighlighter>
+                      {tab === "overview" && <Overview data={detail} />}
+                      {tab === "controller" && <PathList title="Controller 변환본" list={detail?.s3ConvControllerPath} detail={detail} />}
+                      {tab === "service" && <PathList title="Service 변환본" list={detail?.s3ConvServicePath} detail={detail} />}
+                      {tab === "serviceimpl" && <PathList title="ServiceImpl 변환본" list={detail?.s3ConvServiceimplPath} detail={detail} />}
+                      {tab === "vo" && <PathList title="VO 변환본" list={detail?.s3ConvVoPath} detail={detail} />}
+
+                      {tab === "reports" && (
+                        <div className="reports-container">
+                          <ReportGroup title="Controller 리포트" items={detail?.convControllerReport} />
+                          <ReportGroup title="Service 리포트" items={detail?.convServiceReport} />
+                          <ReportGroup title="ServiceImpl 리포트" items={detail?.convServiceimplReport} />
+                          <ReportGroup title="VO 리포트" items={detail?.convVoReport} />
+                        </div>
+                      )}
+
+                      {tab === "reports_json" && (
+                        <div className="json-report-container">
+                          <div className="json-header">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                              <polyline points="14,2 14,8 20,8"></polyline>
+                              <line x1="16" y1="13" x2="8" y2="13"></line>
+                              <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                            <h4>리포트 (원본 JSON)</h4>
+                          </div>
+                          <div className="json-content">
+                            <SyntaxHighlighter language="json" style={github} wrapLongLines>
+                              {reportText}
+                            </SyntaxHighlighter>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
-                </>
-              )}
-            </div>
-          </div>
+                </div>
+              </div>
+            </section>
+          </main>
         </div>
       </div>
     </div>
@@ -124,6 +180,68 @@ export default function EgovSupportViewTransformationDetail() {
 }
 
 /* ───────────────────────── Helper Components ───────────────────────── */
+
+function getTabIcon(key) {
+  switch (key) {
+    case "overview":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 3h18v18H3zM9 9h6v6H9z"></path>
+        </svg>
+      );
+    case "controller":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <circle cx="12" cy="16" r="1"></circle>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      );
+    case "service":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v6m0 6v6"></path>
+          <path d="M1 12h6m6 0h6"></path>
+        </svg>
+      );
+    case "serviceimpl":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+        </svg>
+      );
+    case "vo":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        </svg>
+      );
+    case "reports":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14,2 14,8 20,8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      );
+    case "reports_json":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14,2 14,8 20,8"></polyline>
+          <path d="M10 12a2 2 0 0 0 2 2c1 0 2-1 2-2s-1-2-2-2-2 1-2 2z"></path>
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10"></circle>
+        </svg>
+      );
+  }
+}
 
 function labelOf(key) {
   switch (key) {
@@ -140,24 +258,78 @@ function labelOf(key) {
 
 function Overview({ data }) {
   const rows = [
-    ["Job ID", data.jobId],
-    ["User ID", data.userId],
-    ["입력 언어", data.inputLanguage ?? "-"],
-    ["원본 ZIP", data.s3OriginPath ?? "-"],
-    ["저장 시각", data.savedAt ?? "-"],
+    ["Job ID", data.jobId, "briefcase"],
+    ["User ID", data.userId, "user"],
+    ["입력 언어", data.inputLanguage ?? "-", "code"],
+    ["원본 ZIP", data.s3OriginPath ?? "-", "archive"],
+    ["저장 시각", data.savedAt ?? "-", "clock"],
   ];
+  
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <tbody>
-        {rows.map(([k, v]) => (
-          <tr key={k}>
-            <th style={overTh}>{k}</th>
-            <td style={overTd}>{String(v)}</td>
-          </tr>
+    <div className="overview-container">
+      <div className="overview-grid">
+        {rows.map(([label, value, iconType]) => (
+          <div key={label} className="overview-item">
+            <div className="overview-icon">
+              {getOverviewIcon(iconType)}
+            </div>
+            <div className="overview-content">
+              <div className="overview-label">{label}</div>
+              <div className="overview-value">{String(value)}</div>
+            </div>
+          </div>
         ))}
-      </tbody>
-    </table>
+      </div>
+    </div>
   );
+}
+
+function getOverviewIcon(type) {
+  switch (type) {
+    case "briefcase":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      );
+    case "user":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      );
+    case "code":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="16,18 22,12 16,6"></polyline>
+          <polyline points="8,6 2,12 8,18"></polyline>
+        </svg>
+      );
+    case "archive":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="21,8 21,21 3,21 3,8"></polyline>
+          <rect x="1" y="3" width="22" height="5"></rect>
+          <line x1="10" y1="12" x2="14" y2="12"></line>
+        </svg>
+      );
+    case "clock":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12,6 12,12 16,14"></polyline>
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10"></circle>
+        </svg>
+      );
+  }
 }
 
 /**
@@ -167,11 +339,27 @@ function Overview({ data }) {
  */
 function PathList({ title, list, detail }) {
   const arr = Array.isArray(list) ? list : [];
-  if (!arr.length) return <div style={{ padding: 8 }}>{title}가 없습니다.</div>;
+  if (!arr.length) {
+    return (
+      <div className="empty-path-list">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="M21 21l-4.35-4.35"></path>
+        </svg>
+        <span>{title}가 없습니다.</span>
+      </div>
+    );
+  }
+  
   return (
-    <div>
-      <h4 style={{ margin: "8px 0" }}>{title}</h4>
-      <div style={{ display: "grid", gap: 12 }}>
+    <div className="path-list-container">
+      <div className="path-list-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <h4>{title}</h4>
+      </div>
+      <div className="path-list-grid">
         {arr.map((s3Path, idx) => (
           <FileItem key={idx} s3Path={s3Path} detail={detail} />
         ))}
@@ -179,6 +367,7 @@ function PathList({ title, list, detail }) {
     </div>
   );
 }
+
 function FileItem({ s3Path, detail }) {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -227,28 +416,72 @@ function FileItem({ s3Path, detail }) {
   }, [s3Path]);
 
   return (
-    <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" }}>
-        <div style={{ fontWeight: 600, wordBreak: "break-all" }}>{fileName}</div>
-        <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={handlePreview} style={btnSm} disabled={loading}>
-              {loading ? "불러오는 중…" : preview != null ? "미리보기 닫기" : "미리보기"}
-            </button>
-            <button onClick={handleDownload} style={btnSm} disabled={loading}>
-              다운로드
-            </button>
+    <div className="file-item-card">
+      <div className="file-item-header">
+        <div className="file-info">
+          <div className="file-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14,2 14,8 20,8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <div className="file-name">{fileName}</div>
+        </div>
+        <div className="file-actions">
+          <button 
+            onClick={handlePreview} 
+            className="action-btn preview-btn" 
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="btn-spinner"></div>
+            ) : preview != null ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            )}
+            {loading ? "불러오는 중..." : preview != null ? "닫기" : "미리보기"}
+          </button>
+          <button 
+            onClick={handleDownload} 
+            className="action-btn download-btn" 
+            disabled={loading}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7,10 12,15 17,10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            다운로드
+          </button>
         </div>
       </div>
 
       {preview != null && (
-        <div style={{ marginTop: 10 }}>
-          <SyntaxHighlighter language={guessLang(fileName)} style={github} wrapLongLines showLineNumbers>
-            {preview}
-          </SyntaxHighlighter>
+        <div className="file-preview">
+          <div className="preview-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="16,18 22,12 16,6"></polyline>
+              <polyline points="8,6 2,12 8,18"></polyline>
+            </svg>
+            <span>코드 미리보기</span>
+          </div>
+          <div className="preview-content">
+            <SyntaxHighlighter language={guessLang(fileName)} style={github} wrapLongLines showLineNumbers>
+              {preview}
+            </SyntaxHighlighter>
+          </div>
         </div>
       )}
 
-      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, wordBreak: "break-all" }}>{s3Path}</div>
+      <div className="file-path">{s3Path}</div>
     </div>
   );
 }
@@ -258,56 +491,86 @@ function FileItem({ s3Path, detail }) {
  */
 function ReportGroup({ title, items }) {
   const arr = Array.isArray(items) ? items : [];
+  
   return (
-    <div>
-      <h4 style={{ margin: "8px 0" }}>{title}</h4>
-      {arr.length === 0 && <div style={{ padding: 8, color: "#666" }}>리포트가 없습니다.</div>}
-      <div style={{ display: "grid", gap: 10 }}>
-        {arr.map((obj, i) => {
-          const [name, content] = firstEntry(obj);
-          // content가 {변경 사항, 추가 사항, 요약} 또는 nested 구조일 수 있으므로 방어적으로 처리
-          const conv = content?.conversion ?? content;
-          const gen  = content?.generation;
-
-          return (
-            <div key={i} style={{ border: "1px solid #eee", borderRadius: 10, padding: 10 }}>
-              <div style={{ fontWeight: 700, marginBottom: 4 }}>{name}</div>
-
-              {conv && (
-                <div style={{ marginBottom: 8 }}>
-                  {"변경 사항" in conv && <Line label="변경 사항" value={conv["변경 사항"]} />}
-                  {"추가 사항" in conv && <Line label="추가 사항" value={conv["추가 사항"]} />}
-                  {"요약" in conv && <Line label="요약" value={conv["요약"]} />}
-                </div>
-              )}
-
-              {gen && (
-                <div>
-                  <div style={{ fontWeight: 600, marginTop: 6, marginBottom: 4 }}>생성</div>
-                  {"변경 사항" in gen && <Line label="변경 사항" value={gen["변경 사항"]} />}
-                  {"추가 사항" in gen && <Line label="추가 사항" value={gen["추가 사항"]} />}
-                  {"요약" in gen && <Line label="요약" value={gen["요약"]} />}
-                </div>
-              )}
-
-              {!conv && !gen && typeof content === "object" && (
-                <SyntaxHighlighter language="json" style={github} wrapLongLines>
-                  {JSON.stringify(content, null, 2)}
-                </SyntaxHighlighter>
-              )}
-            </div>
-          );
-        })}
+    <div className="report-group">
+      <div className="report-group-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14,2 14,8 20,8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <h4>{title}</h4>
       </div>
+      
+      {arr.length === 0 ? (
+        <div className="empty-report">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
+          <span>리포트가 없습니다.</span>
+        </div>
+      ) : (
+        <div className="report-items">
+          {arr.map((obj, i) => {
+            const [name, content] = firstEntry(obj);
+            // content가 {변경 사항, 추가 사항, 요약} 또는 nested 구조일 수 있으므로 방어적으로 처리
+            const conv = content?.conversion ?? content;
+            const gen  = content?.generation;
+
+            return (
+              <div key={i} className="report-item">
+                <div className="report-item-header">
+                  <div className="report-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="16,18 22,12 16,6"></polyline>
+                      <polyline points="8,6 2,12 8,18"></polyline>
+                    </svg>
+                  </div>
+                  <div className="report-name">{name}</div>
+                </div>
+
+                {conv && (
+                  <div className="report-section">
+                    <div className="section-title">변환</div>
+                    {"변경 사항" in conv && <Line label="변경 사항" value={conv["변경 사항"]} />}
+                    {"추가 사항" in conv && <Line label="추가 사항" value={conv["추가 사항"]} />}
+                    {"요약" in conv && <Line label="요약" value={conv["요약"]} />}
+                  </div>
+                )}
+
+                {gen && (
+                  <div className="report-section">
+                    <div className="section-title">생성</div>
+                    {"변경 사항" in gen && <Line label="변경 사항" value={gen["변경 사항"]} />}
+                    {"추가 사항" in gen && <Line label="추가 사항" value={gen["추가 사항"]} />}
+                    {"요약" in gen && <Line label="요약" value={gen["요약"]} />}
+                  </div>
+                )}
+
+                {!conv && !gen && typeof content === "object" && (
+                  <div className="report-json">
+                    <SyntaxHighlighter language="json" style={github} wrapLongLines>
+                      {JSON.stringify(content, null, 2)}
+                    </SyntaxHighlighter>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
 function Line({ label, value }) {
   return (
-    <div style={{ margin: "4px 0" }}>
-      <span style={{ fontWeight: 600 }}>{label}:</span>{" "}
-      <span style={{ whiteSpace: "pre-wrap" }}>{String(value)}</span>
+    <div className="report-line">
+      <span className="line-label">{label}:</span>
+      <span className="line-value">{String(value)}</span>
     </div>
   );
 }
