@@ -38,32 +38,35 @@ const formatKST = (isoLike) => {
 /** s3 경로 -> 파일명 */
 const basename = (path) => (path ? path.split("/").pop() : "-");
 
-/** convVoReport에서 evaluation.S들을 추출해 평균 정확도(0~1) 반환 */
+/** 4개 report 구조에서 evaluation.S들을 추출해 평균 정확도(0~1) 반환 */
 function getAccuracy(item) {
-  // 1) 상위에 직접 evaluation.S가 있을 수도 있음
-  const direct = item?.evaluation?.S;
-  if (typeof direct === "number" && isFinite(direct)) return direct;
-
-  // 2) convVoReport 배열 내부 탐색
-  const reports = item?.convVoReport;
-  if (!Array.isArray(reports)) return null;
-
-  const scores = [];
-  for (const entry of reports) {
-    if (entry && typeof entry === "object") {
-      // 각 엔트리는 {"ClassName": { evaluation: {...} }} 형태
-      const key = Object.keys(entry)[0];
-      const ev = key && entry[key]?.evaluation;
-      const s = ev?.S;
-      if (typeof s === "number" && isFinite(s)) scores.push(s);
+  const allScores = [];
+  
+  // 4개의 report 구조에서 evaluation.S 값을 추출
+  const reportTypes = ['convControllerReport', 'convServiceReport', 'convServiceimplReport', 'convVoReport'];
+  
+  for (const reportType of reportTypes) {
+    const reports = item?.[reportType];
+    if (!Array.isArray(reports)) continue;
+    
+    for (const entry of reports) {
+      if (entry && typeof entry === "object") {
+        const key = Object.keys(entry)[0];
+        const ev = key && entry[key]?.evaluation;
+        const s = ev?.S;
+        if (typeof s === "number" && isFinite(s)) {
+          allScores.push(s);
+        }
+      }
     }
   }
-  if (scores.length === 0) return null;
-  return scores.reduce((a, b) => a + b, 0) / scores.length;
+  
+  if (allScores.length === 0) return null;
+  return allScores.reduce((a, b) => a + b, 0) / allScores.length;
 }
 
 const formatPercent = (v) =>
-  typeof v === "number" && isFinite(v) ? `${Math.round(v * 100)}%` : "-";
+  typeof v === "number" && isFinite(v) ? `${(v * 100).toFixed(1)}%` : "-";
 
 /** 정확도 브레이크다운(툴팁용) */
 function getAccuracyBreakdown(item) {
@@ -399,7 +402,7 @@ export default function EgovSupportViewTransformation() {
                             scope="col"
                           >
                             <span className="header-content">
-                              <span className="header-label">정확도</span>
+                              <span className="header-label">변환율</span>
                               {sortKey === "accuracy" && (
                                 <svg className={`sort-icon ${sortDir === "asc" ? "asc" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                   <polyline points="6,9 12,15 18,9"></polyline>
