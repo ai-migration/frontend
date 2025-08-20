@@ -158,16 +158,21 @@ export default function EgovSupportViewTransformation() {
       })
       .sort((a, b) => {
         const dir = sortDir === "asc" ? 1 : -1;
+
         if (sortKey === "jobId") {
-          return (a.jobId - b.jobId) * dir;
+          const an = Number(a.jobId);
+          const bn = Number(b.jobId);
+          return ((isNaN(an) ? 0 : an) - (isNaN(bn) ? 0 : bn)) * dir;
         }
+
         if (sortKey === "accuracy") {
           const av = getAccuracy(a);
           const bv = getAccuracy(b);
-          const an = typeof av === "number" ? av : -1; // null은 맨뒤
+          const an = typeof av === "number" ? av : -1; // null은 끝으로
           const bn = typeof bv === "number" ? bv : -1;
           return (an - bn) * dir;
         }
+
         // savedAt 기본
         return (new Date(a.savedAt) - new Date(b.savedAt)) * dir;
       });
@@ -216,6 +221,10 @@ export default function EgovSupportViewTransformation() {
       setSortDir("desc");
     }
   };
+
+  // aria-sort 값
+  const ariaSort = (key) =>
+    sortKey === key ? (sortDir === "asc" ? "ascending" : "descending") : "none";
 
   return (
     <div className="modern-page-container">
@@ -331,38 +340,75 @@ export default function EgovSupportViewTransformation() {
                 <div className="modern-table-container">
                   <div className="table-wrapper">
                     <table className="modern-table">
+                      {/* ✅ 고정 폭 설정으로 겹침 방지 */}
+                      <colgroup>
+                        <col style={{ width: "72px" }} />   {/* 번호 */}
+                        <col style={{ width: "160px" }} />  {/* JobId */}
+                        <col />                              {/* 원본 파일 (가변) */}
+                        <col style={{ width: "200px" }} />  {/* 저장 일자 */}
+                        <col style={{ width: "180px" }} />  {/* 정확도 */}
+                        <col style={{ width: "120px" }} />  {/* 동작 */}
+                      </colgroup>
                       <thead>
                         <tr>
-                          <th className="table-header">번호</th>
-                          <th className="table-header sortable" onClick={() => toggleSort("jobId")}>
-                            <span>JobId</span>
-                            {sortKey === "jobId" && (
-                              <svg className={`sort-icon ${sortDir === "asc" ? "asc" : "desc"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="6,9 12,15 18,9"></polyline>
-                              </svg>
-                            )}
+                          <th className="table-header th-center">번호</th>
+
+                          <th
+                            className="table-header sortable"
+                            onClick={() => toggleSort("jobId")}
+                            aria-sort={ariaSort("jobId")}
+                            scope="col"
+                          >
+                            <span className="header-content">
+                              <span className="header-label">JobId</span>
+                              {sortKey === "jobId" && (
+                                <svg className={`sort-icon ${sortDir === "asc" ? "asc" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              )}
+                            </span>
                           </th>
-                          <th className="table-header">원본 파일</th>
-                          <th className="table-header sortable" onClick={() => toggleSort("savedAt")}>
-                            <span>저장 일자</span>
-                            {sortKey === "savedAt" && (
-                              <svg className={`sort-icon ${sortDir === "asc" ? "asc" : "desc"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="6,9 12,15 18,9"></polyline>
-                              </svg>
-                            )}
+
+                          <th className="table-header" scope="col">
+                            <span className="header-content">
+                              <span className="header-label">원본 파일</span>
+                            </span>
+                          </th>
+
+                          <th
+                            className="table-header sortable"
+                            onClick={() => toggleSort("savedAt")}
+                            aria-sort={ariaSort("savedAt")}
+                            scope="col"
+                          >
+                            <span className="header-content">
+                              <span className="header-label">저장 일자</span>
+                              {sortKey === "savedAt" && (
+                                <svg className={`sort-icon ${sortDir === "asc" ? "asc" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              )}
+                            </span>
                           </th>
 
                           {/* ✅ 추가: 정확도 */}
-                          <th className="table-header sortable" onClick={() => toggleSort("accuracy")}>
-                            <span>정확도</span>
-                            {sortKey === "accuracy" && (
-                              <svg className={`sort-icon ${sortDir === "asc" ? "asc" : "desc"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="6,9 12,15 18,9"></polyline>
-                              </svg>
-                            )}
+                          <th
+                            className="table-header sortable th-center"
+                            onClick={() => toggleSort("accuracy")}
+                            aria-sort={ariaSort("accuracy")}
+                            scope="col"
+                          >
+                            <span className="header-content">
+                              <span className="header-label">정확도</span>
+                              {sortKey === "accuracy" && (
+                                <svg className={`sort-icon ${sortDir === "asc" ? "asc" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                              )}
+                            </span>
                           </th>
 
-                          <th className="table-header">동작</th>
+                          <th className="table-header th-center" scope="col">동작</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -398,10 +444,11 @@ export default function EgovSupportViewTransformation() {
                             const breakdown = getAccuracyBreakdown(item);
                             return (
                               <tr key={item.jobId} className="table-row">
-                                <td className="table-cell">{(page - 1) * pageSize + idx + 1}</td>
+                                <td className="table-cell td-center">{(page - 1) * pageSize + idx + 1}</td>
+
                                 <td className="table-cell">
                                   <div className="job-id-cell">
-                                    <span className="job-id" title={String(item.jobId)}>{item.jobId}</span>
+                                    <span className="job-id job-id-ellipsis" title={String(item.jobId)}>{item.jobId}</span>
                                     <button
                                       className="copy-btn"
                                       onClick={() => copyJobId(item.jobId)}
@@ -414,6 +461,7 @@ export default function EgovSupportViewTransformation() {
                                     </button>
                                   </div>
                                 </td>
+
                                 <td className="table-cell">
                                   <div className="file-name" title={item.s3OriginPath}>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -423,9 +471,10 @@ export default function EgovSupportViewTransformation() {
                                       <line x1="16" y1="17" x2="8" y2="17"></line>
                                       <polyline points="10,9 9,9 8,9"></polyline>
                                     </svg>
-                                    <span>{basename(item.s3OriginPath)}</span>
+                                    <span className="file-ellipsis">{basename(item.s3OriginPath)}</span>
                                   </div>
                                 </td>
+
                                 <td className="table-cell">
                                   <div className="date-cell">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -434,12 +483,12 @@ export default function EgovSupportViewTransformation() {
                                       <line x1="8" y1="2" x2="8" y2="6"></line>
                                       <line x1="3" y1="10" x2="21" y2="10"></line>
                                     </svg>
-                                    <span>{formatKST(item.savedAt)}</span>
+                                    <span className="nowrap">{formatKST(item.savedAt)}</span>
                                   </div>
                                 </td>
 
                                 {/* ✅ 정확도 셀 */}
-                                <td className="table-cell">
+                                <td className="table-cell td-center">
                                   <div className="accuracy-cell" title={breakdown || ""}>
                                     <div className="accuracy-pill">{formatPercent(acc)}</div>
                                     <div className="accuracy-track" aria-label="accuracy">
@@ -451,7 +500,7 @@ export default function EgovSupportViewTransformation() {
                                   </div>
                                 </td>
 
-                                <td className="table-cell">
+                                <td className="table-cell td-center">
                                   <div className="action-cell">
                                     <Link
                                       to={{ pathname: URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL }}
@@ -492,8 +541,7 @@ export default function EgovSupportViewTransformation() {
       </div>
 
       <style>{`
-        /* 기존 스타일 ... (생략 없음, 그대로 유지) */
-
+        /* Modern Page Styles */
         .modern-page-container {
           min-height: 100vh;
           background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
@@ -508,7 +556,6 @@ export default function EgovSupportViewTransformation() {
 
         .modern-layout { display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: start; }
         .modern-content { display: flex; flex-direction: column; gap: 2rem; }
-
         .content-hero { text-align: center; padding: 3rem 0; }
         .hero-content { max-width: 600px; margin: 0 auto; }
         .hero-icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); border-radius: var(--border-radius-2xl); display: flex; align-items: center; justify-content: center; color: white; box-shadow: var(--shadow-xl); }
@@ -519,6 +566,7 @@ export default function EgovSupportViewTransformation() {
         .content-section { background: white; border-radius: var(--border-radius-2xl); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; }
         .card-content { padding: 2rem; }
 
+        /* Filter Controls */
         .filter-controls { display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; margin-bottom: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-xl); border: 1px solid var(--gray-200); }
         .search-input-group { position: relative; display: flex; align-items: center; }
         .search-icon { position: absolute; left: 1rem; width: 20px; height: 20px; color: var(--gray-400); z-index: 1; }
@@ -534,44 +582,75 @@ export default function EgovSupportViewTransformation() {
         .error-alert { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--border-radius-lg); color: #DC2626; margin-bottom: 1.5rem; }
         .error-alert svg { width: 20px; height: 20px; flex-shrink: 0; }
 
+        /* Modern Table */
         .modern-table-container { border-radius: var(--border-radius-xl); overflow: hidden; border: 1px solid var(--gray-200); }
         .table-wrapper { overflow-x: auto; }
-        .modern-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-        .table-header { background: linear-gradient(135deg, rgba(0, 0, 255, 0.05) 0%, rgba(255, 255, 255, 1) 100%); padding: 1rem 1.5rem; text-align: left; font-weight: 600; color: var(--gray-900); border-bottom: 1px solid var(--gray-200); position: relative; }
-        .table-header.sortable { cursor: pointer; user-select: none; transition: background 0.2s ease; display: flex; align-items: center; justify-content: space-between; }
+        .modern-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 0.95rem;
+          table-layout: fixed; /* ✅ 겹침 방지 */
+        }
+        th, td { vertical-align: middle; }
+
+        .table-header {
+          background: linear-gradient(135deg, rgba(0, 0, 255, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+          padding: 0.875rem 1rem;
+          font-weight: 600;
+          color: var(--gray-900);
+          border-bottom: 1px solid var(--gray-200);
+          white-space: nowrap;
+        }
+        .header-content { display: inline-flex; align-items: center; gap: 6px; }
+        .header-label { line-height: 1; }
+        .table-header.sortable { cursor: pointer; user-select: none; transition: background 0.2s ease; }
         .table-header.sortable:hover { background: rgba(0, 0, 255, 0.08); }
-        .sort-icon { width: 16px; height: 16px; color: var(--primary-blue); transition: transform 0.2s ease; }
+        .sort-icon { width: 14px; height: 14px; color: var(--primary-blue); transition: transform 0.2s ease; flex: 0 0 auto; }
         .sort-icon.asc { transform: rotate(180deg); }
-        .table-row { transition: all 0.2s ease; }
+
+        .table-row { transition: background 0.2s ease; }
         .table-row:hover { background: var(--light-blue); }
-        .table-cell { padding: 1rem 1.5rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
-        .job-id-cell { display: flex; align-items: center; gap: 0.75rem; }
+
+        .table-cell { padding: 0.875rem 1rem; border-bottom: 1px solid var(--gray-100); }
+        .th-center, .td-center { text-align: center; }
+        .nowrap { white-space: nowrap; }
+
+        /* Job ID Cell */
+        .job-id-cell { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
         .job-id { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 0.875rem; color: var(--primary-blue); font-weight: 600; }
-        .copy-btn { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--gray-300); border-radius: var(--border-radius-md); background: white; color: var(--gray-500); cursor: pointer; transition: all 0.2s ease; }
+        .job-id-ellipsis { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .copy-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--gray-300); border-radius: var(--border-radius-md); background: white; color: var(--gray-500); cursor: pointer; transition: all 0.2s ease; flex: 0 0 auto; }
         .copy-btn:hover { background: var(--gray-50); color: var(--primary-blue); border-color: var(--primary-blue); }
         .copy-btn svg { width: 14px; height: 14px; }
-        .file-name { display: flex; align-items: center; gap: 0.75rem; }
-        .file-name svg { width: 20px; height: 20px; color: var(--gray-400); flex-shrink: 0; }
-        .file-name span { font-weight: 500; color: var(--gray-700); }
-        .date-cell { display: flex; align-items: center; gap: 0.75rem; }
-        .date-cell svg { width: 18px; height: 18px; color: var(--gray-400); flex-shrink: 0; }
+
+        /* File Name Cell */
+        .file-name { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+        .file-name svg { width: 18px; height: 18px; color: var(--gray-400); flex: 0 0 auto; }
+        .file-ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Date Cell */
+        .date-cell { display: inline-flex; align-items: center; gap: 0.5rem; }
+        .date-cell svg { width: 18px; height: 18px; color: var(--gray-400); flex: 0 0 auto; }
         .date-cell span { color: var(--gray-600); font-size: 0.875rem; }
 
-        /* ✅ 정확도 UI */
-        .accuracy-cell { display: flex; flex-direction: column; gap: 0.5rem; min-width: 140px; }
-        .accuracy-pill { display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem 0.5rem; font-weight: 600; border-radius: 999px; border: 1px solid var(--gray-200); background: #fff; width: max-content; }
+        /* Accuracy */
+        .accuracy-cell { display: flex; flex-direction: column; gap: 0.5rem; }
+        .accuracy-pill { display: inline-flex; align-items: center; justify-content: center; padding: 0.2rem 0.5rem; font-weight: 700; border-radius: 999px; border: 1px solid var(--gray-200); background: #fff; width: max-content; }
         .accuracy-track { position: relative; width: 100%; height: 8px; background: var(--gray-100); border-radius: 999px; overflow: hidden; }
         .accuracy-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue)); transition: width 300ms ease; }
 
+        /* Action */
         .action-cell { display: flex; justify-content: center; }
-        .detail-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: all 0.2s ease; }
+        .detail-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--primary-blue); color: white; text-decoration: none; border-radius: var(--border-radius-md); font-weight: 500; transition: all 0.2s ease; }
         .detail-btn:hover { background: var(--dark-blue); transform: translateY(-1px); box-shadow: var(--shadow-md); }
         .detail-btn svg { width: 16px; height: 16px; }
 
-        .skeleton-row td { padding: 1rem 1.5rem; }
+        /* Skeleton */
+        .skeleton-row td { padding: 0.875rem 1rem; }
         .skeleton-item { height: 20px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; border-radius: 4px; animation: loading 1.5s infinite; }
         @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+        /* Empty */
         .empty-state { padding: 3rem 1.5rem; text-align: center; }
         .empty-content { display: flex; flex-direction: column; align-items: center; gap: 1rem; color: var(--gray-500); }
         .empty-content svg { width: 48px; height: 48px; color: var(--gray-300); }
@@ -580,6 +659,7 @@ export default function EgovSupportViewTransformation() {
 
         .pagination-container { display: flex; justify-content: center; padding-top: 2rem; border-top: 1px solid var(--gray-200); margin-top: 2rem; }
 
+        /* Responsive */
         @media (max-width: 1024px) {
           .modern-layout { grid-template-columns: 1fr; gap: 1.5rem; }
           .filter-controls { grid-template-columns: 1fr; gap: 1rem; }
@@ -590,7 +670,7 @@ export default function EgovSupportViewTransformation() {
           .hero-title { font-size: 2rem; }
           .card-content { padding: 1.5rem; }
           .filter-controls { padding: 1rem; }
-          .table-cell { padding: 0.75rem 1rem; }
+          .table-cell { padding: 0.75rem 0.875rem; }
         }
         @media (max-width: 640px) {
           .hero-title { font-size: 1.75rem; }
