@@ -240,7 +240,7 @@ function EgovSupportIntro() {
       </div>
 
       <style>{`
-        /* Modern Page Styles - Matching EgovAboutSite */
+        /* Modern Page Styles - Fixed Layout */
         .modern-page-container {
           min-height: 100vh;
           background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
@@ -271,7 +271,7 @@ function EgovSupportIntro() {
           color: var(--gray-600);
           text-decoration: none;
           padding: 0.5rem 0.75rem;
-          border-radius: var(--border-radius-md);
+          border-radius: 6px;
           transition: all 0.2s ease;
         }
 
@@ -353,9 +353,9 @@ function EgovSupportIntro() {
 
         .content-section {
           background: white;
-          border-radius: var(--border-radius-xl);
+          border-radius: 12px;
           border: 1px solid var(--gray-200);
-          box-shadow: var(--shadow-sm);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           overflow: hidden;
         }
 
@@ -413,7 +413,7 @@ function EgovSupportIntro() {
 
         .feature-item:hover {
           background: white;
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           transform: translateY(-2px);
         }
 
@@ -469,7 +469,7 @@ function EgovSupportIntro() {
 
         .step-item:hover {
           background: white;
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           transform: translateY(-2px);
         }
 
@@ -522,7 +522,7 @@ function EgovSupportIntro() {
 
         .resource-item:hover {
           background: white;
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           transform: translateY(-2px);
         }
 
