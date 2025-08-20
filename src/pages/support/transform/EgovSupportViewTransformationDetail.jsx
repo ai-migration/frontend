@@ -65,19 +65,13 @@ export default function EgovSupportViewTransformationDetail() {
             <h2 className="tit_2">작업 상세 (Job {detail?.jobId ?? location.state?.jobId})</h2>
 
             {/* 탭 */}
-            <div style={{ display: "flex", gap: 6, borderBottom: "1px solid #eee", paddingBottom: 6, marginTop: 10 }}>
+            <div className="tab-container">
               {["overview","controller","service","serviceimpl","vo","reports","reports_json"].map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
                   disabled={!detail || !!err}
-                  style={{
-                    padding: "6px 10px",
-                    borderRadius: 8,
-                    border: "1px solid transparent",
-                    background: tab === t ? "#f5f7fb" : "transparent",
-                    cursor: !detail || !!err ? "not-allowed" : "pointer"
-                  }}
+                  className={`tab-button ${tab === t ? "active" : ""}`}
                 >
                   {labelOf(t)}
                 </button>
@@ -85,9 +79,9 @@ export default function EgovSupportViewTransformationDetail() {
             </div>
 
             {/* 내용 */}
-            <div style={{ minHeight: 420, overflow: "auto", marginTop: 8 }}>
-              {loading && <div style={{ padding: 12 }}>불러오는 중…</div>}
-              {err && <div style={{ padding: 12, color: "crimson" }}>에러: {err}</div>}
+            <div className="tab-content">
+              {loading && <div className="loading-message">불러오는 중…</div>}
+              {err && <div className="error-message">에러: {err}</div>}
               {!loading && !err && detail && (
                 <>
                   {tab === "overview"     && <Overview data={detail} />}
@@ -97,7 +91,7 @@ export default function EgovSupportViewTransformationDetail() {
                   {tab === "vo"           && <PathList title="VO 변환본" list={detail?.s3ConvVoPath} detail={detail} />}
 
                   {tab === "reports"      && (
-                    <div style={{ display: "grid", gap: 16 }}>
+                    <div className="reports-grid">
                       <ReportGroup title="Controller 리포트" items={detail?.convControllerReport} />
                       <ReportGroup title="Service 리포트" items={detail?.convServiceReport} />
                       <ReportGroup title="ServiceImpl 리포트" items={detail?.convServiceimplReport} />
@@ -106,12 +100,12 @@ export default function EgovSupportViewTransformationDetail() {
                   )}
 
                   {tab === "reports_json" && (
-                    <>
-                      <h4 style={{ margin: "8px 0" }}>리포트 (원본 JSON)</h4>
+                    <div className="json-report">
+                      <h4 className="section-title">리포트 (원본 JSON)</h4>
                       <SyntaxHighlighter language="json" style={github} wrapLongLines>
                         {reportText}
                       </SyntaxHighlighter>
-                    </>
+                    </div>
                   )}
                 </>
               )}
@@ -147,16 +141,18 @@ function Overview({ data }) {
     ["저장 시각", data.savedAt ?? "-"],
   ];
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <tbody>
-        {rows.map(([k, v]) => (
-          <tr key={k}>
-            <th style={overTh}>{k}</th>
-            <td style={overTd}>{String(v)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="overview-table">
+      <table>
+        <tbody>
+          {rows.map(([k, v]) => (
+            <tr key={k}>
+              <th>{k}</th>
+              <td>{String(v)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -167,11 +163,11 @@ function Overview({ data }) {
  */
 function PathList({ title, list, detail }) {
   const arr = Array.isArray(list) ? list : [];
-  if (!arr.length) return <div style={{ padding: 8 }}>{title}가 없습니다.</div>;
+  if (!arr.length) return <div className="empty-message">{title}가 없습니다.</div>;
   return (
-    <div>
-      <h4 style={{ margin: "8px 0" }}>{title}</h4>
-      <div style={{ display: "grid", gap: 12 }}>
+    <div className="path-list">
+      <h4 className="section-title">{title}</h4>
+      <div className="file-grid">
         {arr.map((s3Path, idx) => (
           <FileItem key={idx} s3Path={s3Path} detail={detail} />
         ))}
@@ -227,28 +223,36 @@ function FileItem({ s3Path, detail }) {
   }, [s3Path]);
 
   return (
-    <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" }}>
-        <div style={{ fontWeight: 600, wordBreak: "break-all" }}>{fileName}</div>
-        <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={handlePreview} style={btnSm} disabled={loading}>
+    <div className="file-item">
+      <div className="file-header">
+        <div className="file-name">{fileName}</div>
+        <div className="file-actions">
+            <button 
+              onClick={handlePreview} 
+              className="btn btn-outline" 
+              disabled={loading}
+            >
               {loading ? "불러오는 중…" : preview != null ? "미리보기 닫기" : "미리보기"}
             </button>
-            <button onClick={handleDownload} style={btnSm} disabled={loading}>
+            <button 
+              onClick={handleDownload} 
+              className="btn btn-primary" 
+              disabled={loading}
+            >
               다운로드
             </button>
         </div>
       </div>
 
       {preview != null && (
-        <div style={{ marginTop: 10 }}>
+        <div className="file-preview">
           <SyntaxHighlighter language={guessLang(fileName)} style={github} wrapLongLines showLineNumbers>
             {preview}
           </SyntaxHighlighter>
         </div>
       )}
 
-      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, wordBreak: "break-all" }}>{s3Path}</div>
+      <div className="file-path">{s3Path}</div>
     </div>
   );
 }
@@ -259,10 +263,10 @@ function FileItem({ s3Path, detail }) {
 function ReportGroup({ title, items }) {
   const arr = Array.isArray(items) ? items : [];
   return (
-    <div>
-      <h4 style={{ margin: "8px 0" }}>{title}</h4>
-      {arr.length === 0 && <div style={{ padding: 8, color: "#666" }}>리포트가 없습니다.</div>}
-      <div style={{ display: "grid", gap: 10 }}>
+    <div className="report-group">
+      <h4 className="section-title">{title}</h4>
+      {arr.length === 0 && <div className="empty-message">리포트가 없습니다.</div>}
+      <div className="report-grid">
         {arr.map((obj, i) => {
           const [name, content] = firstEntry(obj);
           // content가 {변경 사항, 추가 사항, 요약} 또는 nested 구조일 수 있으므로 방어적으로 처리
@@ -270,8 +274,8 @@ function ReportGroup({ title, items }) {
           const gen  = content?.generation;
 
           return (
-            <div key={i} style={{ border: "1px solid #eee", borderRadius: 10, padding: 10 }}>
-              <div style={{ fontWeight: 700, marginBottom: 4 }}>{name}</div>
+            <div key={i} className="report-item">
+              <div className="report-title">{name}</div>
 
               {conv && (
                 <div style={{ marginBottom: 8 }}>
@@ -341,19 +345,3 @@ function detectGroupByPath(p) {
 }
 
 /* ───────────────────────── Styles ───────────────────────── */
-const btnSm = {
-  padding: "6px 10px",
-  borderRadius: 8,
-  border: "1px solid #ddd",
-  background: "#f6f8fa",
-  cursor: "pointer",
-};
-const btnSmOutline = {
-  padding: "6px 10px",
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
-  background: "transparent",
-  cursor: "pointer",
-};
-const overTh = { textAlign: "left", width: 160, background: "#f7f7f9", padding: 8, border: "1px solid #eee" };
-const overTd = { padding: 8, border: "1px solid #eee" };
