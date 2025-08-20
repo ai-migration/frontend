@@ -36,6 +36,8 @@ export default function EgovHeader() {
   const [scrolled, setScrolled] = useState2(false);
   const [scrollPct, setScrollPct] = useState2(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState2(false);
+  const [mousePos, setMousePos] = useState2({ x: 0, y: 0 });
+  const [isLoaded, setIsLoaded] = useState2(false);
 
   // === Chat (전역 FAB + 드로어) ===
   const [isChatOpen, setIsChatOpen] = useState2(false);
