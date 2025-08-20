@@ -258,31 +258,31 @@ function EgovFooter() {
         .banner-link {
           display: block;
           padding: 0.75rem;
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
           transition: all 0.3s ease;
-          backdrop-filter: blur(10px);
+          backdrop-filter: blur(5px);
         }
 
         .banner-link:hover {
-          background: rgba(255, 255, 255, 0.15);
-          border-color: rgba(96, 165, 250, 0.5);
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(96, 165, 250, 0.3);
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .banner-desktop {
           display: block;
           height: 40px;
           width: auto;
-          filter: brightness(0) invert(1);
-          opacity: 0.9;
-          transition: opacity 0.3s ease;
+          filter: brightness(1.2) contrast(0.8) hue-rotate(200deg) saturate(0.7);
+          transition: all 0.3s ease;
         }
 
         .banner-link:hover .banner-desktop {
-          opacity: 1;
+          filter: brightness(1.4) contrast(0.9) hue-rotate(200deg) saturate(0.8);
+          transform: scale(1.05);
         }
 
         .banner-mobile {
@@ -347,9 +347,8 @@ function EgovFooter() {
           .banner-mobile {
             height: 35px;
             width: auto;
-            filter: brightness(0) invert(1);
-            opacity: 0.9;
-            transition: opacity 0.3s ease;
+            filter: brightness(1.2) contrast(0.8) hue-rotate(200deg) saturate(0.7);
+            transition: all 0.3s ease;
           }
 
           .contact-info {
