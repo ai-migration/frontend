@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import jsLang from "react-syntax-highlighter/dist/esm/languages/hljs/javascript";
+
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import EgovLeftNavSecurity from "@/components/leftmenu/EgovLeftNavSecurity";
+import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
+import mdLang from "react-syntax-highlighter/dist/esm/languages/hljs/markdown";
 import EgovPaging from "@/components/EgovPaging";
 import { getSessionItem } from "@/utils/storage";
 import "@/css/modern-styles.css";
@@ -16,6 +23,105 @@ const RAW_POST_BASE =
   import.meta.env.VITE_API_POST_BASE || import.meta.env.VITE_API_BASE || "http://localhost:8088";
 const GET_BASE = (RAW_GET_BASE || "").replace(/\/+$/, "");
 const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
+
+SyntaxHighlighter.registerLanguage("javascript", jsLang);
+SyntaxHighlighter.registerLanguage("markdown", mdLang);
+
+const preview = 
+`
+# Servlet
+
+> **Servlet 이란**
+>
+> 클라이언트의 요청을 처리하고, 그 결과를 반환하는 
+> Servlet 클래스의 구현 규칙을 지킨 자바 웹 프로그래밍 기술
+
+자바를 사용하여 웹을 만들기 위해 필요한 기술. 클라이언트가 어떠한 요청을 하면 그에 대한 결과를 다시 전송하기 위한 프로그램. 자바로 구현된 CGI .
+
+> **CGI(Common Gateway Interface)란?**
+>
+> 웹 서버와 프로그램간의 교환방식. (특별한 라이브러리나 도구를 의미하는 것 X)
+> 어떠한 프로그래밍언어로도 구현이가능.
+> 클라이언트의 HTTP요청에 대해 특정 기능을 수행하고, HTML 문서등 프로그램의 표준 출력 결과를 클라이언트에게 전송하는 것입니다.
+> 즉, 자바 어플리케이션 코딩을 하듯 웹 브라우저용 출력 화면을 만드는 방법입니다.
+
+##  Servlet Container 역할
+
+> **Servlet Container**
+>
+> Servlet을 관리해주는 Container.
+>
+> 서버에 Servlet을 만들었다고 해서 스스로 작동하는 것이 아님. Servlet의 동작을 관리해주는 역할을 하는 것이 바로 Servlet Container. Servlet Container는 클라이언트의 요청(Request)을 받아주고 응답(Response)할 수 있게, 웹서버와 소켓으로 통신. 
+>
+> ex) 톰캣(Tomcat)
+>
+> 톰캣은 실제로 웹 서버와 통신하여 JSP와 Servlet이 작동하는 환경을 제공해줍니다.
+
+### 웹 서버와의 통신 지원
+
+일반적인 통신은 소켓을 만들고, 특정 port를 Listening 하고, 연결 요청이 들어오면 스트림을 생성해서 요청을 받는다. Servlet Container는 이런 통신 과정을 API 로 제공하고 있기 때문에 우리가 쉽게 사용할 수 있다.
+
+### 생명주기(Life Cycle) 관리
+Servlet Container가 기동 시 Servlet Class를 로딩해서 인스턴스화하고, 초기화 메서드를 호출.
+요청이 들어오면 적절한 Servlet 메소드를 찾아서 호출한다. 
+만약 서블릿의 생명이 다하는 순간 가비지 컬렉션을 진행한다.
+
+### 멀티스레드 지원 및 관리
+Servlet Container는 해당 Servlet의 요청이 들어오면 스레드를 생성해서 작업을 수행한다. 즉 동시의 여러 요청이 들어온다면 멀티스레딩 환경으로 동시다발적인 작업을 관리한다.
+
+### 선언적 보안관리
+Servlet Container는 보안 관련된 기능을 지원한다. 따라서 서블릿 코드 안에 보안 관련된 메소드를 구현하지 않아도 된다.
+
+
+
+## Servlet 동작 방식
+
+1. client가 URL을 입력하면 HTTP Request가 Servlet Container로 전송합니다.![img](https://miro.medium.com/max/711/1*p3bdLuk7wjHFS0n8YJXQ_A.png)
+
+   
+
+2. 요청을 전송받은 Servlet Container는 HttpServletRequest, HttpServletResponse 객체를 생성합니다.
+   ![img](https://miro.medium.com/max/821/1*Q4tv8s-_NYuHuE3tYbWcfg.png)
+
+3. web.xml을 기반으로 사용자가 요청한 URL이 어느 Servlet에 대한 요청인지 찾습니다.
+
+4. 해당 Servlet에서 service메소드를 호출한 후 클리아언트의 HTTP 프로토콜에 따라 해당 메소를 호출합니다.
+   ![img](https://miro.medium.com/max/761/1*RoDdyWhZxiZ5ODWoK9XnGw.png)
+
+5. 해당 메소드는 동적 페이지를 생성한 후 HttpServletResponse객체에 응답을 보냅니다.
+
+6. 응답이 끝나면 HttpServletRequest, HttpServletResponse 두 객체를 소멸시킵니다.
+
+
+
+기존 
+
+1. 기존 방식
+	1) Servlet Container가 먼저 뜨고
+	2) ServletContainer 안에 등록되는 Servlet Application에다가 Spring을 연동하는 방식이다.
+		ContextLoaderListener 등록 OR DispatcherServlet 등록
+2. boot 방식
+  1) Spring Boot Application 이 Java Application으로 먼저 뜨고, 
+  2) 그 안에 tomcat이 내장 서버로 뜬다. 
+  3) Servlet(ex, DispatcherServlet)을 내장 톰켓 안에다가 코드로 등록한다.
+
+
+
+출처
+
+------
+
+https://mangkyu.tistory.com/14 [MangKyu's Diary]
+
+https://jsonsang2.tistory.com/52 [리루]
+
+https://codeburst.io/understanding-java-servlet-architecture-b74f5ea64bf4
+
+https://jusungpark.tistory.com/15 [정리정리정리]
+`
+
+
+
 
 /**
  * 유틸: 안전한 날짜 포맷 (UTC 문자열 -> 로컬 시간)
@@ -51,7 +157,7 @@ const basename = (path) => (path ? path.split("/").pop() : "-");
  * - 다운로드 / 상세 / JobId 복사 액션
  * - 로딩 스켈레톤, 에러 배너, 빈 상태 UI
  */
-export default function EgovSecurityDetect() {
+export default function EgovSecurityDetectDetail() {
   const [all, setAll] = useState([]); // 원본
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -218,9 +324,9 @@ export default function EgovSecurityDetect() {
                     <polyline points="10,9 9,9 8,9"></polyline>
                   </svg>
                 </div>
-                <h1 className="hero-title">보안 취약점탐지</h1>
+                <h1 className="hero-title">취약점 상세보기</h1>
                 <p className="hero-description">
-                  AI가 자동으로 <strong>보안 취약점</strong>을 분석합니다.
+                  AI가 분석한 <strong>보안 취약점</strong>을 확인할 수 있습니다.
                 </p>
               </div>
             </section>
@@ -228,55 +334,6 @@ export default function EgovSecurityDetect() {
             {/* Data Section */}
             <section className="content-section modern-card">
               <div className="card-content">
-                {/* Filter Controls */}
-                <div className="filter-controls">
-                  <div className="search-input-group">
-                    <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
-                    <input
-                      type="text"
-                      placeholder="JobId 또는 파일명으로 검색..."
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="search-input"
-                    />
-                  </div>
-                  <div className="filter-group">
-                    <input
-                      type="date"
-                      value={fromDate}
-                      onChange={(e) => setFromDate(e.target.value)}
-                      className="date-input"
-                      placeholder="시작일"
-                    />
-                    <input
-                      type="date"
-                      value={toDate}
-                      onChange={(e) => setToDate(e.target.value)}
-                      className="date-input"
-                      placeholder="종료일"
-                    />
-                    <select
-                      value={pageSize}
-                      onChange={(e) => setPageSize(Number(e.target.value))}
-                      className="select-input"
-                    >
-                      <option value={10}>10개씩 보기</option>
-                      <option value={20}>20개씩 보기</option>
-                      <option value={50}>50개씩 보기</option>
-                    </select>
-                    <button className="refresh-btn" onClick={() => fetchList()}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="23,4 23,10 17,10"></polyline>
-                        <polyline points="1,20 1,14 7,14"></polyline>
-                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
-                      </svg>
-                      새로고침
-                    </button>
-                  </div>
-                </div>
 
                 {error && (
                   <div className="error-alert">
@@ -290,133 +347,88 @@ export default function EgovSecurityDetect() {
                 )}
 
                 {/* Data Table */}
-                <div className="modern-table-container">
-                  <div className="table-wrapper">
-                    <table className="modern-table">
-                      <thead>
-                        <tr>
-                          <th className="table-header">번호</th>
-                          <th className="table-header sortable" onClick={() => toggleSort("jobId")}>
-                            <span>JobId</span>
-                            {sortKey === "jobId" && (
-                              <svg className={`sort-icon ${sortDir === "asc" ? "asc" : "desc"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="6,9 12,15 18,9"></polyline>
-                              </svg>
-                            )}
-                          </th>
-                          <th className="table-header">점검 파일</th>
-                          <th className="table-header sortable" onClick={() => toggleSort("savedAt")}>
-                            <span>저장 일자</span>
-                            {sortKey === "savedAt" && (
-                              <svg className={`sort-icon ${sortDir === "asc" ? "asc" : "desc"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="6,9 12,15 18,9"></polyline>
-                              </svg>
-                            )}
-                          </th>
-                          <th className="table-header">동작</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {/* Loading State */}
-                        {loading ? (
-                          Array.from({ length: pageSize }).map((_, i) => (
-                            <tr key={i} className="skeleton-row">
-                              <td><div className="skeleton-item"></div></td>
-                              <td><div className="skeleton-item"></div></td>
-                              <td><div className="skeleton-item"></div></td>
-                              <td><div className="skeleton-item"></div></td>
-                              <td><div className="skeleton-item"></div></td>
-                            </tr>
-                          ))
-                        ) : pageItems.length === 0 ? (
-                          <tr>
-                            <td colSpan="5" className="empty-state">
-                              <div className="empty-content">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <circle cx="11" cy="11" r="8"></circle>
-                                  <path d="M21 21l-4.35-4.35"></path>
-                                </svg>
-                                <p>검색된 결과가 없습니다.</p>
-                                <span>다른 검색 조건을 시도해보세요.</span>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          /* Data Rows */
-                          pageItems.map((item, idx) => (
-                            <tr key={item.jobId} className="table-row">
-                              <td className="table-cell">{(page - 1) * pageSize + idx + 1}</td>
-                              <td className="table-cell">
-                                <div className="job-id-cell">
-                                  <span className="job-id" title={String(item.jobId)}>{item.jobId}</span>
-                                  <button 
-                                    className="copy-btn" 
-                                    onClick={() => copyJobId(item.jobId)} 
-                                    title="JobId 복사"
-                                  >
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                    </svg>
-                                  </button>
-                                </div>
-                              </td>
-                              <td className="table-cell">
-                                <div className="file-name" title={item.s3OriginPath}>
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14,2 14,8 20,8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10,9 9,9 8,9"></polyline>
-                                  </svg>
-                                  <span>{basename(item.s3OriginPath)}</span>
-                                </div>
-                              </td>
-                              <td className="table-cell">
-                                <div className="date-cell">
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                  </svg>
-                                  <span>{formatKST(item.savedAt)}</span>
-                                </div>
-                              </td>
-                              <td className="table-cell">
-                                <div className="action-cell">
-                                  <Link
-                                    to={{ pathname: URL.SUPPORT_SECURITY_DETECT_DETAIL }}
-                                    state={{ jobId: item.jobId }}
-                                    className="detail-btn"
-                                    title="상세 보기"
-                                  >
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                      <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                    상세 보기
-                                  </Link>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                <div className="table-wrapper two-pane">
+                  <section className="content-section modern-card">
+                    {/* 좌측: Markdown 미리보기 (4) */}
+                    <div className="pane-md markdown-body">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          code({ inline, className, children }) {
+                            const m = /language-(\w+)/.exec(className || "");
+                            return !inline && m ? (
+                              <SyntaxHighlighter
+                                style={github}
+                                language={m[1]}
+                                PreTag="div"
+                                {...props}   // ❌ 빼기
+                              >
+                                {String(children).replace(/\n$/, "")}
+                              </SyntaxHighlighter>
+                            ) : (
+                              <code className={className}>{children}</code>
+                            );
+                          },
+                        }}
+                      >
+                        {preview}
+                      </ReactMarkdown>
+                    </div>
+                  </section>
 
-                {/* Pagination */}
-                <div className="pagination-container">
-                  <EgovPaging
-                    pagination={paginationInfo}
-                    moveToPage={(pageNum) => {
-                      setPage(pageNum);
-                    }}
-                  />
+
+                  <table className="modern-table">
+                    <thead>
+                      <tr>
+                        <th className="table-header">파일</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Loading State */}
+                      {loading ? (
+                        Array.from({ length: pageSize }).map((_, i) => (
+                          <tr key={i} className="skeleton-row">
+                            <td><div className="skeleton-item"></div></td>
+                            <td><div className="skeleton-item"></div></td>
+                            <td><div className="skeleton-item"></div></td>
+                            <td><div className="skeleton-item"></div></td>
+                            <td><div className="skeleton-item"></div></td>
+                          </tr>
+                        ))
+                      ) : pageItems.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="empty-state">
+                            <div className="empty-content">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="M21 21l-4.35-4.35"></path>
+                              </svg>
+                              <p>검색된 결과가 없습니다.</p>
+                              <span>다른 검색 조건을 시도해보세요.</span>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        /* Data Rows */
+                        pageItems.map((item, idx) => (
+                          <tr key={item.jobId} className="table-row">
+                            <td className="table-cell">{(page - 1) * pageSize + idx + 1}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
+              </div>
+
+              {/* Pagination */}
+              <div className="pagination-container">
+                <EgovPaging
+                  pagination={paginationInfo}
+                  moveToPage={(pageNum) => {
+                    setPage(pageNum);
+                  }}
+                />
               </div>
             </section>
           </main>
@@ -424,6 +436,62 @@ export default function EgovSecurityDetect() {
       </div>
 
       <style>{`
+
+        /* 부모 컨테이너: 가로 배치 */
+        .two-pane {
+          display: flex;
+          gap: 16px;
+          align-items: flex-start; /* 위쪽 정렬 */
+        }
+
+        /* 좌측: 넓게 (예: 4) */
+        .two-pane .pane-md {
+          flex: 4 1 0;
+          min-width: 0; /* 긴 텍스트 잘림 방지 */
+        }
+
+        /* 우측: 좁게 (예: 1) */
+        .two-pane .pane-table {
+          flex: 1 1 0;
+          min-width: 280px; /* 최소 폭 보장 */
+          overflow-x: auto; /* 테이블이 넘칠 때 스크롤 */
+        }
+
+        /* 반응형: 화면 좁아지면 세로 배치 */
+        @media (max-width: 1024px) {
+          .two-pane {
+            flex-direction: column;
+          }
+        }
+          
+        .markdown-body {
+          padding:0.5em;
+        }
+
+        .markdown-body p {
+          margin: 0.5em 0;
+          line-height: 1.6;
+        }
+
+        .markdown-body h1,
+        .markdown-body h2,
+        .markdown-body h3 {
+          margin: 1.2em 0 0.6em;
+          font-weight: bold;
+        }
+
+        .markdown-body ul,
+        .markdown-body ol {
+          margin: 0.8em 0;
+          padding-left: 1.5em;
+        }
+
+        .markdown-body code {
+          background: #f5f5f5;
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+
         /* Modern Page Styles */
         .modern-page-container {
           min-height: 100vh;
@@ -544,7 +612,7 @@ export default function EgovSecurityDetect() {
         }
 
         .card-content {
-          padding: 2rem;
+          padding: 0rem;
         }
 
         /* Filter Controls */

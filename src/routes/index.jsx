@@ -47,6 +47,7 @@ import EgovSupportViewTest from "@/pages/support/transform/EgovSupportViewTest";
 import EgovSupportDownload from "@/pages/support/transform/EgovSupportDownload";
 import EgovSecurityIntro from "@/pages/support/security/EgovSecurityIntro";
 import EgovSecurityDetect from "@/pages/support/security/EgovSecurityDetect";
+import EgovSecurityDetectDetail from "@/pages/support/security/EgovSecurityDetectDetail";
 import EgovSecurityCheck from "@/pages/support/security/EgovSecurityCheck";
 import EgovSecurityScan from "@/pages/support/security/EgovSecurityScan";
 import EgovSecurityDownload from "@/pages/support/security/EgovSecurityDownload";
@@ -350,6 +351,7 @@ const SecondRoutes = () => {
 
         <Route path={URL.SUPPORT_SECURITY_INTRO} element={<EgovSecurityIntro />} />
         <Route path={URL.SUPPORT_SECURITY_DETECT} element={<EgovSecurityDetect />} />
+        <Route path={URL.SUPPORT_SECURITY_DETECT_DETAIL} element={<EgovSecurityDetectDetail />} />
         <Route path={URL.SUPPORT_SECURITY_CHECK} element={<EgovSecurityCheck />} />
         <Route path={URL.SUPPORT_SECURITY_SCAN} element={<EgovSecurityScan />} />
         <Route path={URL.SUPPORT_SECURITY_DOWNLOAD} element={<EgovSecurityDownload />} />

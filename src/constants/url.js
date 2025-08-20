@@ -36,6 +36,7 @@ const URL = {
 
   SUPPORT_SECURITY_INTRO : "/support/security/intro",
   SUPPORT_SECURITY_DETECT : "/support/security/detect",
+  SUPPORT_SECURITY_DETECT_DETAIL : "/support/security/detect/detail",
   SUPPORT_SECURITY_CHECK : "/support/security/check",
   SUPPORT_SECURITY_SCAN : "/support/security/scan", // 고객지원/보안/보안 분석하기
   SUPPORT_SECURITY_DOWNLOAD : "/support/security/download", // 고객지원/보안/다운로드
