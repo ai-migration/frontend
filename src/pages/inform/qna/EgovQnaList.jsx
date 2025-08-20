@@ -10,6 +10,8 @@ import EgovPaging from "@/components/EgovPaging";
 
 import { itemIdxByPage } from "@/utils/calc";
 
+import "@/css/modern-pages.css";
+
 function EgovQnaList(props) {
   console.group("EgovQnaList");
   console.log("[Start] EgovQnaList ------------------------------");
@@ -87,22 +89,25 @@ function EgovQnaList(props) {
                 searchCondition: searchCondition,
               }}
               key={listIdx}
-              className="list_item"
+              className="modern-board-row"
             >
-              <div>{listIdx}</div>
-              {(item.replyLc * 1 ? true : false) && (
-                <>
-                  <div className="al reply">{item.nttSj}</div>
-                </>
-              )}
-              {(item.replyLc * 1 ? false : true) && (
-                <>
-                  <div className="al">{item.nttSj}</div>
-                </>
-              )}
-              <div>{item.frstRegisterNm}</div>
-              <div>{item.frstRegisterPnttm}</div>
-              <div>{item.inqireCo}</div>
+              <div className="cell number">{listIdx}</div>
+              <div className="cell title">
+                {(item.replyLc * 1 ? true : false) && (
+                  <div className="title-content reply">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 10l6 6-6 6"/>
+                    </svg>
+                    <span className="title-text">{item.nttSj}</span>
+                  </div>
+                )}
+                {(item.replyLc * 1 ? false : true) && (
+                  <span className="title-text">{item.nttSj}</span>
+                )}
+              </div>
+              <div className="cell author">{item.frstRegisterNm}</div>
+              <div className="cell date">{item.frstRegisterPnttm}</div>
+              <div className="cell views">{item.inqireCo}</div>
             </Link>
           );
         });
@@ -124,48 +129,59 @@ function EgovQnaList(props) {
   console.log("------------------------------EgovQnaList [End]");
   console.groupEnd("EgovQnaList");
   return (
-    <div className="container">
-      <div className="c_wrap">
-        {/* <!-- Location --> */}
-        <div className="location">
+    <div className="modern-container">
+      <div className="modern-wrapper">
+        {/* Breadcrumb Navigation */}
+        <nav className="modern-breadcrumb" aria-label="페이지 위치">
           <ul>
             <li>
-              <Link to={URL.MAIN} className="home">
-                Home
+              <Link to={URL.MAIN} className="breadcrumb-home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9,22 9,12 15,12 15,22"/>
+                </svg>
+                홈
               </Link>
             </li>
             <li>
               <Link to={URL.INFORM}>알림마당</Link>
             </li>
-            <li> Q&A </li>
-            {/* <li>{masterBoard && masterBoard.bbsNm}</li> */}
+            <li>Q&A</li>
           </ul>
-        </div>
-        {/* <!--// Location --> */}
+        </nav>
 
-        <div className="layout">
-          {/* <!-- Navigation --> */}
-          <EgovLeftNav></EgovLeftNav>
-          {/* <!--// Navigation --> */}
+        <div className="modern-layout">
+          {/* Left Navigation */}
+          <aside className="modern-sidebar">
+            <EgovLeftNav />
+          </aside>
 
-          <div className="contents SITE_GALLARY_LIST" id="contents">
-            {/* <!-- 본문 --> */}
+          {/* Main Content */}
+          <main className="modern-content">
+            {/* Page Header */}
+            <header className="modern-page-header">
+              <div className="page-header-content">
+                <div className="page-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    <path d="M8 9h8"/>
+                    <path d="M8 13h6"/>
+                  </svg>
+                </div>
+                <div className="page-titles">
+                  <h1>알림마당</h1>
+                  <h2>Q&A</h2>
+                </div>
+              </div>
+            </header>
 
-            <div className="top_tit">
-              <h1 className="tit_1">알림마당</h1>
-            </div>
-
-            <h2 className="tit_2"> Q&A </h2>
-            {/* <h2 className="tit_2">{masterBoard && masterBoard.bbsNm}</h2> */}
-
-            {/* <!-- 검색조건 --> */}
-            <div className="condition">
-              <ul>
-                <li className="third_1 L">
-                  <label className="f_select" htmlFor="sel1">
+            {/* Search Section */}
+            <section className="modern-search-section">
+              <div className="search-controls">
+                <div className="search-group">
+                  <label className="modern-select-wrapper">
                     <select
-                      id="sel1"
-                      title="조건"
+                      id="searchCondition"
                       defaultValue={searchCondition.searchCnd}
                       ref={cndRef}
                       onChange={(e) => {
@@ -177,14 +193,12 @@ function EgovQnaList(props) {
                       <option value="2">작성자</option>
                     </select>
                   </label>
-                </li>
-                <li className="third_2 R">
-                  <span className="f_search w_500">
+                  
+                  <div className="modern-search-input">
                     <input
                       type="text"
-                      name=""
                       defaultValue={searchCondition.searchWrd}
-                      placeholder=""
+                      placeholder="검색어를 입력하세요"
                       ref={wrdRef}
                       onChange={(e) => {
                         wrdRef.current.value = e.target.value;
@@ -192,6 +206,7 @@ function EgovQnaList(props) {
                     />
                     <button
                       type="button"
+                      className="search-btn"
                       onClick={() => {
                         retrieveList({
                           ...searchCondition,
@@ -201,40 +216,59 @@ function EgovQnaList(props) {
                         });
                       }}
                     >
-                      조회
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                      </svg>
+                      검색
                     </button>
-                  </span>
-                </li>
+                  </div>
+                </div>
+                
                 {user.id && masterBoard.bbsUseFlag === "Y" && (
-                  <li>
-                    <Link
-                      to={URL.INFORM_QNA_CREATE}
-                      state={{ bbsId: bbsId }}
-                      className="btn btn_blue_h46 pd35"
-                    >
-                      등록
-                    </Link>
-                  </li>
+                  <Link
+                    to={URL.INFORM_QNA_CREATE}
+                    state={{ bbsId: bbsId }}
+                    className="modern-create-btn"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"/>
+                      <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    등록
+                  </Link>
                 )}
-              </ul>
-            </div>
-            {/* <!--// 검색조건 --> */}
-
-            {/* <!-- 게시판목록 --> */}
-            <div className="board_list BRD002">
-              <div className="head">
-                <span>번호</span>
-                <span>제목</span>
-                <span>작성자</span>
-                <span>작성일</span>
-                <span>조회수</span>
               </div>
-              <div className="result">{listTag}</div>
-            </div>
-            {/* <!--// 게시판목록 --> */}
+            </section>
 
-            <div className="board_bot">
-              {/* <!-- Paging --> */}
+            {/* Board List */}
+            <section className="modern-board-section">
+              <div className="modern-board-list">
+                <div className="board-header">
+                  <div className="header-cell number">번호</div>
+                  <div className="header-cell title">제목</div>
+                  <div className="header-cell author">작성자</div>
+                  <div className="header-cell date">작성일</div>
+                  <div className="header-cell views">조회수</div>
+                </div>
+                
+                <div className="board-body">
+                  {listTag.length > 0 ? listTag : (
+                    <div className="no-data">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <path d="M8 9h8"/>
+                        <path d="M8 13h6"/>
+                      </svg>
+                      <p>등록된 Q&A가 없습니다.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Pagination */}
+            <section className="modern-pagination-section">
               <EgovPaging
                 pagination={paginationInfo}
                 moveToPage={(passedPage) => {
@@ -246,11 +280,8 @@ function EgovQnaList(props) {
                   });
                 }}
               />
-              {/* <!--/ Paging --> */}
-            </div>
-
-            {/* <!--// 본문 --> */}
-          </div>
+            </section>
+          </main>
         </div>
       </div>
     </div>
