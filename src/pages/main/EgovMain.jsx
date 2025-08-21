@@ -559,8 +559,8 @@ function EgovMain(props) {
 
         /* Section Background */
         .section-background { position:absolute; inset:0; z-index:-1; overflow:hidden; }
-        .section-background video { width:100%; height:100%; object-fit:cover; filter: brightness(.7) contrast(1.2) saturate(1.1); }
-        .section-overlay { position:absolute; inset:0; background: linear-gradient(135deg, rgba(0,0,0,.6), rgba(0,0,0,.4), rgba(0,0,0,.2)); }
+        .section-background video { width:100%; height:100%; object-fit:cover; filter: brightness(.8) contrast(1.3) saturate(1.2); }
+        .section-overlay { position:absolute; inset:0; background: linear-gradient(135deg, rgba(0,0,0,.5), rgba(0,0,0,.3), rgba(0,0,0,.1)); }
 
         /* Animated base */
         .animate-on-scroll { opacity:0; transform: translateY(100px); transition: all 1.2s cubic-bezier(.25,.46,.45,.94); }
@@ -591,34 +591,34 @@ function EgovMain(props) {
         .section-subtitle.animated { opacity:1; transform:none; }
 
         .building-container { display:flex; justify-content:center; align-items:center; min-height:4500px; position:relative; padding:900px 0; }
-        .building { display:flex; flex-direction:column; align-items:center; gap:120px; position:relative; width:100%; max-width:400px; }
+        .building { display:flex; flex-direction:column; align-items:center; gap:120px; position:relative; width:100%; max-width:500px; }
 
         .floor { width:100%; position:relative; opacity:0; transform: translateY(100px); transition: all .8s cubic-bezier(.25,.46,.45,.94); }
         .floor.floor-visible { opacity:1; transform:none; }
         .floor.floor-hidden { opacity:0; transform: translateY(-50px); }
 
-        .building-card { opacity:0; transform: translateY(100px) scale(.8); filter: blur(10px); transition: all .8s cubic-bezier(.25,.46,.45,.94); position:relative; margin:0 auto; width:100%; max-width:350px; }
+        .building-card { opacity:0; transform: translateY(100px) scale(.8); filter: blur(10px); transition: all .8s cubic-bezier(.25,.46,.45,.94); position:relative; margin:0 auto; width:100%; max-width:450px; }
         .floor.floor-visible .building-card { opacity:1; transform:none; filter: blur(0); }
         .floor.floor-hidden .building-card { opacity:0; transform: translateY(-50px) scale(.95); filter: blur(5px); }
 
-        .service-card { display:flex; flex-direction:column; padding:2.5rem; background: rgba(255,255,255,.15); backdrop-filter: blur(30px); border-radius:24px; text-decoration:none; color:inherit; transition: all .8s cubic-bezier(.25,.46,.45,.94); border:1px solid rgba(255,255,255,.2); position:relative; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.3); min-height:280px; }
-        .card-glow { position:absolute; inset:0; background: linear-gradient(135deg, rgba(59,130,246,.1), rgba(96,165,250,.05)); opacity:0; transition:.5s; z-index:0; }
+        .service-card { display:flex; flex-direction:column; padding:3rem; background: rgba(255,255,255,.25); backdrop-filter: blur(40px); border-radius:28px; text-decoration:none; color:inherit; transition: all .8s cubic-bezier(.25,.46,.45,.94); border:2px solid rgba(255,255,255,.3); position:relative; overflow:hidden; box-shadow:0 25px 80px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.1); min-height:320px; }
+        .card-glow { position:absolute; inset:0; background: linear-gradient(135deg, rgba(59,130,246,.15), rgba(96,165,250,.1), rgba(147,51,234,.05)); opacity:0; transition:.5s; z-index:0; }
         .service-card:hover .card-glow { opacity:1; }
-        .service-card:hover { transform: translateY(-15px) scale(1.03); box-shadow:0 35px 80px rgba(0,0,0,.4); border-color:#3b82f6; background: rgba(255,255,255,.25); }
-        .service-card:active { transform: translateY(-5px) scale(1.01); }
+        .service-card:hover { transform: translateY(-20px) scale(1.05); box-shadow:0 40px 100px rgba(0,0,0,.5), 0 0 0 1px rgba(59,130,246,.3); border-color:#3b82f6; background: rgba(255,255,255,.35); }
+        .service-card:active { transform: translateY(-8px) scale(1.02); }
 
-        .card-icon { width:70px; height:70px; background: linear-gradient(135deg,#3b82f6,#1d4ed8); border-radius:18px; display:flex; align-items:center; justify-content:center; color:#fff; margin-bottom:1.5rem; position:relative; z-index:1; transition:.3s; }
-        .service-card:hover .card-icon { transform: scale(1.1) rotate(5deg); box-shadow:0 10px 25px rgba(59,130,246,.4); }
-        .card-icon svg { width:32px; height:32px; }
+        .card-icon { width:80px; height:80px; background: linear-gradient(135deg,#3b82f6,#1d4ed8,#7c3aed); border-radius:20px; display:flex; align-items:center; justify-content:center; color:#fff; margin-bottom:2rem; position:relative; z-index:1; transition:.3s; box-shadow:0 8px 25px rgba(59,130,246,.3); }
+        .service-card:hover .card-icon { transform: scale(1.15) rotate(8deg); box-shadow:0 15px 35px rgba(59,130,246,.5); }
+        .card-icon svg { width:36px; height:36px; }
         .card-content { flex:1; z-index:1; position:relative; }
-        .card-content h3 { font-size:1.5rem; font-weight:700; color:#fff; margin:0 0 .75rem; text-shadow:2px 2px 4px rgba(0,0,0,.3); }
-        .card-content p { font-size:1rem; color:#e0e7ff; margin:0 0 1.5rem; line-height:1.6; opacity:.9; }
-        .card-features { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1.5rem; }
-        .feature-tag { padding:.375rem .75rem; background: rgba(59,130,246,.2); border:1px solid rgba(59,130,246,.3); border-radius:20px; font-size:.75rem; font-weight:600; color:#60a5fa; backdrop-filter: blur(10px); transition:.3s; }
-        .service-card:hover .feature-tag { background: rgba(59,130,246,.3); border-color: rgba(59,130,246,.5); color:#fff; }
-        .card-arrow { color:#60a5fa; transition:.4s; z-index:1; align-self:flex-end; margin-top:auto; }
-        .service-card:hover .card-arrow { color:#fff; transform: translateX(8px) scale(1.1); }
-        .card-arrow svg { width:24px; height:24px; }
+        .card-content h3 { font-size:1.75rem; font-weight:800; color:#fff; margin:0 0 1rem; text-shadow:2px 2px 6px rgba(0,0,0,.5), 0 0 20px rgba(255,255,255,.3); letter-spacing:-.01em; }
+        .card-content p { font-size:1.125rem; color:#f1f5f9; margin:0 0 1.75rem; line-height:1.7; opacity:.95; font-weight:400; text-shadow:1px 1px 3px rgba(0,0,0,.4); }
+        .card-features { display:flex; flex-wrap:wrap; gap:.75rem; margin-bottom:1.75rem; }
+        .feature-tag { padding:.5rem 1rem; background: rgba(59,130,246,.3); border:1px solid rgba(59,130,246,.4); border-radius:25px; font-size:.875rem; font-weight:700; color:#93c5fd; backdrop-filter: blur(15px); transition:.3s; text-shadow:1px 1px 2px rgba(0,0,0,.3); box-shadow:0 4px 12px rgba(59,130,246,.2); }
+        .service-card:hover .feature-tag { background: rgba(59,130,246,.4); border-color: rgba(59,130,246,.6); color:#fff; box-shadow:0 6px 16px rgba(59,130,246,.3); }
+        .card-arrow { color:#93c5fd; transition:.4s; z-index:1; align-self:flex-end; margin-top:auto; }
+        .service-card:hover .card-arrow { color:#fff; transform: translateX(10px) scale(1.15); }
+        .card-arrow svg { width:28px; height:28px; }
 
         /* Responsive */
         @media (max-width:1024px) {
@@ -630,7 +630,8 @@ function EgovMain(props) {
           .innovation-title { font-size:3.5rem; }
           .innovation-subtitle { font-size:1.75rem; }
           .building-container { min-height:4000px; padding:800px 0; }
-          .building { max-width:350px; gap:100px; }
+          .building { max-width:420px; gap:100px; }
+          .building-card { max-width:400px; }
         }
 
         @media (max-width:768px) {
@@ -648,9 +649,14 @@ function EgovMain(props) {
           .innovation-title { font-size:3rem; }
           .innovation-subtitle { font-size:1.5rem; }
           .slideshow-container { height:300px; }
-          .service-card { padding:2rem; min-height:250px; }
+          .service-card { padding:2.5rem; min-height:280px; }
+          .card-content h3 { font-size:1.5rem; }
+          .card-content p { font-size:1rem; }
+          .card-icon { width:70px; height:70px; }
+          .card-icon svg { width:32px; height:32px; }
           .building-container { min-height:3800px; padding:750px 0; }
-          .building { max-width:320px; gap:80px; }
+          .building { max-width:380px; gap:80px; }
+          .building-card { max-width:360px; }
         }
 
         @media (max-width:640px) {
@@ -661,16 +667,17 @@ function EgovMain(props) {
           .section-subtitle { font-size:1rem; }
           .innovation-title { font-size:2.5rem; }
           .innovation-subtitle { font-size:1.25rem; }
-          .service-card { padding:1.5rem; min-height:220px; }
-          .card-content h3 { font-size:1.25rem; }
-          .card-content p { font-size:.875rem; }
-          .card-features { margin-bottom:1rem; }
-          .feature-tag { font-size:.7rem; padding:.25rem .5rem; }
+          .service-card { padding:2rem; min-height:260px; }
+          .card-content h3 { font-size:1.375rem; }
+          .card-content p { font-size:.95rem; }
+          .card-features { margin-bottom:1.25rem; }
+          .feature-tag { font-size:.8rem; padding:.375rem .75rem; }
           .slideshow-container { height:250px; }
           .building-container { min-height:3600px; padding:700px 0; }
-          .building { max-width:300px; gap:70px; }
-          .card-icon { width:60px; height:60px; }
-          .card-icon svg { width:28px; height:28px; }
+          .building { max-width:340px; gap:70px; }
+          .building-card { max-width:320px; }
+          .card-icon { width:65px; height:65px; }
+          .card-icon svg { width:30px; height:30px; }
         }
       `}</style>
     </>
