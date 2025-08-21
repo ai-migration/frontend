@@ -506,7 +506,7 @@ export default function EgovSupportViewTransformation() {
                                 <td className="table-cell td-center">
                                   <div className="action-cell">
                                     <Link
-                                      to={{ pathname: URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL }}
+                                      to={{ pathname: URL.SUPPORT_VIEW_TRANSFORMATION_DETAIL }}
                                       state={{ jobId: item.jobId }}
                                       className="detail-btn"
                                       title="상세 보기"

@@ -9,6 +9,8 @@ import EgovHeader from "@/components/EgovHeader";
 import EgovFooter from "@/components/EgovFooter";
 import EgovInfoPopup from "@/components/EgovInfoPopup";
 import EgovError from "@/components/EgovError";
+import GlobalNoticeIcon from "@/components/GlobalNoticeIcon";
+import GlobalChatWidget from "@/components/GlobalChatWidget";
 
 import EgovMain from "@/pages/main/EgovMain";
 import EgovLogin from "@/pages/login/EgovLogin";
@@ -261,21 +263,36 @@ const SecondRoutes = () => {
 
   return (
     <>
-      <EgovHeader />
+      <GlobalNoticeIcon />
       <Routes>
         {/* MAIN */}
-        <Route path={URL.MAIN} element={<EgovMain />} />
-
+        <Route path={URL.MAIN} element={
+          <>
+            <EgovHeader />
+            <EgovMain />
+          </>
+        } />
+        
         {/* LOGIN */}
         <Route
           path={URL.LOGIN}
-          element={<EgovLogin onChangeLogin={(user) => setLoginVO(user)} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovLogin onChangeLogin={(user) => setLoginVO(user)} />
+            </>
+          }
         />
 
         {/* SIGNUP */}
         <Route 
           path={URL.SIGNUP} 
-          element={<EgovSignup />} >
+          element={
+            <>
+              <EgovHeader />
+              <EgovSignup />
+            </>
+          } >
           <Route index element={<Navigate to="agree" />} />
           <Route path="agree" element={<EgovSignupAgree />} />
           <Route path="form" element={<EgovSignupForm />} />
@@ -285,14 +302,20 @@ const SecondRoutes = () => {
         <Route
           path={URL.SNS_NAVER_CB}
           element={
-            <SnsNaverCallback onChangeLogin={(user) => setLoginVO(user)} />
+            <>
+              <EgovHeader />
+              <SnsNaverCallback onChangeLogin={(user) => setLoginVO(user)} />
+            </>
           }
         />
         {/* Sns Kakao Callback */}
         <Route
           path={URL.SNS_KAKAO_CB}
           element={
-            <SnsKakaoCallback onChangeLogin={(user) => setLoginVO(user)} />
+            <>
+              <EgovHeader />
+              <SnsKakaoCallback onChangeLogin={(user) => setLoginVO(user)} />
+            </>
           }
         />
 
@@ -300,254 +323,728 @@ const SecondRoutes = () => {
         <Route path={URL.ERROR} element={<EgovError />} />
 
         {/* ABOUT */}
-        <Route path={URL.ABOUT} element={<Navigate to={URL.ABOUT_SITE} />} />
-        <Route path={URL.ABOUT_SITE} element={<EgovAboutSite />} />
-        <Route path={URL.ABOUT_HISTORY} element={<EgovAboutHistory />} />
+        <Route path={URL.ABOUT} element={
+          <>
+            <EgovHeader />
+            <Navigate to={URL.ABOUT_SITE} />
+          </>
+        } />
+        <Route path={URL.ABOUT_SITE} element={
+          <>
+            <EgovHeader />
+            <EgovAboutSite />
+          </>
+        } />
+        <Route path={URL.ABOUT_HISTORY} element={
+          <>
+            <EgovHeader />
+            <EgovAboutHistory />
+          </>
+        } />
         <Route
           path={URL.ABOUT_ORGANIZATION}
-          element={<EgovAboutOrganization />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAboutOrganization />
+            </>
+          }
         />
-        <Route path={URL.ABOUT_LOCATION} element={<EgovAboutLocation />} />
+        <Route path={URL.ABOUT_LOCATION} element={
+          <>
+            <EgovHeader />
+            <EgovAboutLocation />
+          </>
+        } />
 
         {/* INTRO */}
-        <Route path={URL.INTRO} element={<Navigate to={URL.INTRO_TRANSFORM} />} />
-        <Route path={URL.INTRO_TRANSFORM} element={<EgovIntroTransform />} />
-        <Route path={URL.INTRO_SECURITY} element={<EgovIntroSecurity />} />
-        <Route path={URL.INTRO_CHATBOT} element={<EgovIntroChatbot />} />
+        <Route path={URL.INTRO} element={
+          <>
+            <EgovHeader />
+            <Navigate to={URL.INTRO_TRANSFORM} />
+          </>
+        } />
+        <Route path={URL.INTRO_TRANSFORM} element={
+          <>
+            <EgovHeader />
+            <EgovIntroTransform />
+          </>
+        } />
+        <Route path={URL.INTRO_SECURITY} element={
+          <>
+            <EgovHeader />
+            <EgovIntroSecurity />
+          </>
+        } />
+        <Route path={URL.INTRO_CHATBOT} element={
+          <>
+            <EgovHeader />
+            <EgovIntroChatbot />
+          </>
+        } />
 
         {/* SUPPORT */}
         <Route
           path={URL.SUPPORT}
-          element={<Navigate to={URL.SUPPORT_TRANSFORM_INTRO} />}
+          element={
+            <>
+              <EgovHeader />
+              <Navigate to={URL.SUPPORT_TRANSFORM_INTRO} />
+            </>
+          }
         />
         <Route
           path={URL.SUPPORT_TRANSFORM_INTRO}
-          element={<EgovSupportIntro />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportIntro />
+            </>
+          }
         />
         <Route
           path={URL.SUPPORT_DOWNLOAD}
-          element={<EgovSupportDownloadList />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportDownloadList />
+            </>
+          }
         />
         <Route
           path={URL.SUPPORT_DOWNLOAD_DETAIL}
-          element={<EgovSupportDownloadDetail />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportDownloadDetail />
+            </>
+          }
         />
         <Route
           path={URL.SUPPORT_DOWNLOAD_CREATE}
-          element={<EgovSupportDownloadCreate />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportDownloadCreate />
+            </>
+          }
         />
 
-        <Route path={URL.SUPPORT_QNA} element={<EgovSupportQnaList />} />
+        <Route path={URL.SUPPORT_QNA} element={
+          <>
+            <EgovHeader />
+            <EgovSupportQnaList />
+          </>
+        } />
         <Route
           path={URL.SUPPORT_QNA_DETAIL}
-          element={<EgovSupportQnaDetail />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportQnaDetail />
+            </>
+          }
         />
 
-        <Route path={URL.SUPPORT_TRANSFORM_TRANSFORMATION} element={<EgovSupportTransformation />} />
-        <Route path={URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON} element={<EgovSupportViewTransformation />} />
-        <Route path={URL.SUPPORT_TRANSFORM_VIEW_TRANSFORMAITON_DETAIL} element={<EgovSupportViewTransformationDetail />} />
-        <Route path={URL.SUPPORT_TRANSFORM_VIEW_TEST} element={<EgovSupportViewTest />} />
-        <Route path={URL.SUPPORT_TRANSFORM_DOWNLOAD} element={<EgovSupportDownload />} />
+        <Route
+          path={URL.SUPPORT_APPLY}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportApply />
+            </>
+          }
+        />
 
-        <Route path={URL.SUPPORT_SECURITY_INTRO} element={<EgovSecurityIntro />} />
-        <Route path={URL.SUPPORT_SECURITY_DETECT} element={<EgovSecurityDetect />} />
-        <Route path={URL.SUPPORT_SECURITY_DETECT_DETAIL} element={<EgovSecurityDetectDetail />} />
-        <Route path={URL.SUPPORT_SECURITY_CHECK} element={<EgovSecurityCheck />} />
-        <Route path={URL.SUPPORT_SECURITY_SCAN} element={<EgovSecurityScan />} />
-        <Route path={URL.SUPPORT_SECURITY_DOWNLOAD} element={<EgovSecurityDownload />} />
-        <Route path={URL.SUPPORT_SECURITY_REPORT} element={<EgovSecurityReport />} />
+        <Route
+          path={URL.SUPPORT_TRANSFORMATION}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportTransformation />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_VIEW_TRANSFORMATION}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportViewTransformation />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_VIEW_TRANSFORMATION_DETAIL}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportViewTransformationDetail />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_VIEW_TEST}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportViewTest />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_TRANSFORM_DOWNLOAD}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSupportDownload />
+            </>
+          }
+        />
 
-        <Route path={URL.SUPPORT_GUIDE_EGOVFRAMEWORK} element={<EgovGuideEgovframework />} />
-        <Route path={URL.SUPPORT_GUIDE_CHATBOT} element={<EgovGuideChatbot />} />
+        <Route
+          path={URL.SUPPORT_SECURITY_INTRO}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSecurityIntro />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_SECURITY_DETECT}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSecurityDetect />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_SECURITY_DETECT_DETAIL}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSecurityDetectDetail />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_SECURITY_CHECK}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSecurityCheck />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_SECURITY_SCAN}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSecurityScan />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_SECURITY_DOWNLOAD}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSecurityDownload />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_SECURITY_REPORT}
+          element={
+            <>
+              <EgovHeader />
+              <EgovSecurityReport />
+            </>
+          }
+        />
 
-        <Route path={URL.SUPPORT_APPLY} element={<EgovSupportApply />} />
+        <Route
+          path={URL.SUPPORT_GUIDE_EGOVFRAMEWORK}
+          element={
+            <>
+              <EgovHeader />
+              <EgovGuideEgovframework />
+            </>
+          }
+        />
+        <Route
+          path={URL.SUPPORT_GUIDE_CHATBOT}
+          element={
+            <>
+              <EgovHeader />
+              <EgovGuideChatbot />
+            </>
+          }
+        />
 
         {/* INFORM */}
-        <Route path={URL.INFORM} element={<Navigate to={URL.INFORM_NOTICE} />} />
-
-        <Route path={URL.INFORM_DAILY} element={<EgovDailyList />} />
-        <Route path={URL.INFORM_DAILY_DETAIL} element={<EgovDailyDetail />} />
-        <Route path={URL.INFORM_WEEKLY} element={<EgovWeeklyList />} />
-        <Route path={URL.INFORM_WEEKLY_DETAIL} element={<EgovDailyDetail />} />
-
-        <Route path={URL.INFORM_NOTICE} element={<EgovNoticeList />} />
-        <Route path={URL.INFORM_NOTICE_DETAIL} element={<EgovNoticeDetail />} />
+        <Route path={URL.INFORM} element={
+          <>
+            <EgovHeader />
+            <Navigate to={URL.INFORM_NOTICE} />
+          </>
+        } />
+        <Route path={URL.INFORM_NOTICE} element={
+          <>
+            <EgovHeader />
+            <EgovNoticeList />
+          </>
+        } />
+        <Route
+          path={URL.INFORM_NOTICE_DETAIL}
+          element={
+            <>
+              <EgovHeader />
+              <EgovNoticeDetail />
+            </>
+          }
+        />
         <Route
           path={URL.INFORM_NOTICE_CREATE}
-          element={<EgovNoticeEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovNoticeEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_NOTICE_MODIFY}
-          element={<EgovNoticeEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovNoticeEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_NOTICE_REPLY}
-          element={<EgovNoticeEdit mode={CODE.MODE_REPLY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovNoticeEdit mode={CODE.MODE_REPLY} />
+            </>
+          }
         />
 
-        <Route path={URL.INFORM_GALLERY} element={<EgovGalleryList />} />
+        <Route path={URL.INFORM_DAILY} element={
+          <>
+            <EgovHeader />
+            <EgovDailyList />
+          </>
+        } />
+        <Route
+          path={URL.INFORM_DAILY_DETAIL}
+          element={
+            <>
+              <EgovHeader />
+              <EgovDailyDetail />
+            </>
+          }
+        />
+
+        <Route path={URL.INFORM_WEEKLY} element={
+          <>
+            <EgovHeader />
+            <EgovWeeklyList />
+          </>
+        } />
+
+        <Route path={URL.INFORM_GALLERY} element={
+          <>
+            <EgovHeader />
+            <EgovGalleryList />
+          </>
+        } />
         <Route
           path={URL.INFORM_GALLERY_DETAIL}
-          element={<EgovGalleryDetail />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovGalleryDetail />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_GALLERY_CREATE}
-          element={<EgovGalleryEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovGalleryEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_GALLERY_MODIFY}
-          element={<EgovGalleryEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovGalleryEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_GALLERY_REPLY}
-          element={<EgovGalleryEdit mode={CODE.MODE_REPLY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovGalleryEdit mode={CODE.MODE_REPLY} />
+            </>
+          }
         />
-        
-        <Route path={URL.INFORM_FAQ} element={<EgovFaqList />} />
+
+        <Route path={URL.INFORM_FAQ} element={
+          <>
+            <EgovHeader />
+            <EgovFaqList />
+          </>
+        } />
         <Route
           path={URL.INFORM_FAQ_CREATE}
-          element={<EgovFaqEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovFaqEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_FAQ_MODIFY}
-          element={<EgovFaqEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovFaqEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
+        />
+        <Route
+          path={URL.INFORM_FAQ_REPLY}
+          element={
+            <>
+              <EgovHeader />
+              <EgovFaqEdit mode={CODE.MODE_REPLY} />
+            </>
+          }
         />
 
-        <Route path={URL.INFORM_QNA} element={<EgovQnaList />} />
+        <Route path={URL.INFORM_QNA} element={
+          <>
+            <EgovHeader />
+            <EgovQnaList />
+          </>
+        } />
         <Route
           path={URL.INFORM_QNA_DETAIL}
-          element={<EgovQnaDetail />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovQnaDetail />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_QNA_CREATE}
-          element={<EgovQnaEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovQnaEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_QNA_MODIFY}
-          element={<EgovQnaEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovQnaEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
         <Route
           path={URL.INFORM_QNA_REPLY}
-          element={<EgovQnaEdit mode={CODE.MODE_REPLY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovQnaEdit mode={CODE.MODE_REPLY} />
+            </>
+          }
         />
 
         {/* ADMIN */}
-        <Route
-          path={URL.ADMIN}
-          element={<Navigate to={URL.ADMIN_NOTICE} />}
-        />
-        <Route path={URL.ADMIN_SCHEDULE} element={<EgovAdminScheduleList />} />
+        <Route path={URL.ADMIN} element={
+          <>
+            <EgovHeader />
+            <Navigate to={URL.ADMIN_NOTICE} />
+          </>
+        } />
+        <Route path={URL.ADMIN_SCHEDULE} element={
+          <>
+            <EgovHeader />
+            <EgovAdminScheduleList />
+          </>
+        } />
         <Route
           path={URL.ADMIN_SCHEDULE_DETAIL}
-          element={<EgovAdminScheduleDetail />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminScheduleDetail />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_SCHEDULE_CREATE}
-          element={<EgovAdminScheduleEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminScheduleEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_SCHEDULE_MODIFY}
-          element={<EgovAdminScheduleEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminScheduleEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
 
-        <Route path={URL.ADMIN_BOARD} element={<EgovAdminBoardList />} />
+        <Route path={URL.ADMIN_BOARD} element={
+          <>
+            <EgovHeader />
+            <EgovAdminBoardList />
+          </>
+        } />
         <Route
           path={URL.ADMIN_BOARD_CREATE}
-          element={<EgovAdminBoardEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminBoardEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_BOARD_MODIFY}
-          element={<EgovAdminBoardEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminBoardEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
 
-        <Route path={URL.ADMIN_USAGE} element={<EgovAdminUsageList />} />
+        <Route path={URL.ADMIN_USAGE} element={
+          <>
+            <EgovHeader />
+            <EgovAdminUsageList />
+          </>
+        } />
         <Route
           path={URL.ADMIN_USAGE_CREATE}
-          element={<EgovAdminUsageEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminUsageEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_USAGE_MODIFY}
-          element={<EgovAdminUsageEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminUsageEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
 
-        <Route path={URL.ADMIN_NOTICE} element={<EgovAdminNoticeList />} />
+        <Route path={URL.ADMIN_NOTICE} element={
+          <>
+            <EgovHeader />
+            <EgovAdminNoticeList />
+          </>
+        } />
         <Route
           path={URL.ADMIN_NOTICE_DETAIL}
-          element={<EgovAdminNoticeDetail />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminNoticeDetail />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_NOTICE_CREATE}
-          element={<EgovAdminNoticeEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminNoticeEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_NOTICE_MODIFY}
-          element={<EgovAdminNoticeEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminNoticeEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_NOTICE_REPLY}
-          element={<EgovAdminNoticeEdit mode={CODE.MODE_REPLY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminNoticeEdit mode={CODE.MODE_REPLY} />
+            </>
+          }
         />
 
         {/* admin_faq */}
-        <Route path={URL.ADMIN_FAQ} element={<EgovAdminFaqList />} />
+        <Route path={URL.ADMIN_FAQ} element={
+          <>
+            <EgovHeader />
+            <EgovAdminFaqList />
+          </>
+        } />
         <Route
           path={URL.ADMIN_FAQ_CREATE}
-          element={<EgovAdminFaqEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminFaqEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_FAQ_MODIFY}
-          element={<EgovAdminFaqEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminFaqEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_FAQ_REPLY}
-          element={<EgovAdminFaqEdit mode={CODE.MODE_REPLY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminFaqEdit mode={CODE.MODE_REPLY} />
+            </>
+          }
         />
 
-
-
-        <Route path={URL.ADMIN_GALLERY} element={<EgovAdminGalleryList />} />
+        <Route path={URL.ADMIN_GALLERY} element={
+          <>
+            <EgovHeader />
+            <EgovAdminGalleryList />
+          </>
+        } />
         <Route
           path={URL.ADMIN_GALLERY_DETAIL}
-          element={<EgovAdminGalleryDetail />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminGalleryDetail />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_GALLERY_CREATE}
-          element={<EgovAdminGalleryEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminGalleryEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_GALLERY_MODIFY}
-          element={<EgovAdminGalleryEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminGalleryEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_GALLERY_REPLY}
-          element={<EgovAdminGalleryEdit mode={CODE.MODE_REPLY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminGalleryEdit mode={CODE.MODE_REPLY} />
+            </>
+          }
         />
         {/* 사이트관리자 암호 바꾸기 기능 */}
-        <Route path={URL.ADMIN_MANAGER} element={<EgovAdminPasswordUpdate />} />
-        <Route path={URL.ADMIN_MEMBERS} element={<EgovAdminMemberList />} />
+        <Route path={URL.ADMIN_MANAGER} element={
+          <>
+            <EgovHeader />
+            <EgovAdminPasswordUpdate />
+          </>
+        } />
+        <Route path={URL.ADMIN_MEMBERS} element={
+          <>
+            <EgovHeader />
+            <EgovAdminMemberList />
+          </>
+        } />
         <Route
           path={URL.ADMIN_MEMBERS_CREATE}
-          element={<EgovAdminMemberEdit mode={CODE.MODE_CREATE} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminMemberEdit mode={CODE.MODE_CREATE} />
+            </>
+          }
         />
         <Route
           path={URL.ADMIN_MEMBERS_MODIFY}
-          element={<EgovAdminMemberEdit mode={CODE.MODE_MODIFY} />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovAdminMemberEdit mode={CODE.MODE_MODIFY} />
+            </>
+          }
         />
         {/* MYPAGE */}
         <Route
           path={URL.MYPAGE}
-          element={<EgovMypageEdit />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovMypageEdit />
+            </>
+          }
         />
         
         {/* Test */}
         <Route
           path={URL.TESTPAGE}
-          element={<EgovTestPage />}
+          element={
+            <>
+              <EgovHeader />
+              <EgovTestPage />
+            </>
+          }
         />
       </Routes>
-
       <EgovFooter />
       <EgovInfoPopup />
+      <GlobalChatWidget />
     </>
   );
 };

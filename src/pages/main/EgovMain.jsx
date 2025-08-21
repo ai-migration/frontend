@@ -1,342 +1,13 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import * as EgovNet from "@/api/egovFetch";
 import URL from "@/constants/url";
+import { getSessionItem as getSI, setSessionItem as setSI } from "@/utils/storage";
 
-// ✅ 동적 효과/겹침 해결용 스타일 (기존 파일 재사용)
+// 스타일 import
 import "@/css/mainMotion.css";
 import "@/css/modern-styles.css";
-
-/** 접근성/성능: 사용자 환경 설정 확인 */
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(m.matches);
-    const on = (e) => setReduced(e.matches);
-    m.addEventListener?.("change", on);
-    return () => m.removeEventListener?.("change", on);
-  }, []);
-  return reduced;
-}
-
-function YouTubeEmbed({ video, autoplay = 0 }) {
-  const [apiReady, setApiReady] = useState(false);
-  const [useNocookie, setUseNocookie] = useState(false);
-  const [nocookieLoaded, setNocookieLoaded] = useState(false);
-  const [tryPlain, setTryPlain] = useState(false);
-  const [plainLoaded, setPlainLoaded] = useState(false);
-  const [hardFallback, setHardFallback] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  const playerRef = useRef(null);
-  const nocookieRef = useRef(null);
-  const plainRef = useRef(null);
-  const domIdRef = useRef(`yt-player-${Math.random().toString(36).slice(2)}`);
-  const PLAYER_DOM_ID = domIdRef.current;
-  const YT_SCRIPT_ID = "youtube-iframe-api";
-
-  const extractYouTubeId = (input) => {
-    try {
-      const u = new window.URL(input);
-      if (u.hostname.includes("youtube.com")) {
-        if (u.pathname.startsWith("/watch")) return u.searchParams.get("v");
-        if (u.pathname.startsWith("/embed/")) return u.pathname.split("/embed/")[1]?.split("?")[0];
-        if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/shorts/")[1]?.split("?")[0];
-      }
-      if (u.hostname === "youtu.be") return u.pathname.slice(1).split("?")[0];
-    } catch {
-      if (/^[\w-]{6,}$/.test(input)) return input;
-    }
-    return null;
-  };
-  const videoId = extractYouTubeId(video);
-  if (!videoId) return null;
-
-  const safeOrigin =
-    typeof window !== "undefined" && window.location?.origin
-      ? window.location.origin
-      : "https://localhost";
-
-  // 1) API 로드 시도 (차단되면 2로)
-  useEffect(() => {
-    if (window.YT?.Player) { setApiReady(true); return; }
-
-    const prev = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => {
-      setApiReady(true);
-      if (typeof prev === "function") prev();
-    };
-
-    let script = document.getElementById(YT_SCRIPT_ID);
-    if (!script) {
-      script = document.createElement("script");
-      script.id = YT_SCRIPT_ID;
-      script.src = "https://www.youtube.com/iframe_api";
-      script.async = true;
-      script.defer = true;
-      script.onload = () => { if (window.YT?.Player) setApiReady(true); };
-      script.onerror = () => setUseNocookie(true); // API 막히면 nocookie 임베드로
-      (document.head || document.body).appendChild(script);
-    }
-
-    const t = setTimeout(() => {
-      if (!window.YT?.Player) setUseNocookie(true);
-    }, 2000);
-    return () => clearTimeout(t);
-  }, []);
-
-  // 1-1) API 플레이어 생성
-  useEffect(() => {
-    if (!apiReady || useNocookie) return;
-
-    // 이전 인스턴스 재사용
-    if (playerRef.current?.loadVideoById) {
-      try { playerRef.current.loadVideoById(videoId); } catch {}
-      return;
-    }
-    try {
-      playerRef.current = new window.YT.Player(PLAYER_DOM_ID, {
-        videoId,
-        host: "https://www.youtube-nocookie.com",
-        playerVars: {
-          rel: 0, modestbranding: 1, controls: 1, autoplay,
-          enablejsapi: 1,
-          origin: safeOrigin,
-        },
-        events: { onReady: () => setIsReady(true) },
-      });
-    } catch {
-      setUseNocookie(true);
-    }
-    return () => { try { playerRef.current?.destroy?.(); } catch {} playerRef.current = null; };
-  }, [apiReady, useNocookie, videoId, autoplay, safeOrigin, PLAYER_DOM_ID]);
-
-  // 2) nocookie 임베드가 3.5초 내 로드 안 되면 3) 일반 임베드로 전환
-  useEffect(() => {
-    if (!useNocookie || tryPlain) return;
-    const t = setTimeout(() => {
-      if (!nocookieLoaded) setTryPlain(true);
-    }, 3500);
-    return () => clearTimeout(t);
-  }, [useNocookie, nocookieLoaded, tryPlain]);
-
-  // 3) 일반 임베드도 못 불러오면 4) 썸네일 링크
-  useEffect(() => {
-    if (!tryPlain) return;
-    const t = setTimeout(() => {
-      if (!plainLoaded) setHardFallback(true);
-    }, 3000);
-    return () => clearTimeout(t);
-  }, [tryPlain, plainLoaded]);
-
-  const play = () => {
-    if (apiReady && !useNocookie) return playerRef.current?.playVideo?.();
-    // nocookie/일반 임베드는 클릭 자체가 사용자 제스처라 플레이 허용됨
-  };
-  const pause = () => {
-    if (apiReady && !useNocookie) return playerRef.current?.pauseVideo?.();
-  };
-  const stop = () => {
-    if (apiReady && !useNocookie) {
-      try { playerRef.current.stopVideo(); playerRef.current.seekTo(0, true); } catch {}
-    }
-  };
-
-  return (
-    <section className="yt-section card" style={{ margin: "24px 0 28px", clear: "both", position: "relative", zIndex: 10 }}>
-      <div className="yt-header" style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 12 }}>
-
-      </div>
-
-      <div className="yt-player-wrap"
-           style={{ position: "relative", width: "100%", aspectRatio: "16/9",
-                    borderRadius: 14, overflow: "hidden", background: "#000",
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
-        {/* 1) API 모드 */}
-        {!useNocookie && <div id={PLAYER_DOM_ID} className="yt-frame" style={{ width: "100%", height: "100%" }} />}
-
-        {/* 2) nocookie 폴백 */}
-        {useNocookie && !tryPlain && !hardFallback && (
-          <iframe
-            title="YouTube (nocookie)"
-            ref={nocookieRef}
-            src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&controls=1${autoplay ? "&autoplay=1&mute=1" : ""}&origin=${encodeURIComponent(safeOrigin)}`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            loading="lazy"
-            onLoad={() => setNocookieLoaded(true)}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-          />
-        )}
-
-        {/* 3) 일반 youtube.com 임베드 (nocookie가 정책/확장에 막힌 경우) */}
-        {tryPlain && !hardFallback && (
-          <iframe
-            title="YouTube (standard)"
-            ref={plainRef}
-            src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&controls=1${autoplay ? "&autoplay=1&mute=1" : ""}`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            loading="lazy"
-            onLoad={() => setPlainLoaded(true)}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-          />
-        )}
-
-        {/* 4) 최후 폴백: 썸네일 + 새창 */}
-        {hardFallback && (
-          <a
-            href={`https://www.youtube.com/watch?v=${videoId}`}
-            target="_blank"
-            rel="noopener"
-            className="yt-thumb-fallback"
-            style={{
-              position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
-              backgroundSize: "cover", backgroundPosition: "center",
-              backgroundImage: `url(https://i3.ytimg.com/vi/${videoId}/hqdefault.jpg)`,
-              color: "#fff", fontWeight: 700, textDecoration: "none",
-            }}
-          >
-            ▶ 새 창에서 보기
-          </a>
-        )}
-
-        {/* 로딩 스켈레톤 */}
-        {!isReady && !useNocookie && !tryPlain && (
-          <div className="yt-skeleton" aria-hidden
-               style={{ position: "absolute", inset: 0,
-                        background: "linear-gradient(120deg,#1a1a1a,#0f0f0f)",
-                        animation: "pulse 1.4s ease-in-out infinite" }} />
-        )}
-      </div>
-
-            <div className="yt-controls" style={{ display: "flex", gap: 8, marginTop: 10 }}>
-
-      </div>
-    </section>
-  );
-}
-
-
-const btnStyle = {
-  padding: "8px 12px",
-  borderRadius: 10,
-  border: "1px solid rgba(0,0,0,0.12)",
-  background: "#fff",
-  cursor: "pointer",
-};
-
-/** 메인 히어로 캐러셀 (src/assets/images 전체 자동 슬라이드) */
-function MainHeroCarousel() {
-  // 👉 src/assets/images 폴더(하위 폴더 포함)의 모든 이미지 자동 로드
-  const images = useMemo(() => Object.values(
-    import.meta.glob("/src/assets/images/**/*.{png,jpg,jpeg,webp,gif,svg}", { eager: true, import: "default" })
-  ), []);
-
-  const slides = images;
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const touchStartX = useRef(null);
-  const AUTOPLAY_MS = 3500;
-  const reduced = usePrefersReducedMotion();
-
-  const next = useCallback(() => {
-    if (slides.length <= 1) return;
-    setIndex((i) => (i + 1) % slides.length);
-  }, [slides.length]);
-
-  const prev = useCallback(() => {
-    if (slides.length <= 1) return;
-    setIndex((i) => (i - 1 + slides.length) % slides.length);
-  }, [slides.length]);
-
-  useEffect(() => {
-    if (paused || slides.length <= 1 || reduced) return;
-    const t = setInterval(next, AUTOPLAY_MS);
-    return () => clearInterval(t);
-  }, [paused, slides.length, next, reduced]);
-
-  // 가시성 변화 시 일시정지 (탭 전환 등)
-  useEffect(() => {
-    const onVis = () => setPaused(document.hidden);
-    document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
-  }, []);
-
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [next, prev]);
-
-  const onTouchStart = (e) => (touchStartX.current = e.touches[0].clientX);
-  const onTouchEnd = (e) => {
-    if (touchStartX.current == null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(dx) > 40) dx < 0 ? next() : prev();
-    touchStartX.current = null;
-  };
-
-  if (slides.length === 0) return null;
-
-  return (
-    <section
-      className="hero-carousel"
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="메인 비주얼"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-    >
-      <div className="blob blob-a" />
-      <div className="blob blob-b" />
-
-      <div className="track" style={{ transform: `translateX(-${index * 100}%)` }}>
-        {slides.map((src, i) => (
-          <div className="slide" id={`slide-${i}`} key={i} aria-hidden={i !== index}>
-            <img src={src} alt={`메인 이미지 ${i + 1}`} loading="lazy" draggable="false" />
-            <div className="slide-overlay">
-              <div className="caption glass">
-                <strong>전자정부 경량환경</strong>
-                <span>최신 정보와 기술을 한 눈에</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {slides.length > 1 && (
-        <>
-          <button className="nav prev" onClick={prev} aria-label="이전 슬라이드">‹</button>
-          <button className="nav next" onClick={next} aria-label="다음 슬라이드">›</button>
-        </>
-      )}
-
-      {slides.length > 1 && (
-        <div className="dots" role="tablist" aria-label="슬라이드 선택">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              className={`dot ${i === index ? "active" : ""}`}
-              onClick={() => setIndex(i)}
-              role="tab"
-              aria-selected={i === index}
-              aria-controls={`slide-${i}`}
-              tabIndex={i === index ? 0 : -1}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
 
 function EgovMain(props) {
   console.group("EgovMain");
@@ -346,242 +17,1334 @@ function EgovMain(props) {
   const location = useLocation();
   console.log("EgovMain [location] : ", location);
 
-  const [noticeBoard, setNoticeBoard] = useState();
-  const [gallaryBoard, setGallaryBoard] = useState(); // eslint-disable-line no-unused-vars
-  const [noticeListTag, setNoticeListTag] = useState();
+  // --- Session / user ---
+  const sessionToken = getSI("jToken");
+  const sessionUser = getSI("loginUser");
+  const sessionUserId = sessionUser?.id;
+  const sessionUserName = sessionUser?.name;
+  const sessionUserSe = sessionUser?.userSe;
 
-  // ✅ initPage 1회만 실행
+  // --- Router ---
+  const navigate = useNavigate();
+
+  // --- UI state ---
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [scrollPct, setScrollPct] = useState(0);
+
+  const [gallaryBoard, setGallaryBoard] = useState();
+
+     // ✅ initPage 1회만 실행
+   useEffect(() => {
+     import("@/js/ui").then(({ default: initPage }) => initPage?.());
+   }, []);
+
+   // 페이지 상단으로 스크롤
+   useEffect(() => {
+     window.scrollTo(0, 0);
+   }, []);
+
+  // === Slideshow State ===
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSlideshowPaused, setIsSlideshowPaused] = useState(false);
+
+  // === Slideshow Images ===
+  const slideshowImages = useMemo(() => [
+    "/src/assets/images/slide1.png",
+    "/src/assets/images/slide2.png", 
+    "/src/assets/images/slide3.jpg",
+    "/src/assets/images/img_sample.png",
+    "/src/assets/images/img_sample2.png"
+  ], []);
+
+  // === Slideshow Functions ===
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % slideshowImages.length);
+  }, [slideshowImages.length]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + slideshowImages.length) % slideshowImages.length);
+  }, [slideshowImages.length]);
+
+  // Auto-play slideshow
   useEffect(() => {
-    import("@/js/ui").then(({ default: initPage }) => initPage?.());
+    if (isSlideshowPaused || slideshowImages.length <= 1) return;
+    
+    const interval = setInterval(nextSlide, 4000);
+    return () => clearInterval(interval);
+  }, [isSlideshowPaused, slideshowImages.length, nextSlide]);
+
+  // Pause on hover
+  const handleSlideshowMouseEnter = useCallback(() => setIsSlideshowPaused(true), []);
+  const handleSlideshowMouseLeave = useCallback(() => setIsSlideshowPaused(false), []);
+
+  // Enhanced Scroll animations with progressive reveal
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const windowHeight = window.innerHeight;
+      
+      // Animate elements on scroll with progressive reveal
+      const animatedElements = document.querySelectorAll('.animate-on-scroll');
+      animatedElements.forEach((element) => {
+        const elementTop = element.offsetTop;
+        const elementVisible = 200;
+        const delay = element.dataset.delay || 0;
+        
+        if (scrollTop + windowHeight > elementTop + elementVisible) {
+          // Delay based on data-delay attribute
+          setTimeout(() => {
+            element.classList.add('animated');
+          }, parseFloat(delay) * 300); // 300ms delay per step
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    
+    // Initial check with a small delay to ensure DOM is ready
+    setTimeout(() => {
+      handleScroll();
+    }, 100);
+    
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const retrieveList = useCallback(() => {
-    console.groupCollapsed("EgovMain.retrieveList()");
-    const retrieveListURL = "/posts?type=notice";
-    const requestOptions = { method: "GET", headers: { "Content-type": "application/json" } };
+  // --- Header Handlers ---
+  const logInHandler = useCallback(() => {
+    navigate(URL.LOGIN);
+    setIsMenuOpen(false);
+    document.querySelector(".all_menu.Mobile")?.classList.add("closed");
+  }, [navigate]);
 
-    EgovNet.requestFetch(
-      retrieveListURL,
-      requestOptions,
-      (resp) => {
-        resp = resp.slice(0, 5);
-        setNoticeBoard(resp);
+  const logOutHandler = useCallback(() => {
+    const requestOptions = { 
+      headers: { "Content-type": "application/json", Authorization: sessionToken }, 
+      credentials: "include" 
+    };
+    EgovNet.requestFetch("/users/logout", requestOptions, () => {
+      setSI("loginUser", { id: "" });
+      setSI("jToken", null);
+      alert("로그아웃되었습니다!");
+      navigate(URL.MAIN);
+      setIsMenuOpen(false);
+      document.querySelector(".all_menu.Mobile")?.classList.add("closed");
+    });
+  }, [navigate, sessionToken]);
 
-        let mutNotiListTag = [];
-        mutNotiListTag.push(<li key="0">검색된 결과가 없습니다.</li>);
+  const toggleAllMenu = useCallback(() => setIsMenuOpen((prev) => !prev), []);
 
-        resp.forEach(function (item, index) {
-          if (index === 0) mutNotiListTag = [];
-          const createdAt = item.createdAt ? item.createdAt.substring(0, 10) : "";
-          mutNotiListTag.push(
-            <li key={item.postId} className="reveal">
-              <Link to={{ pathname: URL.INFORM_NOTICE_DETAIL }} state={{ postId: item.postId }} className="list_item">
-                {item.title}
-                <span>{createdAt}</span>
-              </Link>
-            </li>
-          );
-        });
-        setNoticeListTag(mutNotiListTag);
-      },
-      (resp) => console.log("err response : ", resp)
-    );
-    console.groupEnd("EgovMain.retrieveList()");
+  // Hover로 열기/닫기 (지연 닫힘)
+  const openAllMenuByHover = useCallback(() => {
+    setIsHovering(true);
+    setIsMenuOpen(true);
   }, []);
 
-  useEffect(() => { retrieveList(); }, [retrieveList]);
+  const closeAllMenuByHover = useCallback(() => {
+    setIsHovering(false);
+    setTimeout(() => {
+      if (!isHovering) setIsMenuOpen(false);
+    }, 300);
+  }, [isHovering]);
 
-  // 🔎 스크롤 리빌(IntersectionObserver)
+  // 스크롤 이벤트 처리
   useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [noticeListTag]);
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      
+      setScrolled(scrollTop > 50);
+      setScrollPct(Math.min(scrollPercent, 100));
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+
 
   console.log("------------------------------EgovMain [End]");
   console.groupEnd("EgovMain");
 
   return (
-    <main className="modern-main">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-container">
-          <div className="hero-content">
-            <div className="hero-carousel-wrapper">
-              <MainHeroCarousel />
-            </div>
-            
-            <div className="hero-sidebar">
-              {/* Notice Board */}
-              <div className="notice-card modern-card reveal">
-                <div className="card-header">
-                  <div className="header-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14,2 14,8 20,8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                      <polyline points="10,9 9,9 8,9"></polyline>
-                    </svg>
+    <>
+             {/* Main Background Video */}
+       <div className="main-header-background">
+         <video autoPlay loop muted playsInline>
+           <source src="/assets/images/crack2.mp4" type="video/mp4" />
+         </video>
+         <div className="main-header-overlay"></div>
+       </div>
+
+      <main className="modern-main">
+        {/* Hero Section */}
+        <section className="hero-section">
+          <div className="hero-container">
+            {/* Hero Content */}
+            <div className="hero-content">
+              <div className="hero-text-section">
+                <div className="hero-badge">
+                  <div className="badge-icon">🚀</div>
+                  <span>AI-Powered Platform</span>
+                </div>
+                <h1 className="hero-title">
+                  <span className="title-main">AI CODE MIGRATION</span>
+                  <span className="title-subtitle">전자정부 경량환경</span>
+                </h1>
+                <p className="hero-description">
+                  최신 AI 기술을 활용한 코드 변환 및 보안 검사 서비스로<br />
+                  현대적인 기술 스택으로의 마이그레이션을 지원합니다
+                </p>
+                <div className="hero-actions">
+                  <Link to={URL.SUPPORT_TRANSFORM_INTRO} className="hero-btn primary">
+                    <div className="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                      </svg>
+                    </div>
+                    <span>AI 변환기 시작하기</span>
+                    <div className="btn-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9,18 15,12 9,6"></polyline>
+                      </svg>
+                    </div>
+                  </Link>
+                  <Link to={URL.SUPPORT_SECURITY_INTRO} className="hero-btn secondary">
+                    <div className="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      </svg>
+                    </div>
+                    <span>보안 검사하기</span>
+                    <div className="btn-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9,18 15,12 9,6"></polyline>
+                      </svg>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Slideshow Carousel */}
+              <div className="hero-slideshow-section">
+                <div 
+                  className="slideshow-container"
+                  onMouseEnter={handleSlideshowMouseEnter}
+                  onMouseLeave={handleSlideshowMouseLeave}
+                >
+                  <div className="slideshow-track">
+                    {slideshowImages.map((image, index) => (
+                      <div 
+                        key={index}
+                        className={`slideshow-slide ${index === currentSlide ? 'active' : ''}`}
+                        style={{ backgroundImage: `url(${image})` }}
+                      />
+                    ))}
                   </div>
-                  <h2>공지사항</h2>
-                  <Link to={URL.INFORM_NOTICE} className="view-all-btn">
-                    전체보기
+                  
+                  {/* Slideshow Navigation */}
+                  <div className="slideshow-nav">
+                    {slideshowImages.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`slideshow-dot ${index === currentSlide ? 'active' : ''}`}
+                        onClick={() => setCurrentSlide(index)}
+                        aria-label={`슬라이드 ${index + 1}로 이동`}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Slideshow Controls */}
+                  <button 
+                    className="slideshow-control prev"
+                    onClick={prevSlide}
+                    aria-label="이전 슬라이드"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="15,18 9,12 15,6"></polyline>
+                    </svg>
+                  </button>
+                  <button 
+                    className="slideshow-control next"
+                    onClick={nextSlide}
+                    aria-label="다음 슬라이드"
+                  >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="9,18 15,12 9,6"></polyline>
                     </svg>
-                  </Link>
+                  </button>
                 </div>
-                <div className="notice-list">
-                  <ul>{noticeListTag}</ul>
-                </div>
-              </div>
-
-              {/* Quick Access Cards */}
-              <div className="quick-access-grid">
-                <Link to={URL.SUPPORT_DOWNLOAD} className="quick-card modern-card reveal hover-lift">
-                  <div className="quick-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7,10 12,15 17,10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                  </div>
-                  <div className="quick-card-content">
-                    <h3>자료실</h3>
-                    <p>다양한 자료를 다운로드 받으실 수 있습니다</p>
-                  </div>
-                </Link>
-
-                <Link to={URL.ABOUT} className="quick-card modern-card reveal hover-lift">
-                  <div className="quick-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                  </div>
-                  <div className="quick-card-content">
-                    <h3>찾아오시는 길</h3>
-                    <p>표준프레임워크센터의 위치 정보를 제공합니다</p>
-                  </div>
-                </Link>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+                 </section>
 
-      {/* Video Section */}
-      <section className="video-section">
-        <div className="video-container">
-          <div className="section-header">
-            <h2>전자정부 프레임워크 소개</h2>
-            <p>최신 기술과 트렌드를 반영한 전자정부 표준 프레임워크를 소개합니다</p>
-          </div>
-          <YouTubeEmbed video="https://youtu.be/JNsKvZo6MDs?si=xG50mmAa6J2-SJW2" autoplay={0} />
-        </div>
-      </section>
+                   {/* Innovation Section */}
+          <section className="innovation-section">
+            <div className="innovation-container">
+              <div className="innovation-content">
+                <h2 className="innovation-title animate-on-scroll" data-delay="0">
+                  <span className="title-line">AI CODE MIGRATION</span>
+                </h2>
+                <p className="innovation-subtitle animate-on-scroll" data-delay="1">
+                  <span className="subtitle-line">혁신을 제고하다.</span>
+                </p>
+              </div>
+            </div>
+          </section>
 
-      {/* Services Section */}
-      <section className="services-section">
-        <div className="services-container">
-          <div className="section-header">
-            <h2>주요 서비스</h2>
-            <p>전자정부 프레임워크가 제공하는 핵심 서비스들을 확인해보세요</p>
+         {/* Integrated Services Section */}
+        <section className="integrated-services-section">
+          {/* Section Background Video */}
+          <div className="section-background">
+            <video autoPlay loop muted playsInline>
+              <source src="/assets/images/crack.mp4" type="video/mp4" />
+            </video>
+            <div className="section-overlay"></div>
           </div>
           
-          <div className="services-grid">
-            <div className="service-card modern-card reveal hover-lift">
-              <div className="service-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                </svg>
-              </div>
-              <div className="service-content">
-                <h3>주요사업 소개</h3>
-                <p>표준프레임워크가 제공하는 주요 사업을 소개합니다</p>
-                <Link to={URL.INTRO_WORKS} className="service-link">
-                  자세히 보기
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7,7 17,7 17,17"></polyline>
-                  </svg>
-                </Link>
-              </div>
+          <div className="content-container">
+            <div className="section-header animate-on-scroll">
+              <h2 className="section-title">AI 서비스 허브</h2>
+              <p className="section-subtitle">혁신적인 AI 기술로 제공하는 통합 서비스 플랫폼</p>
             </div>
-
-            <div className="service-card modern-card reveal hover-lift">
-              <div className="service-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                  <line x1="8" y1="21" x2="16" y2="21"></line>
-                  <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg>
-              </div>
-              <div className="service-content">
-                <h3>대표서비스 소개</h3>
-                <p>표준프레임워크 실행환경의 서비스 그룹에서 제공하는 대표서비스입니다</p>
-                <Link to={URL.INTRO_SERVICE} className="service-link">
-                  자세히 보기
+            
+            <div className="services-grid">
+                             <Link to={URL.SUPPORT_TRANSFORM_INTRO} className="service-card animate-on-scroll">
+                <div className="card-glow"></div>
+                <div className="card-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7,7 17,7 17,17"></polyline>
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
                   </svg>
-                </Link>
-              </div>
-            </div>
-
-            <div className="service-card modern-card reveal hover-lift">
-              <div className="service-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 12l2 2 4-4"></path>
-                  <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
-                  <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
-                  <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"></path>
-                  <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"></path>
-                </svg>
-              </div>
-              <div className="service-content">
-                <h3>서비스 신청</h3>
-                <p>표준프레임워크 경량환경 홈페이지의 다양한 서비스를 신청하실 수 있습니다</p>
-                <Link to={URL.SUPPORT_APPLY} className="service-link">
-                  자세히 보기
+                </div>
+                <div className="card-content">
+                  <h3>AI 변환기</h3>
+                  <p>코드를 현대적인 기술로 변환</p>
+                  <div className="card-features">
+                    <span className="feature-tag">빠른 변환</span>
+                    <span className="feature-tag">정확도 95%</span>
+                  </div>
+                </div>
+                <div className="card-arrow">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7,7 17,7 17,17"></polyline>
+                    <polyline points="9,18 15,12 9,6"></polyline>
                   </svg>
-                </Link>
-              </div>
-            </div>
+                </div>
+              </Link>
 
-            <div className="service-card modern-card reveal hover-lift">
-              <div className="service-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </div>
-              <div className="service-content">
-                <h3>일정 현황</h3>
-                <p>표준프레임워크 경량환경 홈페이지의 전체적인 일정 현황을 조회하실 수 있습니다</p>
-                <Link to={URL.INFORM} className="service-link">
-                  자세히 보기
+                             <Link to={URL.SUPPORT_SECURITY_INTRO} className="service-card animate-on-scroll">
+                <div className="card-glow"></div>
+                <div className="card-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7,7 17,7 17,17"></polyline>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                   </svg>
-                </Link>
-              </div>
+                </div>
+                <div className="card-content">
+                  <h3>AI 보안기</h3>
+                  <p>보안 취약점 자동 검사 및 수정</p>
+                  <div className="card-features">
+                    <span className="feature-tag">실시간 검사</span>
+                    <span className="feature-tag">자동 수정</span>
+                  </div>
+                </div>
+                <div className="card-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="9,18 15,12 9,6"></polyline>
+                  </svg>
+                </div>
+              </Link>
+
+                             <Link to={URL.SUPPORT_GUIDE_EGOVFRAMEWORK} className="service-card animate-on-scroll">
+                <div className="card-glow"></div>
+                <div className="card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14,2 14,8 20,8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10,9 9,9 8,9"></polyline>
+                  </svg>
+                </div>
+                <div className="card-content">
+                  <h3>고객지원</h3>
+                  <p>다양한 지원 서비스 제공</p>
+                  <div className="card-features">
+                    <span className="feature-tag">24/7 지원</span>
+                    <span className="feature-tag">전문 상담</span>
+                  </div>
+                </div>
+                <div className="card-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="9,18 15,12 9,6"></polyline>
+                  </svg>
+                </div>
+              </Link>
+
+                             <Link to={URL.ABOUT} className="service-card animate-on-scroll">
+                <div className="card-glow"></div>
+                <div className="card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div className="card-content">
+                  <h3>사이트소개</h3>
+                  <p>AI CODE MIGRATION 소개</p>
+                  <div className="card-features">
+                    <span className="feature-tag">회사 소개</span>
+                    <span className="feature-tag">기술 스택</span>
+                  </div>
+                </div>
+                <div className="card-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="9,18 15,12 9,6"></polyline>
+                  </svg>
+                </div>
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+
+
+
+      <style>{`
+        /* Main Background */
+        .main-header-background {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          z-index: -1;
+          overflow: hidden;
+        }
+
+        .main-header-background video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          filter: brightness(1.1) contrast(1.05) saturate(1.1);
+        }
+
+        .main-header-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
+        }
+
+        /* Modern Main */
+        .modern-main {
+          min-height: 100vh;
+          position: relative;
+          z-index: 1;
+          background: transparent;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .hero-text-section {
+          animation: slideInLeft 0.8s ease-out 0.2s both;
+        }
+
+        .hero-slideshow-section {
+          animation: slideInRight 0.8s ease-out 0.4s both;
+        }
+
+        /* Hero Section */
+        .hero-section {
+          padding: 120px 0 80px;
+          position: relative;
+          z-index: 2;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+        }
+
+        .hero-container {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 2rem;
+        }
+
+        .hero-content {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+          align-items: center;
+          min-height: 60vh;
+        }
+
+        /* Hero Text Section */
+        .hero-text-section {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .hero-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem 1.5rem;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+          border: 1px solid rgba(102, 126, 234, 0.3);
+          border-radius: 50px;
+          color: #667eea;
+          font-size: 0.875rem;
+          font-weight: 600;
+          width: fit-content;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+          transition: all 0.3s ease;
+        }
+
+        .hero-badge:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .badge-icon {
+          font-size: 1.25rem;
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+
+        .hero-title {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          margin: 0;
+          font-family: "Poppins", "spoqa_regular", sans-serif;
+        }
+
+        .title-main {
+          font-size: 4rem;
+          font-weight: 800;
+          line-height: 1.1;
+          color: #ffffff;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+          background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          letter-spacing: -0.02em;
+        }
+
+        .title-subtitle {
+          font-size: 1.75rem;
+          font-weight: 600;
+          color: #e0e7ff;
+          margin-top: 0.5rem;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          font-family: "spoqa_medium", sans-serif;
+        }
+
+        .hero-description {
+          font-size: 1.25rem;
+          line-height: 1.6;
+          color: #e0e7ff;
+          margin: 0;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          font-family: "spoqa_regular", sans-serif;
+          letter-spacing: -0.01em;
+        }
+
+        .hero-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1rem;
+        }
+
+        .hero-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem 2rem;
+          border-radius: 16px;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+          border: 2px solid transparent;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .hero-btn.primary {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .hero-btn.primary:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .hero-btn.secondary {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          color: white;
+        }
+
+        .hero-btn.secondary:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-3px);
+          box-shadow: 0 12px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+        }
+
+        .btn-arrow {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          opacity: 0;
+          transform: translateX(-10px);
+          transition: all 0.3s ease;
+        }
+
+        .hero-btn:hover .btn-arrow {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        /* Hero Slideshow Section */
+        .hero-slideshow-section {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .slideshow-container {
+          width: 100%;
+          height: 500px;
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          position: relative;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          margin: 0 auto;
+          z-index: 1;
+        }
+
+        .slideshow-track {
+          width: 100%;
+          height: 100%;
+          position: relative;
+        }
+
+        .slideshow-slide {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0;
+          transition: opacity 0.8s ease-in-out;
+        }
+
+        .slideshow-slide.active {
+          opacity: 1;
+        }
+
+        /* Slideshow Navigation */
+        .slideshow-nav {
+          position: absolute;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 8px;
+          z-index: 10;
+        }
+
+        .slideshow-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.5);
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .slideshow-dot.active {
+          background: #ffffff;
+          transform: scale(1.2);
+        }
+
+        .slideshow-dot:hover {
+          background: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Slideshow Controls */
+        .slideshow-control {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.9);
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          z-index: 10;
+          color: #374151;
+        }
+
+        .slideshow-control:hover {
+          background: rgba(255, 255, 255, 1);
+          transform: translateY(-50%) scale(1.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .slideshow-control.prev {
+          left: 20px;
+        }
+
+        .slideshow-control.next {
+          right: 20px;
+        }
+
+        /* Slideshow Fade Animation */
+        @keyframes fadeIn {
+          0% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+
+        /* Enhanced Section Background */
+        .section-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          overflow: hidden;
+        }
+
+        .section-background video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          filter: brightness(0.7) contrast(1.2) saturate(1.1);
+        }
+
+        .section-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+        }
+
+        /* Enhanced Scroll Animation Classes */
+        .animate-on-scroll {
+          opacity: 0;
+          transform: translateY(100px);
+          transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .animate-on-scroll.animated {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* Progressive reveal animation for cards */
+        .service-card.animate-on-scroll {
+          transform: translateY(-150px) scale(0.7);
+          filter: blur(3px);
+          opacity: 0;
+          transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .service-card.animate-on-scroll.animated,
+        .service-card.animated {
+          transform: translateY(0) scale(1);
+          filter: blur(0px);
+          opacity: 1;
+        }
+
+                 /* Remove transition delays - now controlled by scroll position */
+
+         /* Innovation Section */
+         .innovation-section {
+           padding: 120px 0;
+           background: #ffffff;
+           position: relative;
+           z-index: 1;
+           overflow: hidden;
+         }
+
+         .innovation-container {
+           max-width: 1440px;
+           margin: 0 auto;
+           padding: 0 2rem;
+           text-align: center;
+         }
+
+                   .innovation-content {
+            opacity: 1;
+            transform: translateY(0);
+          }
+
+                   .innovation-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #000000;
+            margin: 0 0 1rem;
+            font-family: "Poppins", "spoqa_regular", sans-serif;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            overflow: hidden;
+          }
+
+          .innovation-subtitle {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333333;
+            margin: 0;
+            font-family: "spoqa_medium", sans-serif;
+            letter-spacing: -0.01em;
+            overflow: hidden;
+          }
+
+                     /* Text line animation */
+           .title-line,
+           .subtitle-line {
+             display: inline-block;
+             transform: translateY(100%);
+             opacity: 0;
+             transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+           }
+
+           .innovation-title.animated .title-line,
+           .innovation-subtitle.animated .subtitle-line {
+             transform: translateY(0);
+             opacity: 1;
+           }
+
+           /* Force initial state for text lines */
+           .innovation-title:not(.animated) .title-line,
+           .innovation-subtitle:not(.animated) .subtitle-line {
+             transform: translateY(100%);
+             opacity: 0;
+           }
+
+          /* Add a subtle slide effect */
+          .innovation-title.animate-on-scroll {
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          }
+
+          .innovation-subtitle.animate-on-scroll {
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          }
+
+          .innovation-title.animated,
+          .innovation-subtitle.animated {
+            transform: translateY(0);
+            opacity: 1;
+          }
+
+         /* Integrated Services Section */
+        .integrated-services-section {
+          padding: 120px 0;
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(20px);
+          position: relative;
+          z-index: 1;
+          overflow: hidden;
+        }
+
+        .integrated-services-section::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+          z-index: -1;
+        }
+
+        .content-container {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 2rem;
+          position: relative;
+          z-index: 2;
+        }
+
+        .section-header {
+          text-align: center;
+          margin-bottom: 5rem;
+        }
+
+        .section-title {
+          font-size: 3.5rem;
+          font-weight: 900;
+          background: linear-gradient(135deg, #ffffff 0%, #60a5fa 50%, #3b82f6 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin: 0 0 1.5rem;
+          text-shadow: none;
+          letter-spacing: -0.03em;
+          position: relative;
+        }
+
+        .section-title::after {
+          content: '';
+          position: absolute;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 80px;
+          height: 4px;
+          background: linear-gradient(135deg, #3b82f6, #60a5fa);
+          border-radius: 2px;
+        }
+
+        .section-subtitle {
+          font-size: 1.375rem;
+          color: #e0e7ff;
+          margin: 0;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+          font-weight: 500;
+          opacity: 0.9;
+        }
+
+        .services-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2.5rem;
+          position: relative;
+        }
+
+        .service-card {
+          display: flex;
+          flex-direction: column;
+          padding: 2.5rem;
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(30px);
+          border-radius: 24px;
+          text-decoration: none;
+          color: inherit;
+          transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          min-height: 280px;
+          opacity: 0;
+          transform: translateY(-150px) scale(0.7);
+          filter: blur(3px);
+        }
+
+        /* Remove old transition delays as they're now handled by animate-on-scroll */
+
+        .card-glow {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(96, 165, 250, 0.05));
+          opacity: 0;
+          transition: opacity 0.5s ease;
+          z-index: 0;
+        }
+
+        .service-card:hover .card-glow {
+          opacity: 1;
+        }
+
+        .service-card:hover {
+          transform: translateY(-15px) scale(1.03);
+          box-shadow: 0 35px 80px rgba(0, 0, 0, 0.4);
+          border-color: #3b82f6;
+          background: rgba(255, 255, 255, 0.25);
+        }
+
+        .service-card:active {
+          transform: translateY(-5px) scale(1.01);
+        }
+
+        .card-icon {
+          width: 70px;
+          height: 70px;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          border-radius: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          margin-bottom: 1.5rem;
+          position: relative;
+          z-index: 1;
+          transition: all 0.3s ease;
+        }
+
+        .service-card:hover .card-icon {
+          transform: scale(1.1) rotate(5deg);
+          box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .card-icon svg {
+          width: 32px;
+          height: 32px;
+        }
+
+        .card-content {
+          flex: 1;
+          z-index: 1;
+          position: relative;
+        }
+
+        .card-content h3 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #ffffff;
+          margin: 0 0 0.75rem;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-content p {
+          font-size: 1rem;
+          color: #e0e7ff;
+          margin: 0 0 1.5rem;
+          line-height: 1.6;
+          opacity: 0.9;
+        }
+
+        .card-features {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .feature-tag {
+          padding: 0.375rem 0.75rem;
+          background: rgba(59, 130, 246, 0.2);
+          border: 1px solid rgba(59, 130, 246, 0.3);
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #60a5fa;
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+        }
+
+        .service-card:hover .feature-tag {
+          background: rgba(59, 130, 246, 0.3);
+          border-color: rgba(59, 130, 246, 0.5);
+          color: #ffffff;
+        }
+
+        .card-arrow {
+          color: #60a5fa;
+          transition: all 0.4s ease;
+          z-index: 1;
+          align-self: flex-end;
+          margin-top: auto;
+        }
+
+        .service-card:hover .card-arrow {
+          color: #ffffff;
+          transform: translateX(8px) scale(1.1);
+        }
+
+        .card-arrow svg {
+          width: 24px;
+          height: 24px;
+        }
+
+        /* Global Chat FAB */
+        .global-chat-fab {
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          border: none;
+          border-radius: 50%;
+          color: white;
+          cursor: pointer;
+          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+          transition: all 0.3s ease;
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .global-chat-fab:hover {
+          transform: scale(1.1);
+          box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6);
+        }
+
+        .global-chat-fab svg {
+          width: 24px;
+          height: 24px;
+        }
+
+
+
+        /* Responsive Design */
+                 @media (max-width: 1024px) {
+           .hero-content {
+             grid-template-columns: 1fr;
+             gap: 3rem;
+             text-align: center;
+           }
+
+           .title-main {
+             font-size: 3rem;
+           }
+
+           .hero-actions {
+             justify-content: center;
+           }
+
+           .services-grid {
+             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+           }
+
+           .slideshow-container {
+             height: 400px;
+           }
+
+           .section-title {
+             font-size: 3rem;
+           }
+
+           .innovation-title {
+             font-size: 3.5rem;
+           }
+
+           .innovation-subtitle {
+             font-size: 1.75rem;
+           }
+         }
+
+                 @media (max-width: 768px) {
+           .hero-section {
+             padding: 100px 0 60px;
+           }
+
+           .innovation-section {
+             padding: 80px 0;
+           }
+
+           .integrated-services-section {
+             padding: 80px 0;
+           }
+
+           .hero-container,
+           .content-container,
+           .innovation-container {
+             padding: 0 1rem;
+           }
+
+           .title-main {
+             font-size: 2.5rem;
+           }
+
+           .title-subtitle {
+             font-size: 1.5rem;
+           }
+
+           .hero-description {
+             font-size: 1.125rem;
+           }
+
+           .hero-actions {
+             flex-direction: column;
+           }
+
+           .hero-btn {
+             justify-content: center;
+           }
+
+           .section-title {
+             font-size: 2.5rem;
+           }
+
+           .section-subtitle {
+             font-size: 1.125rem;
+           }
+
+           .innovation-title {
+             font-size: 3rem;
+           }
+
+           .innovation-subtitle {
+             font-size: 1.5rem;
+           }
+
+           .slideshow-container {
+             height: 300px;
+           }
+
+           .service-card {
+             padding: 2rem;
+             min-height: 250px;
+           }
+
+           .services-grid {
+             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+             gap: 2rem;
+           }
+         }
+
+                 @media (max-width: 640px) {
+           .title-main {
+             font-size: 2rem;
+           }
+
+           .title-subtitle {
+             font-size: 1.25rem;
+           }
+
+           .hero-description {
+             font-size: 1rem;
+           }
+
+           .section-title {
+             font-size: 2rem;
+           }
+
+           .section-subtitle {
+             font-size: 1rem;
+           }
+
+           .innovation-title {
+             font-size: 2.5rem;
+           }
+
+           .innovation-subtitle {
+             font-size: 1.25rem;
+           }
+
+           .service-card {
+             padding: 1.5rem;
+             min-height: 220px;
+           }
+
+           .card-content h3 {
+             font-size: 1.25rem;
+           }
+
+           .card-content p {
+             font-size: 0.875rem;
+           }
+
+           .card-features {
+             margin-bottom: 1rem;
+           }
+
+           .feature-tag {
+             font-size: 0.7rem;
+             padding: 0.25rem 0.5rem;
+           }
+
+           .slideshow-container {
+             height: 250px;
+           }
+
+           .services-grid {
+             grid-template-columns: 1fr;
+             gap: 1.5rem;
+           }
+
+           .card-icon {
+             width: 60px;
+             height: 60px;
+           }
+
+           .card-icon svg {
+             width: 28px;
+             height: 28px;
+           }
+         }
+      `}</style>
+    </>
   );
 }
 

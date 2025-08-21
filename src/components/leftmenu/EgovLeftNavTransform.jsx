@@ -3,7 +3,8 @@ import "@/css/modern-styles.css";
 
 function EgovLeftNavTransform() {
   return (
-    <nav className="modern-left-nav">
+    <>
+      <nav className="modern-left-nav">
       <div className="nav-container">
         <div className="nav-header">
           <div className="nav-icon">
@@ -98,6 +99,41 @@ function EgovLeftNavTransform() {
         </ul>
       </div>
     </nav>
+
+    <style dangerouslySetInnerHTML={{ __html: `
+      .modern-left-nav {
+        color: #000000 !important;
+      }
+      
+      .nav-title {
+        color: #000000 !important;
+      }
+      
+      .link-text {
+        color: #000000 !important;
+      }
+      
+      .nav-link {
+        color: #000000 !important;
+      }
+      
+      .nav-link:hover {
+        color: #000000 !important;
+      }
+      
+      .nav-link.active {
+        color: #000000 !important;
+      }
+      
+      .link-title {
+        color: #000000 !important;
+      }
+      
+      .link-desc {
+        color: #000000 !important;
+      }
+    `}} />
+    </>
   );
 }
 

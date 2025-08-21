@@ -38,6 +38,8 @@ export default function EgovHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState2(false);
   const [mousePos, setMousePos] = useState2({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState2(false);
+  const [isHeaderHidden, setIsHeaderHidden] = useState2(false);
+  const [lastScrollY, setLastScrollY] = useState2(0);
 
   // === Chat (전역 FAB + 드로어) ===
   const [isChatOpen, setIsChatOpen] = useState2(false);
@@ -96,288 +98,224 @@ export default function EgovHeader() {
 
   const closeAllMenuByHover = useCallback2(() => {
     setIsHovering(false);
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    hoverTimerRef.current = setTimeout(() => { if (!isHovering) setIsMenuOpen(false); }, 180);
-  }, [isHovering]);
-
-  const handleMenuMouseEnter = useCallback2(() => {
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    setIsHovering(true);
-    setIsMenuOpen(true);
-  }, []);
-  const handleMenuMouseLeave = useCallback2(() => {
-    setIsHovering(false);
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    hoverTimerRef.current = setTimeout(() => setIsMenuOpen(false), 120);
+    hoverTimerRef.current = setTimeout(() => {
+      setIsMenuOpen(false);
+    }, 200);
   }, []);
 
-  // 바깥 클릭 시 닫기 (전체메뉴)
+  // === Chat handlers ===
+  const toggleChat = useCallback2(() => {
+    setIsChatOpen((prev) => !prev);
+    if (!isChatOpen) {
+      previouslyFocusedRef.current = document.activeElement;
+      setTimeout(() => firstTrapRef.current?.focus(), 100);
+    } else {
+      previouslyFocusedRef.current?.focus();
+    }
+  }, [isChatOpen]);
+
+  const sendMessage = useCallback2(async () => {
+    if (!input.trim() || pending) return;
+
+    const userMessage = { id: `m${Date.now()}`, role: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setPending(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      const botMessage = { 
+        id: `m${Date.now() + 1}`, 
+        role: "bot", 
+        text: "죄송합니다. 현재 AI 응답 기능이 준비 중입니다. 곧 더 나은 서비스를 제공하겠습니다!" 
+      };
+      setMessages((prev) => [...prev, botMessage]);
+      setPending(false);
+    }, 1000);
+  }, [input, pending]);
+
+  // === Scroll effects ===
   useEffect2(() => {
-    const onClickOutside = (e) => {
-      if (!isMenuOpen) return;
-      const headerEl = headerRef.current;
-      if (headerEl && !headerEl.contains(e.target)) setIsMenuOpen(false);
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      
+      setScrolled(scrollTop > 50);
+      setScrollPct(Math.min(scrollPercent, 100));
+      
+      // Header hide/show logic
+      const scrollThreshold = 100; // 스크롤 임계값
+      const scrollDelta = scrollTop - lastScrollY;
+      
+      if (scrollTop > scrollThreshold) {
+        if (scrollDelta > 10) {
+          // 아래로 스크롤 - 헤더 숨기기
+          setIsHeaderHidden(true);
+        } else if (scrollDelta < -10) {
+          // 위로 스크롤 - 헤더 보이기
+          setIsHeaderHidden(false);
+        }
+      } else {
+        // 상단에 가까우면 항상 보이기
+        setIsHeaderHidden(false);
+      }
+      
+      setLastScrollY(scrollTop);
     };
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, [isMenuOpen]);
 
-  // ESC로 닫기 (전체메뉴 + 챗봇)
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
+  // === Mouse tracking for parallax ===
   useEffect2(() => {
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setIsMenuOpen(false);
-        if (isChatOpen) {
-          setIsChatOpen(false);
-          previouslyFocusedRef.current?.focus?.();
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  // === Load state ===
+  useEffect2(() => {
+    setIsLoaded(true);
+  }, []);
+
+  // === Chat keyboard shortcuts ===
+  useEffect2(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isChatOpen) {
+        toggleChat();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isChatOpen, toggleChat]);
+
+  // === Chat auto-scroll ===
+  useEffect2(() => {
+    if (chatListRef.current) {
+      chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // === Focus trap for chat ===
+  useEffect2(() => {
+    if (!isChatOpen) return;
+
+    const handleTabKey = (e) => {
+      if (e.key === "Tab") {
+        const focusableElements = chatRef.current?.querySelectorAll(
+          "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+        );
+        
+        if (!focusableElements?.length) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
         }
       }
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+
+    document.addEventListener("keydown", handleTabKey);
+    return () => document.removeEventListener("keydown", handleTabKey);
   }, [isChatOpen]);
 
-  // 스크롤 상태 (헤더 음영/축소 + 진행바)
-  useEffect2(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 4);
-      const doc = document.documentElement;
-      const h = doc.scrollHeight - doc.clientHeight;
-      const pct = h > 0 ? Math.min(100, Math.max(0, (y / h) * 100)) : 0;
-      setScrollPct(pct);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // 버튼 aria 업데이트
-  useEffect2(() => { if (btnAllMenuRef.current) btnAllMenuRef.current.title = menuBtnTitle; }, [menuBtnTitle]);
-
-  // 클래스 동기화 (.closed / .active)
-  useEffect2(() => {
-    const menuEl = webMenuRef.current;
-    const btnEl = btnAllMenuRef.current;
-    if (menuEl) menuEl.classList.toggle("closed", !isMenuOpen);
-    if (btnEl) btnEl.classList.toggle("active", isMenuOpen);
-  }, [isMenuOpen]);
-
-  // === Chat: 열기/닫기 & 바깥 클릭 닫기 ===
-  const toggleChat = useCallback2(() => setIsChatOpen((v) => !v), []);
-  const closeChat = useCallback2(() => setIsChatOpen(false), []);
-
-  useEffect2(() => {
-    const onClickOutside = (e) => {
-      if (!isChatOpen) return;
-      const panel = chatRef.current;
-      const btn = chatBtnRef.current;
-      if (panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) {
-        setIsChatOpen(false);
-        previouslyFocusedRef.current?.focus?.();
-      }
-    };
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, [isChatOpen]);
-
-  // Chat 열릴 때 포커스/미읽음/포커스 트랩 준비
-  useEffect2(() => {
-    if (isChatOpen) {
-      setUnread(0);
-      previouslyFocusedRef.current = document.activeElement;
-      setTimeout(() => {
-        inputRef.current?.focus();
-        chatListRef.current?.scrollTo({ top: chatListRef.current.scrollHeight, behavior: "smooth" });
-      }, 10);
-    } else {
-      // 닫히면 포커스 복구
-      previouslyFocusedRef.current?.focus?.();
-    }
-  }, [isChatOpen]);
-
-  // 메시지 자동 스크롤
-  useEffect2(() => {
-    if (!chatListRef.current) return;
-    chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
-  }, [messages.length]);
-
-  // 포커스 트랩: Tab 순환
-  const trapKeyDown = useCallback2((e) => {
-    if (!isChatOpen || e.key !== "Tab") return;
-    const focusables = chatRef.current?.querySelectorAll(
-      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-    );
-    if (!focusables || focusables.length === 0) return;
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-    if (e.shiftKey) {
-      if (document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      }
-    } else {
-      if (document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-  }, [isChatOpen]);
-
-  // === Chat Action UI =====================
-  const getActionTheme = (url = "") => {
-    if (/\/support\/transform/i.test(url)) return "t-transform";
-    if (/\/support\/security/i.test(url)) return "t-security";
-    if (/\/support\/guide/i.test(url) || /egov/i.test(url)) return "t-guide";
-    if (/\/inform/i.test(url)) return "t-inform";
-    if (/download/i.test(url)) return "t-download";
-    return "t-default";
-  };
-
-  const Icon = ({ theme }) => {
-    if (theme === "t-transform")
-      return (
-        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M3 7h10l-2-2 1.4-1.4L18.8 8l-6.4 4.4L11 11l2-2H3zM21 17H11l2 2-1.4 1.4L5.2 16l6.4-4.4L13 13l-2 2h10z" />
-        </svg>
-      );
-    if (theme === "t-security")
-      return (
-        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M12 2l7 3v6c0 5-3.6 9.7-7 11-3.4-1.3-7-6-7-11V5l7-3zm0 4l-4 1.7V11c0 3.5 2.2 7.1 4 8 1.8-.9 4-4.5 4-8V7.7L12 6z" />
-        </svg>
-      );
-    if (theme === "t-guide")
-      return (
-        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M4 4h9a4 4 0 014 4v12H8a4 4 0 01-4-4V4zm9 2H6v10a2 2 0 002 2h9V8a2 2 0 00-2-2zM8 6h1a3 3 0 013 3v1H8V6z" />
-        </svg>
-      );
-    if (theme === "t-download")
-      return (
-        <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M12 3v10l3-3 1.4 1.4-5.4 5.4-5.4-5.4L7 10l3 3V3h2zm-7 16h14v2H5v-2z" />
-        </svg>
-      );
-    return (
-      <svg className="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v5h4v2h-6V7h2z" />
-      </svg>
-    );
-  };
-
-  const ChatActionBar = ({ actions = [] }) => {
-    if (!Array.isArray(actions) || actions.length === 0) return null;
-    return (
-      <div className="modern-action-bar" role="list" aria-label="빠른 이동">
-
-        <div className="action-buttons">
-          {actions.map((a, idx) => {
-            const theme = getActionTheme(a.url);
-            const external = /^https?:\/\//i.test(a.url);
-            if (external) {
-              return (
-                <a
-                  key={idx}
-                  className={`action-chip ${theme}`}
-                  href={a.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  role="listitem"
-                  aria-label={`${a.label} (새 창)`}
-                  onClick={closeChat}
-                >
-                  <span className="chip-label">{a.label}</span>
-                </a>
-              );
-            }
-            return (
-              <button
-                key={idx}
-                type="button"
-                className={`action-chip ${theme}`}
-                role="listitem"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(a.url);
-                  closeChat();
-                }}
-              >
-                <span className="chip-label">{a.label}</span>
-              </button>
-            );
-          })}
-        </div>
+  // === Chat portal ===
+  const chatPortal = createPortal(
+    <div
+      ref={chatRef}
+      className={`chat-drawer ${isChatOpen ? "open" : ""}`}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="chat-title"
+    >
+      <div className="chat-header">
+        <h2 id="chat-title">AI 도우미</h2>
+        <button
+          ref={chatBtnRef}
+          onClick={toggleChat}
+          className="chat-close-btn"
+          aria-label="챗봇 닫기"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
-    );
-  };
 
-  // === Chat: 전송 (Agent / RAG 연동) ===
-  const sendMessage = useCallback2(
-    async (e) => {
-      e?.preventDefault?.();
-      const text = input.trim();
-      if (!text || pending) return;
+      <div ref={chatListRef} className="chat-messages">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`chat-message ${msg.role}`}>
+            <div className="message-content">{msg.text}</div>
+          </div>
+        ))}
+        {pending && (
+          <div className="chat-message bot">
+            <div className="message-content">
+              <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
-      const myMsg = { id: `m-${Date.now()}`, role: "me", text };
-      setMessages((prev) => [...prev, myMsg]);
-      setInput("");
-      setPending(true);
+      <div className="chat-input">
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          placeholder="메시지를 입력하세요..."
+          disabled={pending}
+        />
+        <button
+          onClick={sendMessage}
+          disabled={!input.trim() || pending}
+          className="send-btn"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22,2 15,22 11,13 2,9"></polygon>
+          </svg>
+        </button>
+      </div>
 
-      try {
-        // ✅ 실제 백엔드 연동
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s 타임아웃
-
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text,
-            user: { id: sessionUserId, name: sessionUserName, role: sessionUserSe },
-          }),
-          credentials: "include",
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const data = await res.json();
-        const reply = data?.reply ?? "응답을 받았지만 내용이 비어 있어요.";
-        const actions = Array.isArray(data?.actions) ? data.actions : [];
-        const citations = Array.isArray(data?.citations) ? data.citations : [];
-
-        const botMsg = { id: `b-${Date.now()}`, role: "bot", text: reply, actions, citations };
-        setMessages((prev) => [...prev, botMsg]);
-      } catch {
-        // ❗ 폴백 (연결 오류)
-        const botMsg = {
-          id: `b-${Date.now()}`,
-          role: "bot",
-          text: "잠시 후 다시 시도해주세요. (연결 오류)",
-          actions: [
-            { label: "변환 하기", url: "/support/transform/transformation" },
-            { label: "AI 보안 검사", url: "/support/security/scan" },
-            { label: "전자정부프레임워크 가이드", url: "/support/guide/egovframework" },
-          ],
-        };
-        setMessages((prev) => [...prev, botMsg]);
-      } finally {
-        setPending(false);
-        if (!isChatOpen) setUnread((n) => n + 1);
-      }
-    },
-    [input, pending, isChatOpen, sessionUserId, sessionUserName, sessionUserSe]
+      {/* Focus trap sentinels */}
+      <button ref={firstTrapRef} className="focus-trap" tabIndex={0} />
+      <button ref={lastTrapRef} className="focus-trap" tabIndex={0} />
+    </div>,
+    document.body
   );
 
   return (
     <>
       <header
         ref={headerRef}
-        className={`modern-header ${scrolled ? "is-scrolled" : ""} ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}
+        className={`modern-header ${scrolled ? "is-scrolled" : ""} ${isMobileMenuOpen ? "mobile-menu-open" : ""} ${isHeaderHidden ? "header-hidden" : ""}`}
         data-state={isMenuOpen ? "open" : "closed"}
       >
+
+
         {/* 상단 스크롤 진행바 */}
         <div className="scroll-progress" aria-hidden style={{ transform: `scaleX(${scrollPct / 100})` }} />
 
@@ -415,7 +353,7 @@ export default function EgovHeader() {
                 </div>
                 <div className="logo-text">
                   <span className="logo-title">AI CODE MIGRATION</span>
-                  <span className="logo-subtitle">Powered by KT AIVLE</span>
+                  <span className="logo-subtitle">전자정부 경량환경</span>
                 </div>
               </HLink>
             </h1>
@@ -426,37 +364,34 @@ export default function EgovHeader() {
             className="desktop-nav"
             role="navigation"
             aria-label="주요 메뉴"
+            onMouseEnter={openAllMenuByHover}
+            onMouseLeave={closeAllMenuByHover}
           >
             <ul className="nav-list">
               <li className="nav-item">
                 <HNavLink to={URL2.ABOUT} className="nav-link">
-                  <span>사이트소개</span>
-                  <div className="nav-indicator"></div>
+                  사이트소개
                 </HNavLink>
               </li>
               <li className="nav-item">
                 <HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO} className="nav-link">
-                  <span>AI 변환기</span>
-                  <div className="nav-indicator"></div>
+                  AI 변환기
                 </HNavLink>
               </li>
               <li className="nav-item">
                 <HNavLink to={URL2.SUPPORT_SECURITY_INTRO} className="nav-link">
-                  <span>AI 보안기</span>
-                  <div className="nav-indicator"></div>
+                  AI 보안기
                 </HNavLink>
               </li>
               <li className="nav-item">
                 <HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK} className="nav-link">
-                  <span>고객지원</span>
-                  <div className="nav-indicator"></div>
+                  고객지원
                 </HNavLink>
               </li>
               {sessionUserSe === "ADM" && (
                 <li className="nav-item">
                   <HNavLink to={URL2.ADMIN} className="nav-link">
-                    <span>사이트관리</span>
-                    <div className="nav-indicator"></div>
+                    사이트관리
                   </HNavLink>
                 </li>
               )}
@@ -502,318 +437,840 @@ export default function EgovHeader() {
             <button
               className="mobile-menu-toggle"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-expanded={isMobileMenuOpen}
-              aria-label="모바일 메뉴 토글"
+              aria-label="모바일 메뉴"
             >
-              <span className="hamburger-line"></span>
-              <span className="hamburger-line"></span>
-              <span className="hamburger-line"></span>
+              <span></span>
+              <span></span>
+              <span></span>
             </button>
 
-            {/* 데스크톱 전체메뉴 버튼 */}
-            <button
-              ref={btnAllMenuRef}
-              type="button"
-              className="all-menu-btn"
-              title={menuBtnTitle}
-              aria-expanded={isMenuOpen}
-              aria-controls="allmenu-web"
-              onClick={toggleAllMenu}
-              onMouseEnter={openAllMenuByHover}
-              onMouseLeave={closeAllMenuByHover}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-              <span>전체메뉴</span>
-            </button>
+
+          </div>
+
+          {/* 전체메뉴 드롭다운 */}
+          <div 
+            className={`all-menu-dropdown ${isMenuOpen ? "open" : ""}`}
+            onMouseEnter={openAllMenuByHover}
+            onMouseLeave={closeAllMenuByHover}
+          >
+            <div className="all-menu-container">
+              <div className="all-menu-content">
+                <div className="menu-section">
+                  <h3>사이트소개</h3>
+                  <ul>
+                    <li><HLink to={URL2.ABOUT}>소개</HLink></li>
+                    <li><HLink to={URL2.ABOUT_HISTORY}>연혁</HLink></li>
+                    <li><HLink to={URL2.ABOUT_ORGANIZATION}>조직도</HLink></li>
+                    <li><HLink to={URL2.ABOUT_LOCATION}>찾아오시는 길</HLink></li>
+                  </ul>
+                </div>
+                
+                <div className="menu-section">
+                  <h3>AI 변환기</h3>
+                  <ul>
+                    <li><HLink to={URL2.SUPPORT_TRANSFORM_INTRO}>소개</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_TRANSFORMATION}>변환</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_VIEW_TRANSFORMATION}>변환 이력</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_VIEW_TEST}>테스트 이력</HLink></li>
+                  </ul>
+                </div>
+                
+                <div className="menu-section">
+                  <h3>AI 보안기</h3>
+                  <ul>
+                    <li><HLink to={URL2.SUPPORT_SECURITY_INTRO}>소개</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_SECURITY_SCAN}>보안 검사</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_SECURITY_DETECT}>취약점 탐지</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_SECURITY_REPORT}>보고서</HLink></li>
+                  </ul>
+                </div>
+                
+                <div className="menu-section">
+                  <h3>고객지원</h3>
+                  <ul>
+                    <li><HLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK}>가이드</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_GUIDE_CHATBOT}>챗봇</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_QNA}>Q&A</HLink></li>
+                    <li><HLink to={URL2.SUPPORT_DOWNLOAD}>다운로드</HLink></li>
+                  </ul>
+                </div>
+                
+                {sessionUserSe === "ADM" && (
+                  <div className="menu-section">
+                    <h3>사이트관리</h3>
+                    <ul>
+                      <li><HLink to={URL2.ADMIN}>관리자 메뉴</HLink></li>
+                      <li><HLink to={URL2.ADMIN_NOTICE}>공지사항 관리</HLink></li>
+                      <li><HLink to={URL2.ADMIN_FAQ}>FAQ 관리</HLink></li>
+                      <li><HLink to={URL2.ADMIN_MEMBER}>회원 관리</HLink></li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
+
+
 
         {/* 모바일 메뉴 */}
         <div className={`mobile-menu ${isMobileMenuOpen ? "open" : ""}`}>
-          <div className="mobile-menu-content">
-            <nav className="mobile-nav">
-              <ul className="mobile-nav-list">
-                <li>
-                  <HNavLink to={URL2.ABOUT} onClick={() => setIsMobileMenuOpen(false)}>
-                    사이트소개
-                  </HNavLink>
-                </li>
-                <li>
-                  <HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO} onClick={() => setIsMobileMenuOpen(false)}>
-                    AI 변환기
-                  </HNavLink>
-                </li>
-                <li>
-                  <HNavLink to={URL2.SUPPORT_SECURITY_INTRO} onClick={() => setIsMobileMenuOpen(false)}>
-                    AI 보안기
-                  </HNavLink>
-                </li>
-                <li>
-                  <HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK} onClick={() => setIsMobileMenuOpen(false)}>
-                    고객지원
-                  </HNavLink>
-                </li>
-                {sessionUserSe === "ADM" && (
-                  <li>
-                    <HNavLink to={URL2.ADMIN} onClick={() => setIsMobileMenuOpen(false)}>
-                      사이트관리
-                    </HNavLink>
-                  </li>
-                )}
-              </ul>
-            </nav>
-          </div>
-        </div>
-
-        {/* All Menu (WEB) - Modern Mega Menu */}
-        <div
-          id="allmenu-web"
-          ref={webMenuRef}
-          className={`mega-menu ${isMenuOpen ? "open" : "closed"}`}
-          aria-hidden={!isMenuOpen}
-          onMouseEnter={handleMenuMouseEnter}
-          onMouseLeave={handleMenuMouseLeave}
-        >
-          <div className="mega-menu-content">
-            <div className="mega-menu-grid">
-              <div className="mega-menu-section">
-                <div className="section-header">
-                  <div className="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                      <polyline points="9,22 9,12 15,12 15,22"></polyline>
-                    </svg>
-                  </div>
-                  <h3>사이트소개</h3>
-                </div>
-                <ul className="section-links">
-                  <li><HNavLink to={URL2.ABOUT_SITE}>소개</HNavLink></li>
-                  <li><HNavLink to={URL2.ABOUT_HISTORY}>연혁</HNavLink></li>
-                  <li><HNavLink to={URL2.ABOUT_ORGANIZATION}>조직소개</HNavLink></li>
-                  <li><HNavLink to={URL2.ABOUT_LOCATION}>찾아오시는 길</HNavLink></li>
-                </ul>
-              </div>
-
-              <div className="mega-menu-section">
-                <div className="section-header">
-                  <div className="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                      <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
-                      <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
-                      <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
-                    </svg>
-                  </div>
-                  <h3>AI 변환기</h3>
-                </div>
-                <ul className="section-links">
-                  <li><HNavLink to="/support/transform/intro">기능 소개</HNavLink></li>
-                  <li><HNavLink to="/support/transform/transformation">변환 하기</HNavLink></li>
-                  <li><HNavLink to="/support/transform/view_transform">변환 이력 조회</HNavLink></li>
-                  <li><HNavLink to="/support/transform/view_test">테스트 이력 조회</HNavLink></li>
-                  <li><HNavLink to="/support/transform/download">다운로드</HNavLink></li>
-                </ul>
-              </div>
-
-              <div className="mega-menu-section">
-                <div className="section-header">
-                  <div className="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                  </div>
-                  <h3>AI 보안기</h3>
-                </div>
-                <ul className="section-links">
-                  <li><HNavLink to="/support/security/intro">기능 소개</HNavLink></li>
-                  <li><HNavLink to="/support/security/scan">AI 보안 검사</HNavLink></li>
-                  <li><HNavLink to="/support/security/vulnerability">보안 취약점탐지</HNavLink></li>
-                  <li><HNavLink to="/support/security/report">보안 점검결과</HNavLink></li>
-                  <li><HNavLink to="/support/security/report_detail">다운로드</HNavLink></li>
-                </ul>
-              </div>
-
-              <div className="mega-menu-section">
-                <div className="section-header">
-                  <div className="section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                  </div>
-                  <h3>고객지원</h3>
-                </div>
-                <ul className="section-links">
-                  <li><HNavLink to="/support/guide/egovframework">전자정부프레임워크 가이드</HNavLink></li>
-                  <li><HNavLink to="/intro">정보마당</HNavLink></li>
-                  <li><HNavLink to="/inform">알림마당</HNavLink></li>
-                </ul>
-              </div>
-
+          <nav className="mobile-nav">
+            <ul className="mobile-nav-list">
+              <li>
+                <HNavLink to={URL2.ABOUT} onClick={() => setIsMobileMenuOpen(false)}>
+                  사이트소개
+                </HNavLink>
+              </li>
+              <li>
+                <HNavLink to={URL2.SUPPORT_TRANSFORM_INTRO} onClick={() => setIsMobileMenuOpen(false)}>
+                  AI 변환기
+                </HNavLink>
+              </li>
+              <li>
+                <HNavLink to={URL2.SUPPORT_SECURITY_INTRO} onClick={() => setIsMobileMenuOpen(false)}>
+                  AI 보안기
+                </HNavLink>
+              </li>
+              <li>
+                <HNavLink to={URL2.SUPPORT_GUIDE_EGOVFRAMEWORK} onClick={() => setIsMobileMenuOpen(false)}>
+                  고객지원
+                </HNavLink>
+              </li>
               {sessionUserSe === "ADM" && (
-                <div className="mega-menu-section admin-section">
-                  <div className="section-header">
-                    <div className="section-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                      </svg>
-                    </div>
-                    <h3>사이트관리</h3>
-                  </div>
-                  <ul className="section-links">
-                    <li><HNavLink to={URL2.ADMIN_NOTICE}>공지사항 관리</HNavLink></li>
-                    <li><HNavLink to={URL2.ADMIN_FAQ}>FAQ 관리</HNavLink></li>
-                    <li><HNavLink to={URL2.ADMIN_QNA}>Q&A 관리</HNavLink></li>
-                    <li><HNavLink to={URL2.ADMIN_MEMBERS}>회원 관리</HNavLink></li>
-                    <li><HNavLink to={URL2.ADMIN_MANAGER}>관리자 관리</HNavLink></li>
-                  </ul>
-                </div>
+                <li>
+                  <HNavLink to={URL2.ADMIN} onClick={() => setIsMobileMenuOpen(false)}>
+                    사이트관리
+                  </HNavLink>
+                </li>
               )}
-            </div>
-          </div>
+            </ul>
+          </nav>
         </div>
       </header>
 
-      {/* === 전역 Floating Chat Button (FAB) === */}
-      {createPortal(
-        <button
-          ref={chatBtnRef}
-          type="button"
-          className={`modern-chat-fab ${isChatOpen ? "active" : ""}`}
-          title={chatBtnTitle}
-          aria-label={chatBtnTitle}
-          aria-expanded={isChatOpen}
-          aria-controls="ai-chat-panel"
-          onClick={() => {
-            previouslyFocusedRef.current = chatBtnRef.current;
-            toggleChat();
-          }}
-        >
-          <div className="fab-icon-container">
-            <svg className="fab-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="9" cy="12" r="1" fill="currentColor"/>
-              <circle cx="15" cy="12" r="1" fill="currentColor"/>
-              <circle cx="12" cy="9" r="1" fill="currentColor"/>
-            </svg>
-            <div className="fab-pulse-ring"></div>
-            <div className="fab-pulse-ring-2"></div>
-          </div>
-          {unread > 0 && <span className="modern-badge">{unread > 99 ? "99+" : unread}</span>}
-        </button>,
-        document.body
-      )}
+      {/* Chat Portal */}
+      {chatPortal}
 
-      {/* === Chat Panel: Portal + Focus Trap === */}
-      {createPortal(
-        <section
-          id="ai-chat-panel"
-          ref={chatRef}
-          className={`modern-chat-panel ${isChatOpen ? "open" : ""}`}
-          role="dialog"
-          aria-modal="true"
-          aria-label="AI 챗봇"
-          onKeyDown={trapKeyDown}
-        >
-          {/* focus trap sentinels */}
-          
+      <style>{`
 
-          <header className="modern-chat-head">
-            <div className="chat-head-left">
-              <div className="chat-head-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                <div className="icon-glow"></div>
-              </div>
-              <div className="chat-title-section">
-                <strong>전자정부 AI 도우미</strong>
-                <span className="chat-status" aria-live="polite">
-                  <span className="status-dot"></span>
-                  온라인
-                </span>
-              </div>
-            </div>
-            <div className="chat-head-right">
-              <button className="modern-chat-close-btn" onClick={() => { closeChat(); previouslyFocusedRef.current?.focus?.(); }} aria-label="챗봇 닫기">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </header>
 
-          <div className="modern-chat-body" ref={chatListRef}>
-            {messages.map((m) => (
-              <div key={m.id} className={`modern-chat-msg ${m.role}`}>
-                <div className="chat-message-container">
-                  {/* 답변 텍스트 */}
-                  <div className="modern-bubble">{m.text}</div>
-                  
-                  {/* 네비게이션 버튼들 (봇 메시지에만 표시) */}
-                  {m.role === "bot" && <ChatActionBar actions={m.actions} />}
-                  
-                  {/* 참고 근거 (봇 메시지에만 표시) */}
-                  {m.role === "bot" && Array.isArray(m.citations) && m.citations.length > 0 && (
-                    <div className="modern-citations">
-                      <details className="citations-details">
-                        <summary className="citations-summary">
-                          참고 근거 ({m.citations.length}개)
-                          <span className="citations-toggle">▼</span>
-                        </summary>
-                        <div className="citations-content">
-                          {m.citations.map((c, i) => (
-                            <div key={i} className="citation-item">
-                              <div className="citation-source">{c.source}</div>
-                              <div className="citation-snippet">{c.snippet}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-            {pending && (
-              <div className="modern-chat-msg bot">
-                <div className="modern-bubble typing">
-                  <div className="typing-indicator">
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+        /* Modern Header Styles */
+        .modern-header {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 1000;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          overflow: hidden;
+          transform: translateY(0);
+        }
 
-          <form className="modern-chat-input" onSubmit={sendMessage}>
-            <div className="input-container">
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="전자정부 서비스에 대해 궁금한 점을 물어보세요..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                aria-label="메시지 입력"
-              />
-              <button type="submit" disabled={pending || !input.trim()} aria-label="전송" className="send-button">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
-                </svg>
-              </button>
-            </div>
-          </form>
+        .modern-header.header-hidden {
+          transform: translateY(-100%);
+        }
 
-          
-        </section>,
-        document.body
-      )}
+
+
+        .modern-header.is-scrolled {
+          background: rgba(255, 255, 255, 0.99);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+
+
+        /* Scroll Progress */
+        .scroll-progress {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background: linear-gradient(90deg, #667eea, #764ba2);
+          transform-origin: left;
+          z-index: 1001;
+        }
+
+        /* Header Container */
+        .header-container {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 80px;
+          gap: 2rem;
+          position: relative;
+        }
+
+        /* Logo Section */
+        .logo-section {
+          flex-shrink: 0;
+          min-width: 280px;
+        }
+
+        .logo {
+          margin: 0;
+        }
+
+        .logo-link {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          text-decoration: none;
+          color: inherit;
+          transition: all 0.3s ease;
+        }
+
+        .logo-link:hover {
+          transform: translateY(-2px);
+        }
+
+        .logo-icon {
+          width: 48px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+          transition: all 0.3s ease;
+        }
+
+        .logo-icon:hover {
+          transform: scale(1.1);
+          box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-text {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem;
+          min-width: 200px;
+        }
+
+        .logo-title {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #374151;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .logo-subtitle {
+          font-size: 0.75rem;
+          color: #6b7280;
+          font-weight: 500;
+          white-space: nowrap;
+        }
+
+        /* Desktop Navigation */
+        .desktop-nav {
+          display: flex;
+          align-items: center;
+        }
+
+        .nav-list {
+          display: flex;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          gap: 3rem;
+        }
+
+        .nav-item {
+          position: relative;
+        }
+
+        .nav-link {
+          color: #374151;
+          text-decoration: none;
+          font-weight: 500;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+          position: relative;
+          padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+          color: #667eea;
+        }
+
+        .nav-link.active {
+          color: #667eea;
+          font-weight: 600;
+        }
+
+        .nav-link::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #667eea, #764ba2);
+          transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+          width: 100%;
+        }
+
+        /* 전체메뉴 드롭다운 */
+        .all-menu-dropdown {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-10px);
+          transition: all 0.3s ease;
+          z-index: 1001;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .all-menu-dropdown.open {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) translateY(0);
+        }
+
+        .all-menu-container {
+          padding: 2rem;
+        }
+
+        .all-menu-content {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .menu-section h3 {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #374151;
+          margin: 0 0 1rem 0;
+          padding-bottom: 0.5rem;
+          border-bottom: 2px solid #667eea;
+        }
+
+        .menu-section ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .menu-section li {
+          margin-bottom: 0.75rem;
+        }
+
+        .menu-section a {
+          display: block;
+          padding: 0.5rem 0;
+          color: #6b7280;
+          text-decoration: none;
+          font-size: 0.875rem;
+          transition: all 0.3s ease;
+          border-radius: 4px;
+          padding-left: 0.5rem;
+        }
+
+        .menu-section a:hover {
+          color: #667eea;
+          background: rgba(102, 126, 234, 0.08);
+          transform: translateX(4px);
+        }
+
+        /* 메뉴 섹션 애니메이션 */
+        .menu-section {
+          animation: fadeInUp 0.3s ease-out;
+        }
+
+        .menu-section:nth-child(1) { animation-delay: 0.1s; }
+        .menu-section:nth-child(2) { animation-delay: 0.2s; }
+        .menu-section:nth-child(3) { animation-delay: 0.3s; }
+        .menu-section:nth-child(4) { animation-delay: 0.4s; }
+        .menu-section:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Header Actions */
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .user-section {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .user-info {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 1rem;
+          background: rgba(255, 255, 255, 0.8);
+          border-radius: 12px;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 600;
+          font-size: 0.875rem;
+        }
+
+        .user-details {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .user-name {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        .user-role {
+          font-size: 0.75rem;
+          color: #6b7280;
+        }
+
+        .user-actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .auth-buttons {
+          display: flex;
+          gap: 0.75rem;
+        }
+
+        .action-btn {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .action-btn.primary {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+        }
+
+        .action-btn.primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn.secondary {
+          background: rgba(255, 255, 255, 0.8);
+          color: #667eea;
+          border: 2px solid #667eea;
+        }
+
+        .action-btn.secondary:hover {
+          background: #667eea;
+          color: white;
+          transform: translateY(-2px);
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+          display: none;
+          flex-direction: column;
+          gap: 3px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 6px;
+          transition: all 0.3s ease;
+        }
+
+        .mobile-menu-toggle span {
+          width: 20px;
+          height: 2px;
+          background: #374151;
+          transition: all 0.3s ease;
+          border-radius: 1px;
+        }
+
+        .mobile-menu-toggle:hover span {
+          background: #667eea;
+        }
+
+
+
+        /* Mobile Menu */
+        .mobile-menu {
+          position: fixed;
+          top: 80px;
+          left: 0;
+          right: 0;
+          background: rgba(255, 255, 255, 0.99);
+          backdrop-filter: blur(10px);
+          border-top: 1px solid rgba(0, 0, 0, 0.1);
+          transform: translateY(-100%);
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+          z-index: 999;
+        }
+
+        .mobile-menu.open {
+          transform: translateY(0);
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .mobile-nav {
+          padding: 1.5rem;
+        }
+
+        .mobile-nav-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .mobile-nav-list a {
+          display: block;
+          padding: 1rem 1.5rem;
+          color: #374151;
+          text-decoration: none;
+          font-weight: 500;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+
+        .mobile-nav-list a:hover {
+          background: rgba(102, 126, 234, 0.08);
+          color: #667eea;
+        }
+
+        /* Chat Drawer */
+        .chat-drawer {
+          position: fixed;
+          top: 0;
+          right: -400px;
+          width: 400px;
+          height: 100vh;
+          background: white;
+          box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+          display: flex;
+          flex-direction: column;
+          transition: right 0.3s ease;
+          z-index: 2000;
+        }
+
+        .chat-drawer.open {
+          right: 0;
+        }
+
+        .chat-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.5rem;
+          border-bottom: 1px solid #e5e7eb;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+        }
+
+        .chat-header h2 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+
+        .chat-close-btn {
+          background: none;
+          border: none;
+          color: white;
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+
+        .chat-close-btn:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-close-btn svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .chat-messages {
+          flex: 1;
+          overflow-y: auto;
+          padding: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .chat-message {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .chat-message.user {
+          justify-content: flex-end;
+        }
+
+        .chat-message.bot {
+          justify-content: flex-start;
+        }
+
+        .message-content {
+          max-width: 80%;
+          padding: 0.75rem 1rem;
+          border-radius: 12px;
+          font-size: 0.875rem;
+          line-height: 1.4;
+        }
+
+        .chat-message.user .message-content {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+        }
+
+        .chat-message.bot .message-content {
+          background: #f3f4f6;
+          color: #374151;
+        }
+
+        .typing-indicator {
+          display: flex;
+          gap: 0.25rem;
+          align-items: center;
+        }
+
+        .typing-indicator span {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #9ca3af;
+          animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+          0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+          40% { transform: scale(1); opacity: 1; }
+        }
+
+        .chat-input {
+          display: flex;
+          gap: 0.5rem;
+          padding: 1rem;
+          border-top: 1px solid #e5e7eb;
+        }
+
+        .chat-input input {
+          flex: 1;
+          padding: 0.75rem 1rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          font-size: 0.875rem;
+          transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-btn {
+          width: 40px;
+          height: 40px;
+          border: none;
+          border-radius: 10px;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+        }
+
+        .send-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .send-btn svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .focus-trap {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .desktop-nav {
+            display: none;
+          }
+
+          .all-menu-dropdown {
+            display: none;
+          }
+
+          .header-container {
+            padding: 0 1rem;
+          }
+
+          .logo-section {
+            min-width: 200px;
+          }
+
+          .logo-title {
+            font-size: 1rem;
+          }
+
+          .logo-subtitle {
+            font-size: 0.7rem;
+          }
+
+          .mobile-menu-toggle {
+            display: flex;
+          }
+
+          .header-container {
+            padding: 0 1rem;
+          }
+
+          .user-info {
+            display: none;
+          }
+
+          .auth-buttons {
+            display: none;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .header-container {
+            height: 70px;
+          }
+
+          .logo-text {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.3rem;
+          }
+
+          .logo-title {
+            font-size: 0.9rem;
+          }
+
+          .logo-subtitle {
+            font-size: 0.6rem;
+          }
+
+          .chat-drawer {
+            width: 100%;
+            right: -100%;
+          }
+
+
+        }
+
+        @media (max-width: 480px) {
+          .header-container {
+            padding: 0 0.5rem;
+          }
+
+          .logo-icon {
+            width: 40px;
+            height: 40px;
+          }
+
+          .logo-title {
+            font-size: 0.8rem;
+          }
+
+          .logo-subtitle {
+            font-size: 0.5rem;
+          }
+
+          .logo-text {
+            min-width: 150px;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.2rem;
+          }
+        }
+      `}</style>
     </>
   );
 }
