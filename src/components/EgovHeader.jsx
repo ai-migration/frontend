@@ -45,7 +45,13 @@ export default function EgovHeader() {
   const [isChatOpen, setIsChatOpen] = useState2(false);
   const [unread, setUnread] = useState2(0);
   const [messages, setMessages] = useState2([
-    { id: "m0", role: "bot", text: "안녕하세요! 🤖 AI 도우미입니다. 무엇을 도와드릴까요?" },
+    { 
+      id: "m0", 
+      role: "bot", 
+      text: "안녕하세요! 🤖 AI 도우미입니다. 무엇을 도와드릴까요?",
+      actions: [],
+      citations: []
+    },
   ]);
   const [pending, setPending] = useState2(false);
   const [input, setInput] = useState2("");
@@ -114,24 +120,79 @@ export default function EgovHeader() {
     }
   }, [isChatOpen]);
 
+  // 액션 버튼 클릭 핸들러
+  const handleActionClick = useCallback2((action) => {
+    console.log("액션 클릭:", action);
+    // URL이 내부 경로인 경우 navigate 사용
+    if (action.url.startsWith('/')) {
+      navigate(action.url);
+    } else {
+      // 외부 URL인 경우 새 탭에서 열기
+      window.open(action.url, '_blank');
+    }
+  }, [navigate]);
+
   const sendMessage = useCallback2(async () => {
     if (!input.trim() || pending) return;
 
-    const userMessage = { id: `m${Date.now()}`, role: "user", text: input };
+    const userMessage = { 
+      id: `m${Date.now()}`, 
+      role: "user", 
+      text: input,
+      actions: [],
+      citations: []
+    };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setPending(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // ✅ FastAPI 챗봇 API 호출
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: input,
+          user: {
+            id: "user",
+            name: "사용자",
+            role: "user"
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // ✅ API 응답에서 reply, actions, citations 추출
       const botMessage = { 
         id: `m${Date.now() + 1}`, 
         role: "bot", 
-        text: "죄송합니다. 현재 AI 응답 기능이 준비 중입니다. 곧 더 나은 서비스를 제공하겠습니다!" 
+        text: data.reply || "죄송합니다. 응답을 받지 못했습니다.",
+        actions: data.actions || [],
+        citations: data.citations || []
       };
+      
       setMessages((prev) => [...prev, botMessage]);
+      
+    } catch (error) {
+      console.error("챗봇 API 호출 오류:", error);
+      const errorMessage = { 
+        id: `m${Date.now() + 1}`, 
+        role: "bot", 
+        text: "죄송합니다. 서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.",
+        actions: [],
+        citations: []
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setPending(false);
-    }, 1000);
+    }
   }, [input, pending]);
 
   // === Scroll effects ===
@@ -263,6 +324,33 @@ export default function EgovHeader() {
         {messages.map((msg) => (
           <div key={msg.id} className={`chat-message ${msg.role}`}>
             <div className="message-content">{msg.text}</div>
+            
+            {/* 액션 버튼들 (봇 메시지에만 표시) */}
+            {msg.role === "bot" && msg.actions && msg.actions.length > 0 && (
+              <div className="message-actions">
+                {msg.actions.map((action, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleActionClick(action)}
+                    className="action-btn"
+                  >
+                    {action.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Citations 정보 (봇 메시지에만 표시) */}
+            {msg.role === "bot" && msg.citations && msg.citations.length > 0 && (
+              <div className="message-citations">
+                <div className="citations-title">📚 참조 문서:</div>
+                {msg.citations.map((citation, index) => (
+                  <div key={index} className="citation-item">
+                    <strong>{citation.source}</strong>: {citation.snippet}...
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
         {pending && (
@@ -1172,6 +1260,51 @@ export default function EgovHeader() {
           clip: rect(0, 0, 0, 0);
           white-space: nowrap;
           border: 0;
+        }
+
+        /* 액션 버튼 스타일 */
+        .message-actions {
+          margin-top: 0.5rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .action-btn {
+          padding: 0.5rem 1rem;
+          background: linear-gradient(135deg, #28a745, #20c997);
+          color: white;
+          border: none;
+          border-radius: 1rem;
+          font-size: 0.75rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Citations 스타일 */
+        .message-citations {
+          margin-top: 0.5rem;
+          font-size: 0.75rem;
+          color: #666;
+          font-style: italic;
+        }
+
+        .citations-title {
+          margin-bottom: 0.25rem;
+          font-weight: 600;
+        }
+
+        .citation-item {
+          padding: 0.25rem 0.5rem;
+          background: rgba(0,0,0,0.05);
+          border-radius: 0.25rem;
+          margin-bottom: 0.125rem;
         }
 
         /* Responsive Design */

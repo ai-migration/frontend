@@ -1,15 +1,23 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 
 function GlobalChatWidget() {
   // === Chat (전역 FAB + 모달) ===
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [unread, setUnread] = useState(0);
   const [messages, setMessages] = useState([
-    { id: "m0", role: "bot", text: "안녕하세요! 🤖 AI 도우미입니다. 무엇을 도와드릴까요?" },
+    { 
+      id: "m0", 
+      role: "bot", 
+      text: "안녕하세요! 🤖 AI 도우미입니다. 무엇을 도와드릴까요?",
+      actions: [],
+      citations: []
+    },
   ]);
   const [pending, setPending] = useState(false);
   const [input, setInput] = useState("");
+  const navigate = useNavigate();
 
   // --- Chat Refs ---
   const chatRef = useRef(null);
@@ -22,24 +30,79 @@ function GlobalChatWidget() {
     setIsChatOpen((prev) => !prev);
   }, []);
 
+  // 액션 버튼 클릭 핸들러
+  const handleActionClick = (action) => {
+    console.log("액션 클릭:", action);
+    // URL이 내부 경로인 경우 navigate 사용
+    if (action.url.startsWith('/')) {
+      navigate(action.url);
+    } else {
+      // 외부 URL인 경우 새 탭에서 열기
+      window.open(action.url, '_blank');
+    }
+  };
+
   const sendMessage = useCallback(async () => {
     if (!input.trim() || pending) return;
 
-    const userMessage = { id: `m${Date.now()}`, role: "user", text: input };
+    const userMessage = { 
+      id: `m${Date.now()}`, 
+      role: "user", 
+      text: input,
+      actions: [],
+      citations: []
+    };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setPending(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // ✅ FastAPI 챗봇 API 호출
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: input,
+          user: {
+            id: "user",
+            name: "사용자",
+            role: "user"
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // ✅ API 응답에서 reply, actions, citations 추출
       const botMessage = { 
         id: `m${Date.now() + 1}`, 
         role: "bot", 
-        text: "죄송합니다. 현재 AI 응답 기능이 준비 중입니다. 곧 더 나은 서비스를 제공하겠습니다!" 
+        text: data.reply || "죄송합니다. 응답을 받지 못했습니다.",
+        actions: data.actions || [],
+        citations: data.citations || []
       };
+      
       setMessages((prev) => [...prev, botMessage]);
+      
+    } catch (error) {
+      console.error("챗봇 API 호출 오류:", error);
+      const errorMessage = { 
+        id: `m${Date.now() + 1}`, 
+        role: "bot", 
+        text: "죄송합니다. 서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.",
+        actions: [],
+        citations: []
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setPending(false);
-    }, 1000);
+    }
   }, [input, pending]);
 
   // === Chat keyboard shortcuts ===
@@ -103,6 +166,33 @@ function GlobalChatWidget() {
           {messages.map((msg) => (
             <div key={msg.id} className={`global-chat-message ${msg.role}`}>
               <div className="global-message-content">{msg.text}</div>
+              
+              {/* 액션 버튼들 (봇 메시지에만 표시) */}
+              {msg.role === "bot" && msg.actions && msg.actions.length > 0 && (
+                <div className="global-message-actions">
+                  {msg.actions.map((action, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleActionClick(action)}
+                      className="global-action-btn"
+                    >
+                      {action.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Citations 정보 (봇 메시지에만 표시) */}
+              {msg.role === "bot" && msg.citations && msg.citations.length > 0 && (
+                <div className="global-message-citations">
+                  <div className="global-citations-title">📚 참조 문서:</div>
+                  {msg.citations.map((citation, index) => (
+                    <div key={index} className="global-citation-item">
+                      <strong>{citation.source}</strong>: {citation.snippet}...
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
           {pending && (
@@ -289,8 +379,8 @@ function GlobalChatWidget() {
           color: white;
           cursor: pointer;
           padding: 0.5rem;
-          border-radius: 50%;
-          transition: background 0.2s ease;
+          border-radius: 0.5rem;
+          transition: background-color 0.2s ease;
         }
 
         .global-chat-close-btn:hover {
@@ -304,8 +394,8 @@ function GlobalChatWidget() {
 
         .global-chat-messages {
           flex: 1;
-          padding: 1rem;
           overflow-y: auto;
+          padding: 1rem;
           display: flex;
           flex-direction: column;
           gap: 1rem;
@@ -313,41 +403,87 @@ function GlobalChatWidget() {
 
         .global-chat-message {
           display: flex;
-          margin-bottom: 0.5rem;
+          flex-direction: column;
+          max-width: 80%;
         }
 
         .global-chat-message.user {
-          justify-content: flex-end;
+          align-self: flex-end;
         }
 
         .global-chat-message.bot {
-          justify-content: flex-start;
+          align-self: flex-start;
         }
 
         .global-message-content {
-          max-width: 80%;
           padding: 0.75rem 1rem;
-          border-radius: 18px;
+          border-radius: 1rem;
           font-size: 0.875rem;
           line-height: 1.4;
+          word-wrap: break-word;
         }
 
         .global-chat-message.user .global-message-content {
           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
           color: white;
-          border-bottom-right-radius: 4px;
+          border-bottom-right-radius: 0.25rem;
         }
 
         .global-chat-message.bot .global-message-content {
           background: #f3f4f6;
           color: #374151;
-          border-bottom-left-radius: 4px;
+          border-bottom-left-radius: 0.25rem;
+        }
+
+        /* 액션 버튼 스타일 */
+        .global-message-actions {
+          margin-top: 0.5rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .global-action-btn {
+          padding: 0.5rem 1rem;
+          background: linear-gradient(135deg, #28a745, #20c997);
+          color: white;
+          border: none;
+          border-radius: 1rem;
+          font-size: 0.75rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .global-action-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Citations 스타일 */
+        .global-message-citations {
+          margin-top: 0.5rem;
+          font-size: 0.75rem;
+          color: #666;
+          font-style: italic;
+        }
+
+        .global-citations-title {
+          margin-bottom: 0.25rem;
+          font-weight: 600;
+        }
+
+        .global-citation-item {
+          padding: 0.25rem 0.5rem;
+          background: rgba(0,0,0,0.05);
+          border-radius: 0.25rem;
+          margin-bottom: 0.125rem;
         }
 
         .global-typing-indicator {
           display: flex;
           gap: 0.25rem;
-          padding: 0.5rem;
+          align-items: center;
         }
 
         .global-typing-indicator span {
@@ -355,21 +491,20 @@ function GlobalChatWidget() {
           height: 8px;
           background: #9ca3af;
           border-radius: 50%;
-          animation: globalTyping 1.4s infinite ease-in-out;
+          animation: typing 1.4s infinite ease-in-out;
         }
 
-        .global-typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .global-typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        .global-typing-indicator span:nth-child(2) {
+          animation-delay: 0.2s;
+        }
 
-        @keyframes globalTyping {
-          0%, 80%, 100% {
-            transform: scale(0.8);
-            opacity: 0.5;
-          }
-          40% {
-            transform: scale(1);
-            opacity: 1;
-          }
+        .global-typing-indicator span:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+          0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+          40% { transform: scale(1); opacity: 1; }
         }
 
         .global-chat-input {
@@ -384,7 +519,7 @@ function GlobalChatWidget() {
           flex: 1;
           padding: 0.75rem 1rem;
           border: 1px solid #d1d5db;
-          border-radius: 25px;
+          border-radius: 1.5rem;
           font-size: 0.875rem;
           outline: none;
           transition: border-color 0.2s ease;
@@ -408,13 +543,14 @@ function GlobalChatWidget() {
           transition: transform 0.2s ease;
         }
 
-        .global-send-btn:hover:not(:disabled) {
+        .global-send-btn:hover {
           transform: scale(1.1);
         }
 
         .global-send-btn:disabled {
           opacity: 0.5;
           cursor: not-allowed;
+          transform: none;
         }
 
         .global-send-btn svg {
@@ -422,20 +558,8 @@ function GlobalChatWidget() {
           height: 16px;
         }
 
-        /* Responsive Design */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-          .global-chat-fab {
-            bottom: 1rem;
-            right: 1rem;
-            width: 50px;
-            height: 50px;
-          }
-
-          .global-chat-fab svg {
-            width: 20px;
-            height: 20px;
-          }
-
           .global-chat-modal {
             width: calc(100vw - 2rem);
             height: calc(100vh - 2rem);
