@@ -18,10 +18,23 @@ export default defineConfig({
     proxy: {
       // ── 여기 추가: /api → 8000 FastAPI 서버로 프록시
       "/api": {
-        target: "http://gateway:8080",
+        target: "http://3.39.231.225:8080", // 배포 환경의 FastAPI 서버 주소
         changeOrigin: true,
         // backend가 /api 프리픽스를 그대로 기대하므로 rewrite 불필요
         // 필요 시: rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      // 백엔드 API 프록시 추가 (배포 환경용)
+      "/users": {
+        target: "http://3.39.231.225:8088", // 배포 환경의 백엔드 서버 주소
+        changeOrigin: true,
+      },
+      "/auth": {
+        target: "http://3.39.231.225:8088", // 배포 환경의 백엔드 서버 주소
+        changeOrigin: true,
+      },
+      "/agents": {
+        target: "http://3.39.231.225:8088", // 배포 환경의 백엔드 서버 주소
+        changeOrigin: true,
       },
     },
   },

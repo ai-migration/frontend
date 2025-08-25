@@ -45,5 +45,5 @@
     "test": "vitest",
     "test:run": "vitest run"
   },
-  "proxy": "http://localhost:8080"
+  "proxy": "http://3.39.231.225:8088"
 }

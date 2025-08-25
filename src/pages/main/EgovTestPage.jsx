@@ -138,7 +138,7 @@ function EgovTestPage() {
     setStatus("RUNNING");
     setRunning(true);
 
-    const es = new EventSource("http://localhost:8088/agents/test");
+    const es = new EventSource("http://3.39.231.225:8088/agents/test");
     esRef.current = es;
 
     es.addEventListener("step", (e) => {

@@ -12,8 +12,8 @@ import jsonLang from "react-syntax-highlighter/dist/esm/languages/hljs/json";
 import "@/css/modern-styles.css";
 
 // ── Base URLs ────────────────────────────────────────────────────────────────
-const RAW_GET_BASE  = import.meta.env.VITE_API_BASE      || "http://localhost:8088";
-const RAW_POST_BASE = import.meta.env.VITE_API_POST_BASE || import.meta.env.VITE_API_BASE || "http://localhost:8088";
+const RAW_GET_BASE  = import.meta.env.VITE_API_BASE      || "http://3.39.231.225:8088";
+const RAW_POST_BASE = import.meta.env.VITE_API_POST_BASE || import.meta.env.VITE_API_BASE || "http://3.39.231.225:8088";
 const GET_BASE  = (RAW_GET_BASE  || "").replace(/\/+$/, "");
 const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
 
