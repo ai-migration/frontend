@@ -6,6 +6,7 @@ import EgovProgressBar from "@/components/EgovProgressBar";
 import DinoGame from "@/components/DinoGame";
 import { getSessionItem } from "@/utils/storage";
 import "@/css/modern-styles.css";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Base URLs
@@ -121,7 +122,7 @@ function EgovSupportTransformation() {
     }
 
     const item = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       file,
       status: "ready",
       progress: 0,

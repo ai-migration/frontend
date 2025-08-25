@@ -6,6 +6,7 @@ import DinoGame from "@/components/DinoGame";
 import { getSessionItem } from "@/utils/storage";
 import "@/css/modern-styles.css";
 import EgovLeftNavSecurity from "@/components/leftmenu/EgovLeftNavSecurity";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Base URLs
@@ -15,14 +16,14 @@ const RAW_POST_BASE = import.meta.env.VITE_API_POST_BASE || import.meta.env.VITE
 const GET_BASE  = (RAW_GET_BASE  || "").replace(/\/+$/, "");
 const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
 
-console.log("GET_BASE =", GET_BASE);
-console.log("POST_BASE =", POST_BASE);
+// console.log("GET_BASE =", GET_BASE);
+// console.log("POST_BASE =", POST_BASE);
 
 function EgovSecurityScan() {
   const MAX_SIZE_MB = 20;
 
   // ✅ 단일 파일 상태로 변경
-  const [file, setFile1] = useState(null); // 보안 검사용 (단일)
+  const [file, setFile] = useState(null); // 보안 검사용 (단일)
   const fileInputRef = useRef(null);
 
   // 변환 UI (업로드와 분리)
@@ -36,10 +37,9 @@ function EgovSecurityScan() {
   const [showDinoGame, setShowDinoGame] = useState(false);
 
   // 옵션 (변환 시 사용)
-  const [lang, setLang] = useState("Python");
-  const [conversionType, setConversionType] = useState("CODE");
-  const [fromVer, setFromVer] = useState("4.1");
-  const [toVer, setToVer] = useState("4.3");
+  // const [lang, setLang] = useState("Python");
+  // const [fromVer, setFromVer] = useState("4.1");
+  // const [toVer, setToVer] = useState("4.3");
 
   const sessionUser = getSessionItem("loginUser");
 
@@ -71,7 +71,7 @@ function EgovSecurityScan() {
     const clientJobId = Date.now() + Math.floor(Math.random() * 1000);
 
     const form = new FormData();
-    const agentPayload = { jobId: clientJobId, userId: uid , filePath: item.file.name, inputeGovFrameVer: fromVer, outputeGovFrameVer: toVer, isTestCode: false, conversionType: conversionType}; // 필요 데이터 추가
+    const agentPayload = { jobId: clientJobId, userId: uid , filePath: item.file.name, inputeGovFrameVer: null, outputeGovFrameVer: null, isTestCode: false, conversionType: null}; // 필요 데이터 추가
     const agentBlob = new Blob([JSON.stringify(agentPayload)], { type: "application/json" });
     form.append("agent", agentBlob, "agent.json");
     form.append("file", item.file, item.file.name);
@@ -79,7 +79,7 @@ function EgovSecurityScan() {
     // 업로드 시작
     setFile(prev => ({ ...prev, status: "uploading", jobId: clientJobId }));
     
-    const res = await axios.post(`${POST_BASE}/agents/conversion`, form, {
+    const res = await axios.post(`${POST_BASE}/agents/security`, form, {
       onUploadProgress: (evt) => {
         if (!evt.total) return;
         const pct = Math.round((evt.loaded * 100) / evt.total);
@@ -119,7 +119,7 @@ function EgovSecurityScan() {
     }
 
     const item = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       file,
       status: "ready",
       progress: 0,
@@ -136,8 +136,6 @@ function EgovSecurityScan() {
 
   // 변환 버튼: 업로드와 분리되었지만, "클릭 시 업로드를 실행"하고 "그 다음 SSE"
   const handleTransform = async (type) => {
-    // const conversionType = type === "프레임워크 변환" ? "CODE" : "EGOV";
-    setConversionType(type === "보안 검사" ? "CODE" : "EGOV");
     const target = file;
 
     if (!target) {
@@ -307,15 +305,7 @@ function EgovSecurityScan() {
       </div>
 
       <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-        {transformType === "프레임워크 변환" ? (
-          <></>
-        ) : (
-          <>
-            {renderSelect("현재 버전", ["4.1", "4.3"], fromVer, setFromVer)}
-            {renderSelect("타겟 버전", ["4.3", "4.1"], toVer, setToVer)}
-          </>
-        )}
-
+        
         <button
           onClick={() => handleTransform(transformType)}
           style={{
@@ -333,10 +323,10 @@ function EgovSecurityScan() {
           disabled={!!loadingType}
         >
           {loadingType === transformType
-            ? `변환중... (${progress}%)`
+            ? `검사중... (${progress}%)`
             : successType === transformType
-            ? "✅ 변환 완료!"
-            : "🚀 변환 하기"}
+            ? "✅ 검사 완료!"
+            : "🚀 검사 하기"}
         </button>
         
         {loadingType === transformType && (
@@ -436,7 +426,7 @@ function EgovSecurityScan() {
             <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9,18 15,12 9,6"></polyline>
             </svg>
-            <Link to="/support" className="breadcrumb-link">AI 변환기</Link>
+            <Link to="/support" className="breadcrumb-link">AI 보안기</Link>
             <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9,18 15,12 9,6"></polyline>
             </svg>
@@ -601,14 +591,14 @@ function EgovSecurityScan() {
                       {loadingType === "프레임워크 변환" ? (
                         <>
                           <div className="btn-spinner"></div>
-                          변환중... ({progress}%)
+                          검사중... ({progress}%)
                         </>
                       ) : successType === "프레임워크 변환" ? (
                         <>
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="20,6 9,17 4,12"></polyline>
                           </svg>
-                          변환 완료!
+                          검사 완료!
                         </>
                       ) : (
                         <>
@@ -616,7 +606,7 @@ function EgovSecurityScan() {
                             <polyline points="16,18 22,12 16,6"></polyline>
                             <polyline points="8,6 2,12 8,18"></polyline>
                           </svg>
-                          변환 시작
+                          검사 시작
                         </>
                       )}
                     </button>

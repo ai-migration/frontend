@@ -4,7 +4,8 @@ WORKDIR /app
 
 # 의존성만 먼저 복사 → 캐시 극대화
 COPY package*.json ./
-RUN npm ci --no-audit --no-fund
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --no-audit --no-fund
 
 # 나머지 소스 복사
 COPY . .

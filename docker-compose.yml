@@ -1,6 +1,6 @@
 services:
   front:
-    image: leeyumin/front:v1
+    image: leeyumin/front:v10
     container_name: front
     ports:
       - 3000:3000
