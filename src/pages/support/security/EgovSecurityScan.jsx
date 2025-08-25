@@ -6,6 +6,7 @@ import DinoGame from "@/components/DinoGame";
 import { getSessionItem } from "@/utils/storage";
 import "@/css/modern-styles.css";
 import EgovLeftNavSecurity from "@/components/leftmenu/EgovLeftNavSecurity";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Base URLs
@@ -36,9 +37,9 @@ function EgovSecurityScan() {
   const [showDinoGame, setShowDinoGame] = useState(false);
 
   // 옵션 (변환 시 사용)
-  const [lang, setLang] = useState("Python");
-  const [fromVer, setFromVer] = useState("4.1");
-  const [toVer, setToVer] = useState("4.3");
+  // const [lang, setLang] = useState("Python");
+  // const [fromVer, setFromVer] = useState("4.1");
+  // const [toVer, setToVer] = useState("4.3");
 
   const sessionUser = getSessionItem("loginUser");
 
@@ -78,7 +79,7 @@ function EgovSecurityScan() {
     // 업로드 시작
     setFile(prev => ({ ...prev, status: "uploading", jobId: clientJobId }));
     
-    const res = await axios.post(`${POST_BASE}/agents/conversion`, form, {
+    const res = await axios.post(`${POST_BASE}/agents/security`, form, {
       onUploadProgress: (evt) => {
         if (!evt.total) return;
         const pct = Math.round((evt.loaded * 100) / evt.total);
@@ -118,7 +119,7 @@ function EgovSecurityScan() {
     }
 
     const item = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       file,
       status: "ready",
       progress: 0,
