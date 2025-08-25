@@ -209,16 +209,18 @@ export default function EgovSecurityDetect() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14,2 14,8 20,8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10,9 9,9 8,9"></polyline>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">보안 취약점탐지</h1>
                 </div>
-                <h1 className="hero-title">보안 취약점탐지</h1>
                 <p className="hero-description">
                   AI가 자동으로 <strong>보안 취약점</strong>을 분석합니다.
                 </p>
@@ -497,6 +499,34 @@ export default function EgovSecurityDetect() {
         .hero-content {
           max-width: 600px;
           margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .hero-icon {
+          width: 48px;
+          height: 48px;
+          flex-shrink: 0;
+        }
+
+        .hero-icon svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        .hero-title {
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #1a202c;
         }
 
         .hero-icon {

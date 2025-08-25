@@ -36,14 +36,16 @@ function EgovSecurityIntro() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <circle cx="12" cy="16" r="1"></circle>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <circle cx="12" cy="16" r="1"></circle>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">AI 보안기 기능 소개</h1>
                 </div>
-                <h1 className="hero-title">AI 보안기 기능 소개</h1>
                 <p className="hero-description">
                   AI 보안기는 업로드된 코드에 대해 자동으로 보안 분석을 수행하고, 취약점 탐지 및 해결 제안을 제공합니다.
                 </p>
@@ -403,6 +405,34 @@ function EgovSecurityIntro() {
         .hero-content {
           max-width: 600px;
           margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .hero-icon {
+          width: 48px;
+          height: 48px;
+          flex-shrink: 0;
+        }
+
+        .hero-icon svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        .hero-title {
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #1a202c;
         }
 
         .hero-icon {

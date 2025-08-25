@@ -36,15 +36,17 @@ function EgovSupportIntro() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
-                    <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
-                    <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
+                      <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
+                      <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">AI 변환기 기능 소개</h1>
                 </div>
-                <h1 className="hero-title">AI 변환기 기능 소개</h1>
                 <p className="hero-description">
                   AI 변환기는 사용자가 업로드한 코드를 <strong>전자정부표준프레임워크(eGovFrame)</strong> 구조에 맞춰 자동으로 변환해주는 도구입니다.
                 </p>
@@ -313,6 +315,34 @@ function EgovSupportIntro() {
         .hero-content {
           max-width: 600px;
           margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .hero-icon {
+          width: 48px;
+          height: 48px;
+          flex-shrink: 0;
+        }
+
+        .hero-icon svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        .hero-title {
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #1a202c;
         }
 
         .hero-icon {

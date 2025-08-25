@@ -266,14 +266,16 @@ export default function EgovSecurityDownload() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7,10 12,15 17,10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7,10 12,15 17,10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">다운로드</h1>
                 </div>
-                <h1 className="hero-title">다운로드</h1>
                 <p className="hero-description">
                   보안 분석 리포트를 다운로드합니다.
                 </p>
@@ -570,12 +572,21 @@ export default function EgovSecurityDownload() {
         .hero-content {
           max-width: 600px;
           margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
         }
 
         .hero-icon {
-          width: 80px;
-          height: 80px;
-          margin: 0 auto 1.5rem;
+          width: 48px;
+          height: 48px;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
           border-radius: var(--border-radius-2xl);
           display: flex;
@@ -583,15 +594,16 @@ export default function EgovSecurityDownload() {
           justify-content: center;
           color: white;
           box-shadow: var(--shadow-xl);
+          flex-shrink: 0;
         }
 
         .hero-icon svg {
-          width: 40px;
-          height: 40px;
+          width: 24px;
+          height: 24px;
         }
 
         .hero-title {
-          margin: 0 0 1rem;
+          margin: 0;
           font-size: 2.5rem;
           font-weight: 700;
           color: var(--gray-900);

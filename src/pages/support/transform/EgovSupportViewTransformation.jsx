@@ -260,15 +260,17 @@ export default function EgovSupportViewTransformation() {
             {/* Hero */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14,2 14,8 20,8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">변환 이력 조회</h1>
                 </div>
-                <h1 className="hero-title">변환 이력 조회</h1>
                 <p className="hero-description">
                   AI 변환기로 처리된 파일들의 변환 이력을 조회하고 상세 정보를 확인할 수 있습니다.
                 </p>
@@ -560,10 +562,44 @@ export default function EgovSupportViewTransformation() {
         .modern-layout { display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: start; }
         .modern-content { display: flex; flex-direction: column; gap: 2rem; }
         .content-hero { text-align: center; padding: 3rem 0; }
-        .hero-content { max-width: 600px; margin: 0 auto; }
-        .hero-icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); border-radius: var(--border-radius-2xl); display: flex; align-items: center; justify-content: center; color: white; box-shadow: var(--shadow-xl); }
-        .hero-icon svg { width: 40px; height: 40px; }
-        .hero-title { margin: 0 0 1rem; font-size: 2.5rem; font-weight: 700; color: var(--gray-900); background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-content { 
+          max-width: 600px; 
+          margin: 0 auto; 
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .hero-icon { 
+          width: 48px; 
+          height: 48px; 
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); 
+          border-radius: var(--border-radius-2xl); 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          color: white; 
+          box-shadow: var(--shadow-xl);
+          flex-shrink: 0;
+        }
+        .hero-icon svg { width: 24px; height: 24px; }
+        .hero-title { 
+          margin: 0; 
+          font-size: 2.5rem; 
+          font-weight: 700; 
+          color: var(--gray-900); 
+          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); 
+          -webkit-background-clip: text; 
+          -webkit-text-fill-color: transparent; 
+          background-clip: text; 
+        }
         .hero-description { margin: 0; font-size: 1.125rem; color: var(--gray-600); line-height: 1.6; }
 
         .content-section { background: white; border-radius: var(--border-radius-2xl); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; }
