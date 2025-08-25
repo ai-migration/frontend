@@ -266,14 +266,16 @@ export default function EgovSupportDownload() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7,10 12,15 17,10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7,10 12,15 17,10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">변환 결과 다운로드</h1>
                 </div>
-                <h1 className="hero-title">변환 결과 다운로드</h1>
                 <p className="hero-description">
                   AI 변환기로 처리된 파일들을 다운로드하고 변환 결과를 확인할 수 있습니다.
                 </p>
@@ -569,6 +571,34 @@ export default function EgovSupportDownload() {
         .hero-content {
           max-width: 600px;
           margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .hero-icon {
+          width: 48px;
+          height: 48px;
+          flex-shrink: 0;
+        }
+
+        .hero-icon svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        .hero-title {
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #1a202c;
         }
 
         .hero-icon {

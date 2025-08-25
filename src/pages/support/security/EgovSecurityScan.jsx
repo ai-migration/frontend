@@ -451,13 +451,15 @@ function EgovSecurityScan() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 12l2 2 4-4"></path>
-                    <circle cx="12" cy="12" r="10"></circle>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 12l2 2 4-4"></path>
+                      <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">AI 보안 검사</h1>
                 </div>
-                <h1 className="hero-title">AI 보안 검사</h1>
                 <p className="hero-description">
                   코드 파일을 업로드하면 AI가 자동으로 <b>보안취약점</b>을 분석합니다.
                 </p>
@@ -749,6 +751,34 @@ function EgovSecurityScan() {
         .hero-content {
           max-width: 600px;
           margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .hero-icon {
+          width: 48px;
+          height: 48px;
+          flex-shrink: 0;
+        }
+
+        .hero-icon svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        .hero-title {
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #1a202c;
         }
 
         .hero-icon {

@@ -34,12 +34,14 @@ function EgovSupportViewTest() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </div>
+                  <h1 className="hero-title">테스트 이력 조회</h1>
                 </div>
-                <h1 className="hero-title">테스트 이력 조회</h1>
                 <p className="hero-description">
                   변환된 코드의 자동 테스트 실행 결과를 조회하고 품질을 확인할 수 있습니다.
                 </p>
@@ -220,12 +222,21 @@ function EgovSupportViewTest() {
         .hero-content {
           max-width: 600px;
           margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
         }
 
         .hero-icon {
-          width: 80px;
-          height: 80px;
-          margin: 0 auto 1.5rem;
+          width: 48px;
+          height: 48px;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
           border-radius: var(--border-radius-2xl);
           display: flex;
@@ -233,15 +244,16 @@ function EgovSupportViewTest() {
           justify-content: center;
           color: white;
           box-shadow: var(--shadow-xl);
+          flex-shrink: 0;
         }
 
         .hero-icon svg {
-          width: 40px;
-          height: 40px;
+          width: 24px;
+          height: 24px;
         }
 
         .hero-title {
-          margin: 0 0 1rem;
+          margin: 0;
           font-size: 2.5rem;
           font-weight: 700;
           color: var(--gray-900);

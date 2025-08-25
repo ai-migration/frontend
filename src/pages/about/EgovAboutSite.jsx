@@ -1,30 +1,61 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { default as EgovLeftNav } from "@/components/leftmenu/EgovLeftNavAbout";
 import "@/css/modern-styles.css";
 
 function EgovAboutSite() {
+  const [animatedStats, setAnimatedStats] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setAnimatedStats(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+      observer.observe(statsSection);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="modern-page-container">
       <div className="modern-page-wrapper">
         {/* Breadcrumb Navigation */}
         <nav className="modern-breadcrumb">
-          <div className="breadcrumb-container">
-            <Link to="/" className="breadcrumb-home">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+          <ul className="breadcrumb-container">
+            <li>
+              <Link to="/" className="breadcrumb-home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                </svg>
+                홈
+              </Link>
+            </li>
+            <li>
+              <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9,18 15,12 9,6"></polyline>
               </svg>
-              Home
-            </Link>
-            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9,18 15,12 9,6"></polyline>
-            </svg>
-            <Link to="/about" className="breadcrumb-link">사이트 소개</Link>
-            <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9,18 15,12 9,6"></polyline>
-            </svg>
-            <span className="breadcrumb-current">소개</span>
-          </div>
+            </li>
+            <li>
+              <Link to="/about" className="breadcrumb-link">사이트소개</Link>
+            </li>
+            <li>
+              <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9,18 15,12 9,6"></polyline>
+              </svg>
+            </li>
+            <li>
+              <span className="breadcrumb-current">프로젝트 소개</span>
+            </li>
+          </ul>
         </nav>
 
         <div className="modern-layout">
@@ -34,203 +65,257 @@ function EgovAboutSite() {
           {/* Main Content */}
           <main className="modern-content" id="contents">
             {/* Hero Section */}
-            <section className="content-hero">
-              <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9,22 9,12 15,12 15,22"></polyline>
-                  </svg>
-                </div>
-                <h1 className="hero-title">프로젝트 소개</h1>
-                <p className="hero-description">
-                  표준프레임워크 경량환경의 개요와 연혁, 조직소개, 표준프레임워크센터의 약도 등의 정보를 제공하고 있습니다.
-                </p>
-              </div>
-            </section>
+                         <section className="content-hero">
+               <div className="hero-content">
+                 <div className="hero-header">
+                   <div className="hero-icon">
+                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                       <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
+                       <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
+                       <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                     </svg>
+                   </div>
+                   <h1 className="hero-title">AI Code Migration</h1>
+                 </div>
+                 <p className="hero-description">
+                   <strong>'클릭 한번'</strong>으로 <strong>'생각하는 AI 팀'</strong>이 대신해드리는 전자정부 표준 프레임워크 자동 변환 시스템
+                 </p>
+               </div>
+             </section>
 
-            {/* Overview Section */}
-            <section className="content-section modern-card">
-              <div className="card-header">
-                <div className="header-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
-                  <h2>프레임워크 개요</h2>
-                </div>
-              </div>
-              <div className="card-content">
-                <div className="overview-description">
-                  <p>
-                    전자정부 표준 프레임워크는 응용SW의 구성기반이 되며 응용SW실행 시 필요한 기본 기능을 제공하는 환경입니다.
-                    전자정부 서비스의 품질향상 및 정보화 투자 효율성 향상을 위해 개발 프레임워크 표준을 정립하고, 
-                    개발 프레임워크 표준 적용을 통한 응용 SW의 표준화 및 품질과 재사용성 향상을 목표로 합니다.
-                  </p>
-                </div>
-              </div>
-            </section>
+                         {/* Project Overview Section */}
+             <section className="content-section modern-card">
+               <div className="card-header">
+                 <div className="header-icon">
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                   </svg>
+                   <h2>프로젝트 개요</h2>
+                 </div>
+               </div>
+               <div className="card-content">
+                 <div className="overview-grid">
+                   <div className="overview-item">
+                     <div className="overview-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <polyline points="16,18 22,12 16,6"></polyline>
+                         <polyline points="8,6 2,12 8,18"></polyline>
+                       </svg>
+                     </div>
+                     <div className="overview-content">
+                       <h3>전자정부 표준 프레임워크로 변환</h3>
+                       <p>Flask, FastAPI, SpringBoot → 전자정부 표준프레임워크</p>
+                     </div>
+                   </div>
 
-            {/* Key Benefits Section */}
-            <section className="content-section modern-card">
-              <div className="card-header">
-                <div className="header-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                  </svg>
-                  <h2>주요 효과</h2>
-                </div>
-              </div>
-              <div className="card-content">
-                <div className="features-grid">
-                  <div className="feature-item">
-                    <div className="feature-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                      </svg>
-                    </div>
-                    <div className="feature-content">
-                      <h3>국가 정보화 투자효율성 제고</h3>
-                      <p>표준화를 통한 중복 투자 방지 및 효율적 자원 활용을 실현합니다.</p>
-                    </div>
-                  </div>
+                   <div className="overview-item">
+                     <div className="overview-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                       </svg>
+                     </div>
+                     <div className="overview-content">
+                       <h3>프로그래밍 언어 변환</h3>
+                       <p>Python → Java 기반 전자정부 프레임워크</p>
+                     </div>
+                   </div>
 
-                  <div className="feature-item">
-                    <div className="feature-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                      </svg>
-                    </div>
-                    <div className="feature-content">
-                      <h3>중소SI업체 경쟁력 확보</h3>
-                      <p>공정한 경쟁 환경 조성 및 기술 종속성 해결을 지원합니다.</p>
-                    </div>
-                  </div>
+                   <div className="overview-item">
+                     <div className="overview-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                         <circle cx="12" cy="16" r="1"></circle>
+                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                       </svg>
+                     </div>
+                     <div className="overview-content">
+                       <h3>자동 테스트 코드 생성 & 실행</h3>
+                       <p>테스트 통과 여부, 예외 로그 수집까지 자동화</p>
+                     </div>
+                   </div>
 
-                  <div className="feature-item">
-                    <div className="feature-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                      </svg>
-                    </div>
-                    <div className="feature-content">
-                      <h3>선진 국가정보화 기반환경 제공</h3>
-                      <p>최신 기술 기반의 안정적이고 확장 가능한 인프라를 제공합니다.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
+                   <div className="overview-item">
+                     <div className="overview-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                       </svg>
+                     </div>
+                     <div className="overview-content">
+                       <h3>보안 검사 및 개선 방안 제안</h3>
+                       <p>전자정부 표준프레임워크 기반 코드의 보안 취약점 분석</p>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </section>
 
-            {/* Current Issues Section */}
-            <section className="content-section modern-card">
-              <div className="card-header">
-                <div className="header-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
-                  <h2>해결해야 할 문제점</h2>
-                </div>
-              </div>
-              <div className="card-content">
-                <div className="architecture-layers">
-                  <div className="layer-item">
-                    <div className="layer-number">01</div>
-                    <div className="layer-content">
-                      <h4>특정업체 종속성 발생</h4>
-                      <p>공정경쟁 저하 및 사업자 변경 시 예산낭비 문제가 발생하고 있습니다.</p>
-                      <div className="layer-tags">
-                        <span className="tag danger">종속성</span>
-                        <span className="tag danger">예산낭비</span>
-                        <span className="tag danger">경쟁력 저하</span>
-                      </div>
-                    </div>
-                  </div>
+             {/* Project Materials Section */}
+             <section className="content-section modern-card">
+               <div className="card-header">
+                 <div className="header-icon">
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                     <polyline points="14,2 14,8 20,8"></polyline>
+                     <line x1="16" y1="13" x2="8" y2="13"></line>
+                     <line x1="16" y1="17" x2="8" y2="17"></line>
+                   </svg>
+                   <h2>프로젝트 자료</h2>
+                 </div>
+               </div>
+               <div className="card-content">
+                 <div className="materials-grid">
+                   <div className="material-item">
+                     <div className="material-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <polygon points="23,7 16,12 23,17 23,7"></polygon>
+                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                       </svg>
+                     </div>
+                     <div className="material-content">
+                       <h3>1분 쇼츠 영상</h3>
+                       <p>AI Code Migration 프로젝트를 간단히 소개하는 1분 영상</p>
+                       <div className="material-preview">
+                         <video controls poster="/assets/project/shorts-poster.jpg" className="material-video">
+                           <source src="/assets/project/shorts.mp4" type="video/mp4" />
+                           브라우저가 비디오를 지원하지 않습니다.
+                         </video>
+                       </div>
+                     </div>
+                   </div>
 
-                  <div className="layer-item">
-                    <div className="layer-number">02</div>
-                    <div className="layer-content">
-                      <h4>개별적인 정보화 사업추진</h4>
-                      <p>기관별/사업별 중복개발로 인한 비효율성이 증가하고 있습니다.</p>
-                      <div className="layer-tags">
-                        <span className="tag warning">중복개발</span>
-                        <span className="tag warning">비효율성</span>
-                        <span className="tag warning">자원낭비</span>
-                      </div>
-                    </div>
-                  </div>
+                   <div className="material-item">
+                     <div className="material-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <polygon points="23,7 16,12 23,17 23,7"></polygon>
+                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                       </svg>
+                     </div>
+                     <div className="material-content">
+                       <h3>발표 영상</h3>
+                       <p>프로젝트 전체 발표 영상 - 상세한 기술 설명과 데모</p>
+                       <div className="material-preview">
+                         <video controls poster="/assets/project/presentation-poster.jpg" className="material-video">
+                           <source src="/assets/project/presentation.mp4" type="video/mp4" />
+                           브라우저가 비디오를 지원하지 않습니다.
+                         </video>
+                       </div>
+                     </div>
+                   </div>
 
-                  <div className="layer-item">
-                    <div className="layer-number">03</div>
-                    <div className="layer-content">
-                      <h4>상호 운용성 부족</h4>
-                      <p>표준화된 공통 개발기반 부재로 재사용성이 저하되고 있습니다.</p>
-                      <div className="layer-tags">
-                        <span className="tag info">표준화 부재</span>
-                        <span className="tag info">재사용성 저하</span>
-                        <span className="tag info">호환성 문제</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
+                   <div className="material-item">
+                     <div className="material-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                         <polyline points="21,15 16,10 5,21"></polyline>
+                       </svg>
+                     </div>
+                     <div className="material-content">
+                       <h3>사업 솔루션</h3>
+                       <p>프로젝트의 핵심 솔루션과 비즈니스 모델을 한눈에</p>
+                       <div className="material-preview">
+                         <img src="/assets/project/solution.png" alt="사업 솔루션" className="material-image" />
+                       </div>
+                     </div>
+                   </div>
 
-            {/* Solution Section */}
-            <section className="content-section modern-card">
+                   <div className="material-item">
+                     <div className="material-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <polygon points="23,7 16,12 23,17 23,7"></polygon>
+                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                       </svg>
+                     </div>
+                     <div className="material-content">
+                       <h3>시연 영상</h3>
+                       <p>실제 시스템 동작을 보여주는 시연 영상</p>
+                       <div className="material-preview">
+                         <video controls poster="/assets/project/demo-poster.jpg" className="material-video">
+                           <source src="/assets/project/demo.mp4" type="video/mp4" />
+                           브라우저가 비디오를 지원하지 않습니다.
+                         </video>
+                       </div>
+                     </div>
+                   </div>
+
+                   <div className="material-item">
+                     <div className="material-icon">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                         <polyline points="14,2 14,8 20,8"></polyline>
+                         <line x1="16" y1="13" x2="8" y2="13"></line>
+                         <line x1="16" y1="17" x2="8" y2="17"></line>
+                       </svg>
+                     </div>
+                     <div className="material-content">
+                       <h3>발표자료</h3>
+                       <p>프로젝트 발표용 PowerPoint 자료</p>
+                       <div className="material-preview">
+                         <div className="material-download">
+                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                             <polyline points="7,10 12,15 17,10"></polyline>
+                             <line x1="12" y1="15" x2="12" y2="3"></line>
+                           </svg>
+                           <a href="/assets/project/presentation.pptx" download className="download-link">
+                             발표자료 다운로드
+                           </a>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </section>
+
+            {/* Statistics Section */}
+            <section className="content-section modern-card stats-section">
               <div className="card-header">
                 <div className="header-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22,4 12,14.01 9,11.01"></polyline>
                   </svg>
-                  <h2>해결방안</h2>
+                  <h2>주요 성과</h2>
                 </div>
               </div>
               <div className="card-content">
-                <div className="getting-started-steps">
-                  <div className="step-item">
-                    <div className="step-number">1</div>
-                    <div className="step-content">
-                      <h4>표준화 기반 구축</h4>
-                      <p>사업자 고유 개발 프레임워크에 대한 기술 종속성을 배제하고 표준화된 개발 환경을 구축합니다.</p>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <div className="stat-number">{animatedStats ? "120만+" : "0"}</div>
+                    <div className="stat-label">누적 다운로드</div>
+                    <div className="stat-description">2024년 11월 기준</div>
+                    <div className="chart-container">
+                      <div className="chart-bar" style={{ width: '95%' }}></div>
                     </div>
                   </div>
-
-                  <div className="step-item">
-                    <div className="step-number">2</div>
-                    <div className="step-content">
-                      <h4>품질 및 재사용성 향상</h4>
-                      <p>응용 SW의 표준화와 품질, 재사용성을 향상시켜 개발 효율성을 높입니다.</p>
+                  <div className="stat-item">
+                    <div className="stat-number">{animatedStats ? "67%" : "0%"}</div>
+                    <div className="stat-label">표준프레임워크 채택률</div>
+                    <div className="stat-description">조달청 발주 정보화사업</div>
+                    <div className="chart-container">
+                      <div className="chart-bar" style={{ width: '67%' }}></div>
                     </div>
                   </div>
-
-                  <div className="step-item">
-                    <div className="step-number">3</div>
-                    <div className="step-content">
-                      <h4>투자 효율성 제고</h4>
-                      <p>개발 프레임워크의 유지 보수 단일화를 통한 투자 효율성을 향상시킵니다.</p>
+                  <div className="stat-item">
+                    <div className="stat-number">{animatedStats ? "17개국" : "0개국"}</div>
+                    <div className="stat-label">해외 적용 국가</div>
+                    <div className="stat-description">33개 정보시스템 적용</div>
+                    <div className="chart-container">
+                      <div className="chart-bar" style={{ width: '85%' }}></div>
                     </div>
                   </div>
-
-                  <div className="step-item">
-                    <div className="step-number">4</div>
-                    <div className="step-content">
-                      <h4>지속적인 발전</h4>
-                      <p>오픈소스 기반의 지속가능한 프레임워크 생태계를 구축합니다.</p>
-                    </div>
+                  <div className="stat-item">
+                    <div className="stat-number">{animatedStats ? "254개" : "0개"}</div>
+                    <div className="stat-label">공통 컴포넌트</div>
+                    <div className="stat-description">eGovFrame 제공</div>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Framework Features Section */}
+            {/* Benefits Section */}
             <section className="content-section modern-card">
               <div className="card-header">
                 <div className="header-icon">
@@ -238,61 +323,49 @@ function EgovAboutSite() {
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                   </svg>
-                  <h2>프레임워크 특징</h2>
+                  <h2>기대 효과</h2>
                 </div>
               </div>
               <div className="card-content">
-                <div className="resources-grid">
-                  <div className="resource-item">
-                    <div className="resource-icon">
+                <div className="benefits-grid">
+                  <div className="benefit-item">
+                    <div className="benefit-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <circle cx="12" cy="16" r="1"></circle>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
                       </svg>
                     </div>
-                    <div className="resource-content">
-                      <h4>보안성 강화</h4>
-                      <p>공공기관의 엄격한 보안 요구사항을 만족하는 보안 기능들을 내장하고 있습니다.</p>
+                    <div className="benefit-content">
+                      <h4>중복 개발 방지</h4>
+                      <p>공통 기능을 한 번 만들고 여러 사업에서 재사용하여 불필요한 중복 개발을 방지합니다.</p>
                     </div>
                   </div>
 
-                  <div className="resource-item">
-                    <div className="resource-icon">
+                  <div className="benefit-item">
+                    <div className="benefit-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                        <polyline points="7.5,4.21 12,6.81 16.5,4.21"></polyline>
-                        <polyline points="7.5,19.79 7.5,14.6 3,12"></polyline>
-                        <polyline points="21,12 16.5,14.6 16.5,19.79"></polyline>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
                       </svg>
                     </div>
-                    <div className="resource-content">
-                      <h4>표준화 지원</h4>
-                      <p>공통 컴포넌트와 표준화된 개발 방법론을 통해 일관된 개발 환경을 제공합니다.</p>
+                    <div className="benefit-content">
+                      <h4>시스템 연계 효율성</h4>
+                      <p>서로 다른 시스템도 하나의 블록처럼 맞춰 연결되며, 준비·테스트 시간을 크게 줄여줍니다.</p>
                     </div>
                   </div>
 
-                  <div className="resource-item">
-                    <div className="resource-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
-                      </svg>
-                    </div>
-                    <div className="resource-content">
-                      <h4>성능 최적화</h4>
-                      <p>대용량 트래픽 처리와 높은 가용성을 보장하는 성능 최적화 기능을 제공합니다.</p>
-                    </div>
-                  </div>
-
-                  <div className="resource-item">
-                    <div className="resource-icon">
+                  <div className="benefit-item">
+                    <div className="benefit-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                       </svg>
                     </div>
-                    <div className="resource-content">
-                      <h4>테스트 지원</h4>
-                      <p>단위 테스트, 통합 테스트를 위한 테스트 프레임워크와 도구를 제공합니다.</p>
+                    <div className="benefit-content">
+                      <h4>표준화 제공</h4>
+                      <p>규칙과 설명이 함께 정리되어있는 표준을 제공하여 이해는 쉽고, 연계작업은 빠르게 되도록 합니다.</p>
                     </div>
                   </div>
                 </div>
@@ -303,315 +376,48 @@ function EgovAboutSite() {
       </div>
 
       <style>{`
-        /* Modern Page Styles - Compact and Clean */
-        
-        /* Architecture Layers */
-        .architecture-layers {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
+                 /* Hero Content Override */
+         .hero-content {
+           max-width: 800px;
+           margin: 0 auto;
+           text-align: center;
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           gap: 1.5rem;
+         }
 
-        .layer-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 1rem;
-          padding: 1.25rem;
-          background: var(--gray-50);
-          border-radius: 12px;
-          border: 1px solid var(--gray-200);
-          transition: all 0.3s ease;
-        }
-
-        .layer-item:hover {
-          background: white;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          transform: translateY(-2px);
-        }
-
-        .layer-number {
-          width: 36px;
-          height: 36px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: 700;
-          font-size: 0.875rem;
-          flex-shrink: 0;
-        }
-
-        .layer-content {
-          flex: 1;
-        }
-
-        .layer-content h4 {
-          margin: 0 0 0.5rem;
-          font-size: 1rem;
-          font-weight: 700;
-          color: var(--gray-900);
-        }
-
-        .layer-content p {
-          margin: 0 0 0.75rem;
-          color: var(--gray-600);
-          line-height: 1.5;
-          font-size: 0.875rem;
-        }
-
-        .layer-tags {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-        }
-
-        .tag {
-          padding: 0.25rem 0.5rem;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-
-        .tag.danger {
-          background: rgba(239, 68, 68, 0.1);
-          color: #dc2626;
-        }
-
-        .tag.warning {
-          background: rgba(245, 158, 11, 0.1);
-          color: #d97706;
-        }
-
-        .tag.info {
-          background: rgba(59, 130, 246, 0.1);
-          color: #2563eb;
-        }
-
-        /* Resources Grid */
-        .resources-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.25rem;
-        }
-
-        .resource-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 1rem;
-          padding: 1.25rem;
-          background: var(--gray-50);
-          border-radius: 12px;
-          border: 1px solid var(--gray-200);
-          transition: all 0.3s ease;
-        }
-
-        .resource-item:hover {
-          background: white;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          transform: translateY(-2px);
-        }
-
-        .resource-icon {
-          width: 36px;
-          height: 36px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          flex-shrink: 0;
-        }
-
-        .resource-icon svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        .resource-content h4 {
-          margin: 0 0 0.375rem;
-          font-size: 1rem;
-          font-weight: 700;
-          color: var(--gray-900);
-        }
-
-        .resource-content p {
-          margin: 0;
-          font-size: 0.875rem;
-          color: var(--gray-600);
-          line-height: 1.4;
-        }
-
-        .modern-page-container {
-          min-height: 100vh;
-          background: linear-gradient(135deg, rgba(0, 0, 255, 0.02) 0%, rgba(255, 255, 255, 0.8) 100%);
-        }
-
-        .modern-page-wrapper {
-          max-width: 1440px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-
-        .modern-breadcrumb {
-          margin-bottom: 2rem;
-        }
-
-        .breadcrumb-container {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.875rem;
-        }
-
-        .breadcrumb-home,
-        .breadcrumb-link {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          color: var(--gray-600);
-          text-decoration: none;
-          padding: 0.5rem 0.75rem;
-          border-radius: var(--border-radius-md);
-          transition: all 0.2s ease;
-        }
-
-        .breadcrumb-home:hover,
-        .breadcrumb-link:hover {
-          background: var(--light-blue);
-          color: var(--primary-blue);
-        }
-
-        .breadcrumb-home svg,
-        .breadcrumb-separator {
-          width: 16px;
-          height: 16px;
-        }
-
-        .breadcrumb-current {
-          color: var(--primary-blue);
-          font-weight: 600;
-        }
-
-        .modern-layout {
-          display: grid;
-          grid-template-columns: auto 1fr;
-          gap: 2rem;
-          align-items: start;
-        }
-
-        .modern-content {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        .content-hero {
-          text-align: center;
-          padding: 2rem 0;
-        }
-
-        .hero-content {
-          max-width: 600px;
-          margin: 0 auto;
-        }
-
-        .hero-icon {
-          width: 56px;
-          height: 56px;
-          margin: 0 auto 1rem;
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
+         .hero-header {
+           display: flex;
+           align-items: center;
+           gap: 1rem;
+           justify-content: center;
+         }
+                 /* Hero Icon Styles */
+         .hero-icon {
+           width: 56px;
+           height: 56px;
+           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+           border-radius: 16px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: white;
+           flex-shrink: 0;
+         }
         .hero-icon svg {
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
         }
 
-        .hero-title {
-          margin: 0 0 0.75rem;
-          font-size: 1.875rem;
-          font-weight: 700;
-          color: var(--gray-900);
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
+                 /* Overview Grid */
+         .overview-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 1.5rem;
+         }
 
-        .hero-description {
-          margin: 0;
-          font-size: 1rem;
-          color: var(--gray-600);
-          line-height: 1.6;
-        }
-
-        .content-section {
-          background: white;
-          border-radius: var(--border-radius-xl);
-          border: 1px solid var(--gray-200);
-          box-shadow: var(--shadow-sm);
-          overflow: hidden;
-        }
-
-        .card-header {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 1.25rem 1.5rem;
-          background: linear-gradient(135deg, 
-            rgba(0, 0, 255, 0.05) 0%, 
-            rgba(255, 255, 255, 1) 100%);
-          border-bottom: 1px solid var(--gray-200);
-        }
-
-        .header-icon {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .header-icon svg {
-          width: 16px;
-          height: 16px;
-          color: var(--primary-blue);
-        }
-
-        .header-icon h2 {
-          margin: 0;
-          font-size: 1.125rem;
-          font-weight: 700;
-          color: var(--gray-900);
-        }
-
-        .card-content {
-          padding: 1.5rem;
-        }
-
-        /* Overview Description */
-        .overview-description p {
-          font-size: 1rem;
-          line-height: 1.6;
-          color: var(--gray-700);
-          margin: 0;
-        }
-
-        /* Features Grid - Horizontal Layout */
-        .features-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.25rem;
-        }
-
-        .feature-item {
+        .overview-item {
           display: flex;
           align-items: flex-start;
           gap: 1rem;
@@ -622,194 +428,258 @@ function EgovAboutSite() {
           transition: all 0.3s ease;
         }
 
-        .feature-item:hover {
+        .overview-item:hover {
           background: white;
           box-shadow: var(--shadow-md);
           transform: translateY(-2px);
         }
 
-        .feature-icon {
-          width: 36px;
-          height: 36px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          flex-shrink: 0;
-        }
+                 .overview-icon {
+           width: 48px;
+           height: 48px;
+           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+           border-radius: 12px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: white;
+           flex-shrink: 0;
+           padding: 12px;
+         }
 
-        .feature-icon svg {
-          width: 16px;
-          height: 16px;
-        }
+                 .overview-icon svg {
+           width: 20px;
+           height: 20px;
+         }
 
-        .feature-content h3 {
+        .overview-content h3 {
           margin: 0 0 0.375rem;
           font-size: 1rem;
           font-weight: 700;
           color: var(--gray-900);
         }
 
-        .feature-content p {
+        .overview-content p {
           margin: 0;
           font-size: 0.875rem;
           color: var(--gray-600);
           line-height: 1.4;
         }
 
-        /* Getting Started Steps - Horizontal Layout */
-        .getting-started-steps {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 1.25rem;
-        }
+                 /* Stats Grid */
+         .stats-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 1.5rem;
+         }
 
-        .step-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+        .stat-item {
           text-align: center;
-          padding: 1.25rem;
+          padding: 1.5rem;
           background: var(--gray-50);
           border-radius: 12px;
           border: 1px solid var(--gray-200);
           transition: all 0.3s ease;
         }
 
-        .step-item:hover {
+        .stat-item:hover {
           background: white;
           box-shadow: var(--shadow-md);
           transform: translateY(-2px);
         }
 
-        .step-number {
-          width: 36px;
-          height: 36px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
+        .stat-number {
+          font-size: 2rem;
           font-weight: 700;
-          font-size: 0.875rem;
-          margin-bottom: 0.75rem;
-          flex-shrink: 0;
+          color: var(--primary-blue);
+          margin-bottom: 0.5rem;
+          transition: all 0.5s ease;
         }
 
-        .step-content h4 {
-          margin: 0 0 0.375rem;
+        .stat-label {
           font-size: 1rem;
-          font-weight: 700;
+          font-weight: 600;
           color: var(--gray-900);
+          margin-bottom: 0.25rem;
         }
 
-        .step-content p {
-          margin: 0;
-          color: var(--gray-600);
-          line-height: 1.4;
+        .stat-description {
           font-size: 0.875rem;
+          color: var(--gray-600);
         }
 
-        .step-arrow {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--gray-400);
-          flex-shrink: 0;
-        }
+                 /* Benefits Grid */
+         .benefits-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 1.25rem;
+         }
 
-        .step-arrow svg {
-          width: 18px;
-          height: 18px;
-        }
+         .benefit-item {
+           display: flex;
+           align-items: flex-start;
+           gap: 1rem;
+           padding: 1.25rem;
+           background: var(--gray-50);
+           border-radius: 12px;
+           border: 1px solid var(--gray-200);
+           transition: all 0.3s ease;
+         }
 
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-          .modern-layout {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
+         .benefit-item:hover {
+           background: white;
+           box-shadow: var(--shadow-md);
+           transform: translateY(-2px);
+         }
+
+                  .benefit-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+            padding: 12px;
           }
 
-          .features-grid {
-            grid-template-columns: 1fr;
+                  .benefit-icon svg {
+            width: 20px;
+            height: 20px;
           }
 
-          .process-steps {
-            flex-direction: column;
-            gap: 1rem;
-          }
+         .benefit-content h4 {
+           margin: 0 0 0.375rem;
+           font-size: 1rem;
+           font-weight: 700;
+           color: var(--gray-900);
+         }
 
-          .step-arrow {
-            transform: rotate(90deg);
-          }
-        }
+         .benefit-content p {
+           margin: 0;
+           font-size: 0.875rem;
+           color: var(--gray-600);
+           line-height: 1.4;
+         }
 
-                  @media (max-width: 768px) {
-          .modern-page-wrapper {
-            padding: 1rem;
-          }
+         /* Materials Grid */
+         .materials-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 1.5rem;
+         }
 
-          .content-hero {
-            padding: 1.5rem 0;
-          }
+         .material-item {
+           padding: 1.5rem;
+           background: var(--gray-50);
+           border-radius: 12px;
+           border: 1px solid var(--gray-200);
+           transition: all 0.3s ease;
+         }
 
-          .hero-title {
-            font-size: 1.625rem;
-          }
+         .material-item:hover {
+           background: white;
+           box-shadow: var(--shadow-md);
+           transform: translateY(-2px);
+         }
 
-          .card-content {
-            padding: 1.25rem;
-          }
+         .material-icon {
+           width: 48px;
+           height: 48px;
+           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+           border-radius: 12px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: white;
+           margin-bottom: 1rem;
+           padding: 12px;
+         }
 
-          .card-header {
-            padding: 1rem 1.25rem;
-          }
+         .material-icon svg {
+           width: 20px;
+           height: 20px;
+         }
 
-          .features-grid {
-            grid-template-columns: 1fr;
-          }
+         .material-content h3 {
+           margin: 0 0 0.5rem;
+           font-size: 1.125rem;
+           font-weight: 700;
+           color: var(--gray-900);
+         }
 
-          .getting-started-steps {
-            grid-template-columns: 1fr;
-          }
+         .material-content p {
+           margin: 0 0 1rem;
+           font-size: 0.875rem;
+           color: var(--gray-600);
+           line-height: 1.4;
+         }
 
-          .step-item {
-            padding: 1rem;
-          }
-        }
+         .material-preview {
+           border-radius: 8px;
+           overflow: hidden;
+           background: white;
+           border: 1px solid var(--gray-200);
+         }
 
-        @media (max-width: 640px) {
-          .hero-title {
-            font-size: 1.5rem;
-          }
+         .material-video {
+           width: 100%;
+           height: auto;
+           max-height: 200px;
+           object-fit: cover;
+         }
 
-          .hero-description {
-            font-size: 0.95rem;
-          }
+         .material-image {
+           width: 100%;
+           height: auto;
+           max-height: 200px;
+           object-fit: cover;
+         }
 
-          .card-content {
-            padding: 1rem;
-          }
+         .material-download {
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           gap: 0.5rem;
+           padding: 1rem;
+           background: var(--primary-blue);
+           color: white;
+           border-radius: 8px;
+           transition: all 0.3s ease;
+         }
 
-          .card-header {
-            padding: 0.875rem 1rem;
-          }
+         .material-download:hover {
+           background: var(--secondary-blue);
+           transform: translateY(-1px);
+         }
 
-          .header-icon h2 {
-            font-size: 1rem;
-          }
+         .material-download svg {
+           width: 16px;
+           height: 16px;
+         }
 
-          .feature-item {
-            padding: 0.875rem;
-          }
+         .download-link {
+           color: white;
+           text-decoration: none;
+           font-weight: 600;
+           font-size: 0.875rem;
+         }
 
-          .step-item {
-            padding: 0.875rem;
-          }
-        }
+         .download-link:hover {
+           text-decoration: underline;
+         }
+
+         /* Responsive Design */
+         @media (max-width: 768px) {
+           .overview-grid,
+           .benefits-grid,
+           .materials-grid,
+           .stats-grid {
+             grid-template-columns: 1fr;
+           }
+         }
       `}</style>
     </div>
   );
