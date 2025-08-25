@@ -5,6 +5,7 @@ import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
 import EgovProgressBar from "@/components/EgovProgressBar";
 import DinoGame from "@/components/DinoGame";
 import { getSessionItem } from "@/utils/storage";
+import { randomUUID } from "crypto";
 import "@/css/modern-styles.css";
 
 /**
@@ -121,7 +122,7 @@ function EgovSupportTransformation() {
     }
 
     const item = {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       file,
       status: "ready",
       progress: 0,
