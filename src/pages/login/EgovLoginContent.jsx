@@ -26,6 +26,7 @@ function EgovLoginContent(props) {
   const [loginStatus, setLoginStatus] = useState("");
 
   const checkRef = useRef();
+  const KEY_ID = "KEY_ID";
 
   const handleSaveIDFlag = (e) => {
     setSaveIDFlag(e.target.checked);
@@ -60,28 +61,70 @@ function EgovLoginContent(props) {
 
     console.log("Request body:", JSON.stringify(requestBody));
 
+    
     EgovNet.requestFetch(loginURL, requestOptions, (resp) => {
-      console.log("resp : ", resp);
-      if (resp.resultCode === "200") {
-        setSessionItem("loginUser", resp.result);
-        setSessionItem("jToken", resp.result.jToken);
-        if (saveIDFlag) {
-          setLocalItem("saveIDFlag", "true");
-          setLocalItem("saveID", userInfo.email);
-        } else {
-          setLocalItem("saveIDFlag", "false");
-          setLocalItem("saveID", "");
-        }
-        setLoginStatus("SUCCESS");
-        props.onChangeLogin(resp.result);
-        navigate(URL.MAIN);
+      // let resultVO = resp.resultVO;
+      let jToken = resp?.accessToken || null;
+      // let jToken = resp?.accessToken.split(' ')[1] || null;
+
+      const obj = {
+        id: resp?.id,
+        name: resp?.nickname,
+        userSe: resp?.role,
+      };
+
+      setSessionItem("jToken", jToken);
+      setSessionItem("loginUser", obj);
+
+    if (saveIDFlag) setLocalItem(KEY_ID, userInfo.email);
+
+    // 3) 만료/임박 처리
+    const isExpired = !resp?.isExpired;         // 백엔드에서 true/false
+    // const daysLeft  = Number(resp?.daysLeft ?? NaN); // 선택: 남은 일수 제공 시
+    console.log(isExpired);
+    if (isExpired) {
+      const goChange = window.confirm(
+        "마지막으로 비밀번호를 변경하신지 60일이 지났습니다.\n지금 바로 변경하시겠습니까?"
+      );
+      if (goChange) {
+        // 비밀번호 변경 화면(라우팅 상수에 맞춰 수정하세요)
+        navigate(URL.MYPAGE); // 예: '/mypage/password' 등
+        return;
       } else {
-        setLoginStatus("FAIL");
-        // 구체적인 오류 메시지 표시
-        const errorMessage = resp.resultMessage || "로그인에 실패했습니다.";
-        alert(errorMessage);
+        alert("보안을 위해 가능한 빨리 비밀번호를 변경해 주세요.");
+        // 원하는 정책에 따라: 메인으로 보낼지, 로그인 유지 막을지 결정
+        navigate(URL.MAIN);
+        return;
       }
+    }
+
+    // 4) 정상 로그인 플로우
+    alert("로그인 성공!");
+    navigate(URL.MAIN);
     });
+
+    // EgovNet.requestFetch(loginURL, requestOptions, (resp) => {
+    //   console.log("resp : ", resp);
+    //   // if (resp.resultCode === "200") {
+    //     setSessionItem("loginUser", resp.result);
+    //     setSessionItem("jToken", resp.result.jToken);
+    //     if (saveIDFlag) {
+    //       setLocalItem("saveIDFlag", "true");
+    //       setLocalItem("saveID", userInfo.email);
+    //     } else {
+    //       setLocalItem("saveIDFlag", "false");
+    //       setLocalItem("saveID", "");
+    //     }
+    //     setLoginStatus("SUCCESS");
+    //     props.onChangeLogin(resp.result);
+    //     navigate(URL.MAIN);
+    //   // } else {
+    //   //   setLoginStatus("FAIL");
+    //   //   // 구체적인 오류 메시지 표시
+    //   //   const errorMessage = resp.resultMessage || "로그인에 실패했습니다.";
+    //   //   alert(errorMessage);
+    //   // }
+    // });
   };
 
   useEffect(() => {

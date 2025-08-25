@@ -6,15 +6,14 @@ import URL from "@/constants/url";
 import CODE from "@/constants/code";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
-import { DiffCodeCompare } from "@/components/DiffCodeCompare";
 import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
 import java from "react-syntax-highlighter/dist/esm/languages/hljs/java";
 import jsonLang from "react-syntax-highlighter/dist/esm/languages/hljs/json";
 import "@/css/modern-styles.css";
 
 // ── Base URLs ────────────────────────────────────────────────────────────────
-const RAW_GET_BASE  = import.meta.env.VITE_API_BASE      || "http://3.39.231.225:8088";
-const RAW_POST_BASE = import.meta.env.VITE_API_POST_BASE || import.meta.env.VITE_API_BASE || "http://3.39.231.225:8088";
+const RAW_GET_BASE  = import.meta.env.VITE_API_BASE      || "http://localhost:8088";
+const RAW_POST_BASE = import.meta.env.VITE_API_POST_BASE || import.meta.env.VITE_API_BASE || "http://localhost:8088";
 const GET_BASE  = (RAW_GET_BASE  || "").replace(/\/+$/, "");
 const POST_BASE = (RAW_POST_BASE || "").replace(/\/+$/, "");
 
@@ -306,7 +305,7 @@ export default function EgovSupportViewTransformationDetail() {
               <div className="card-content">
                 {/* Tab Navigation */}
                 <div className="tab-navigation">
-                  {["overview","controller","service","serviceimpl","vo","reports","reports_json", "diff"].map((t) => (
+                  {["overview","controller","service","serviceimpl","vo","reports","reports_json"].map((t) => (
                     <button
                       key={t}
                       onClick={() => setTab(t)}
@@ -356,7 +355,6 @@ export default function EgovSupportViewTransformationDetail() {
                       {tab === "service" && <PathList title="Service 변환본" list={detail?.s3ConvServicePath} detail={detail} />}
                       {tab === "serviceimpl" && <PathList title="ServiceImpl 변환본" list={detail?.s3ConvServiceimplPath} detail={detail} />}
                       {tab === "vo" && <PathList title="VO 변환본" list={detail?.s3ConvVoPath} detail={detail} />}
-                      {tab === "diff" && <DiffCodeCompare />}
 
                       {tab === "reports" && (
                         <div className="reports-container">
@@ -395,74 +393,6 @@ export default function EgovSupportViewTransformationDetail() {
       </div>
 
       <style>{`
-      .diff-header-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 6px 12px;
-          font-size: 14px !important;
-}
-
-.diff-header-inline {
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 6px 12px;
-}
-
-.file-name {
-  // font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  color: #374151;
-}
-        .react-diff-42iver-word-diff {
-          padding: 0px !important;
-        }
-
-        /* Diff 뷰 내부에서는 절대 줄바꿈 금지 */
-        .diff-viewer, .diff-viewer * {
-          word-break: normal !important;
-          overflow-wrap: normal !important;  /* (= word-wrap) */
-        }
-        /* 코드 셀 */
-        .diff-viewer .diff-line,
-        .diff-viewer .diff-line pre,
-        .diff-viewer .diff-line code {
-          white-space: pre-wrap !important;   /* 기본은 줄 유지, 필요할 때만 wrap */
-          overflow-wrap: anywhere !important; /* 칸을 벗어나면 강제로 줄바꿈 */
-          word-break: break-word !important;  /* 단어 단위 줄바꿈 */
-        }
-        .diff-viewer,
-        .diff-viewer pre,
-        .diff-viewer code {
-          font-family: 'Fira Code', Consolas, monospace !important;
-          font-size: 10px !important;
-        }
-
-        /* pre/code가 pre-wrap으로 덮여 있으면 숫자가 꺾입니다 → 고정 */
-        .diff-viewer code {
-          white-space: pre !important;  /* 반드시 한 줄 유지 */
-        }
-
-        /* gutter 셀 자체 */
-        .diff-viewer .diff-gutter {
-          width: 56px !important;     /* 2~3자리 대비 여유 폭 */
-          min-width: 56px !important;
-          text-align: right;
-          // line-height: 1em;
-          font-size: 13px;
-          white-space: nowrap !important;  /* 부모 수준에서도 차단 */
-          overflow: visible;               /* 필요 시 가로로 삐져나오게 */
-        }
-
-        /* gutter 내부 텍스트 노드 */
-        .diff-viewer .diff-gutter > span,
-        .diff-viewer .diff-gutter code,
-        .diff-viewer .diff-gutter pre {
-          display: inline-block !important;
-          white-space: nowrap !important;
-          max-width: none !important;
-        }
-
         /* Modern Page Styles - Consistent with other pages */
         .modern-page-container {
           min-height: 100vh;
@@ -1565,14 +1495,6 @@ function getTabIcon(key) {
           <path d="M10 12a2 2 0 0 0 2 2c1 0 2-1 2-2s-1-2-2-2-2 1-2 2z"></path>
         </svg>
       );
-    case "diff":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14,2 14,8 20,8"></polyline>
-          <path d="M10 12a2 2 0 0 0 2 2c1 0 2-1 2-2s-1-2-2-2-2 1-2 2z"></path>
-        </svg>
-      );
     default:
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1589,9 +1511,8 @@ function labelOf(key) {
     case "service": return "Service";
     case "serviceimpl": return "ServiceImpl";
     case "vo": return "VO";
-    case "reports": return "리포트";
+    case "reports": return "변환 리포트";
     case "reports_json": return "리포트(JSON)";
-    case "diff": return "코드 비교";
     default: return key;
   }
 }
