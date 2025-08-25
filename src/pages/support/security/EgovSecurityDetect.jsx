@@ -74,7 +74,7 @@ export default function EgovSecurityDetect() {
     setLoading(true);
     setError("");
     try {
-      const retrieveListURL = `/agents/records/${sessionUser.id}`;
+      const retrieveListURL = `/agents/records/${sessionUser.id}/security`;
       const requestOptions = { method: "GET", headers: { "Content-Type": "application/json" } };
       const data = await new Promise((resolve, reject) => {
         EgovNet.requestFetch(

@@ -110,7 +110,7 @@ export default function EgovSupportViewTransformation() {
     setLoading(true);
     setError("");
     try {
-      const retrieveListURL = `/agents/records/${sessionUser.id}`;
+      const retrieveListURL = `/agents/records/${sessionUser.id}/conversion`;
       const requestOptions = { method: "GET", headers: { "Content-Type": "application/json" } };
       const data = await new Promise((resolve, reject) => {
         EgovNet.requestFetch(
