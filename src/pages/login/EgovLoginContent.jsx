@@ -18,7 +18,7 @@ function EgovLoginContent(props) {
   console.log("EgovLoginContent [location] : ", location);
 
   const [userInfo, setUserInfo] = useState({
-    id: "",
+    email: "", // id에서 email로 변경
     password: "",
   });
   const [saveIDFlag, setSaveIDFlag] = useState(false);
@@ -42,13 +42,23 @@ function EgovLoginContent(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("EgovLoginContent handleSubmit");
+    console.log("userInfo:", userInfo);
 
     const loginURL = "/users/login";
+    
+    // 백엔드 API가 email 필드를 사용하므로 그대로 전송
+    const requestBody = {
+      email: userInfo.email,
+      password: userInfo.password
+    };
+    
     const requestOptions = {
       method: "POST",
       headers: { "Content-type": "application/json" },
-      body: JSON.stringify(userInfo),
+      body: JSON.stringify(requestBody),
     };
+
+    console.log("Request body:", JSON.stringify(requestBody));
 
     EgovNet.requestFetch(loginURL, requestOptions, (resp) => {
       console.log("resp : ", resp);
@@ -57,7 +67,7 @@ function EgovLoginContent(props) {
         setSessionItem("jToken", resp.result.jToken);
         if (saveIDFlag) {
           setLocalItem("saveIDFlag", "true");
-          setLocalItem("saveID", userInfo.id);
+          setLocalItem("saveID", userInfo.email);
         } else {
           setLocalItem("saveIDFlag", "false");
           setLocalItem("saveID", "");
@@ -67,6 +77,9 @@ function EgovLoginContent(props) {
         navigate(URL.MAIN);
       } else {
         setLoginStatus("FAIL");
+        // 구체적인 오류 메시지 표시
+        const errorMessage = resp.resultMessage || "로그인에 실패했습니다.";
+        alert(errorMessage);
       }
     });
   };
@@ -76,7 +89,7 @@ function EgovLoginContent(props) {
     const saveID = getLocalItem("saveID");
     if (saveIDFlag === "true") {
       setSaveIDFlag(true);
-      setUserInfo((prev) => ({ ...prev, id: saveID }));
+      setUserInfo((prev) => ({ ...prev, email: saveID })); // id에서 email로 변경
     }
   }, []);
 
@@ -106,18 +119,18 @@ function EgovLoginContent(props) {
           <div className="form-group">
             <label className="form-label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
               </svg>
-              아이디
+              이메일
             </label>
             <input
-              type="text"
-              name="id"
-              value={userInfo.id}
+              type="email"
+              name="email"
+              value={userInfo.email}
               onChange={handleChange}
               className="form-input"
-              placeholder="아이디를 입력하세요"
+              placeholder="이메일을 입력하세요"
               required
             />
           </div>
@@ -151,7 +164,7 @@ function EgovLoginContent(props) {
                 checked={saveIDFlag}
               />
               <span className="checkmark"></span>
-              <span className="checkbox-text">아이디 저장</span>
+              <span className="checkbox-text">이메일 저장</span>
             </label>
           </div>
 

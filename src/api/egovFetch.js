@@ -40,7 +40,23 @@ export function requestFetch(url, requestOptions, handler, errorHandler) {
     .then((response) => {
       // response Stream. Not completion object
       //console.log("requestFetch [Response Stream] ", response);
-      return response.json();
+      
+      // Content-Type 확인
+      const contentType = response.headers.get("content-type");
+      
+      if (contentType && contentType.includes("application/json")) {
+        return response.json();
+      } else {
+        // JSON이 아닌 경우 텍스트로 처리
+        return response.text().then(text => {
+          // 텍스트 응답을 JSON 형태로 변환
+          return {
+            resultCode: response.status.toString(),
+            resultMessage: text,
+            result: null
+          };
+        });
+      }
     })
     .then((resp) => {
       if (Number(resp.resultCode) === Number(CODE.RCV_ERROR_AUTH)) {
