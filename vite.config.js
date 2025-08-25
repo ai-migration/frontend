@@ -18,7 +18,7 @@ export default defineConfig({
     proxy: {
       // ── 여기 추가: /api → 8000 FastAPI 서버로 프록시
       "/api": {
-        target: "http://127.0.0.1:8000",
+        target: "http://gateway:8080",
         changeOrigin: true,
         // backend가 /api 프리픽스를 그대로 기대하므로 rewrite 불필요
         // 필요 시: rewrite: (path) => path.replace(/^\/api/, ""),
