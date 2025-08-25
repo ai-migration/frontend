@@ -58,7 +58,7 @@ function GlobalChatWidget() {
 
     try {
       // ✅ FastAPI 챗봇 API 호출
-      const response = await fetch("/api/chat", {
+      const response = await fetch("http://3.39.231.225:8000/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
