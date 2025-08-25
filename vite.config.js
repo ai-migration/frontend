@@ -14,6 +14,7 @@ export default defineConfig({
 
   server: {
     port: 3000,
+    host: 'localhost',
     proxy: {
       // ── 여기 추가: /api → 8000 FastAPI 서버로 프록시
       "/api": {
