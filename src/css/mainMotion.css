@@ -1,0 +1,35 @@
+.hero-carousel { position: relative; width: 100%; height: clamp(240px, 28vw, 420px); overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,255,.15); isolation: isolate; background: linear-gradient(135deg, #000080, #0000FF); }
+.hero-carousel .track { display: flex; height: 100%; transition: transform 600ms cubic-bezier(.22,.61,.36,1); }
+.hero-carousel .slide { position: relative; min-width: 100%; height: 100%; user-select: none; }
+.hero-carousel .slide img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; filter: saturate(1.05) contrast(1.02); }
+.hero-carousel .slide-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,11,30,0) 40%, rgba(8,11,30,.55)); display: grid; place-items: end start; padding: 24px; }
+.hero-carousel .caption.glass { backdrop-filter: blur(8px) saturate(1.2); -webkit-backdrop-filter: blur(8px) saturate(1.2); background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); border-radius: 14px; padding: 10px 14px; color: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.hero-carousel .caption strong { display:block; font-size: clamp(16px, 2.4vw, 22px); }
+.hero-carousel .caption span { display:block; opacity:.9; font-size: 13px; }
+
+/* 네비 버튼 */
+.hero-carousel .nav { position: absolute; top: 50%; translate: 0 -50%; z-index: 2; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.12); color: #fff; display: grid; place-items: center; cursor: pointer; transition: transform .2s ease, background .2s ease; backdrop-filter: blur(6px); }
+.hero-carousel .nav:hover { transform: scale(1.06); background: rgba(255,255,255,.2); }
+.hero-carousel .prev { left: 10px; }
+.hero-carousel .next { right: 10px; }
+
+/* 도트 */
+.hero-carousel .dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 2; }
+.hero-carousel .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(255,255,255,.8); background: transparent; cursor: pointer; }
+.hero-carousel .dot.active { background: #fff; }
+
+/* 블롭 백그라운드 */
+.hero-carousel .blob { position: absolute; inset: auto auto -40% -20%; width: 60%; height: 140%; background: radial-gradient(ellipse at center, rgba(0,0,255,.35), transparent 60%); filter: blur(40px); z-index: 0; }
+.hero-carousel .blob-b { inset: -40% -20% auto auto; background: radial-gradient(ellipse at center, rgba(65,105,225,.3), transparent 60%); }
+
+/* 리빌 애니메이션 */
+.reveal { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* 카드 & 호버 상승 */
+.card { background: #fff; border-radius: 16px; box-shadow: 0 10px 24px rgba(0,0,0,.06); }
+.hover-lift { transition: transform .2s ease, box-shadow .2s ease; }
+.hover-lift:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,.12); }
+
+/* 유튜브 스켈레톤 */
+@keyframes pulse { 0%,100% { opacity:.8 } 50% { opacity: .55 } }

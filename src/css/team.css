@@ -1,0 +1,271 @@
+:root {
+  --team-maxw: 1200px;
+  --radius: 18px;
+  --pad: 18px;
+
+  /* Colors: keep existing intent but soften accents */
+  --card-bg: #0f1220;     /* dark base (unchanged) */
+  --card-fg: #eef1f7;     /* foreground on dark */
+  --muted:   #98a2b3;     /* secondary text */
+  --hairline: color-mix(in oklab, #ffffff 18%, transparent);
+  --shadow: 0 10px 25px rgba(0,0,0,.16), 0 2px 6px rgba(0,0,0,.12);
+
+  /* Accent ring (quieter than before) */
+  --ring: conic-gradient(from 180deg at 50% 50%, #7c3aed33, #06b6d433, #10b98133, #f59e0b33, #ef444433, #7c3aed33);
+
+  /* Modal dynamic accents (defaults, overridden inline) */
+  --acc1: #2563eb; /* blue-600 */
+  --acc2: #60a5fa; /* blue-400 */
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --card-bg: #ffffff;   /* light base */
+    --card-fg: #0f1220;   /* foreground on light */
+    --muted:   #657084;
+    --hairline: color-mix(in oklab, #000 12%, transparent);
+    --shadow: 0 8px 24px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.06);
+  }
+}
+
+/* SF‑like system typography & smoothing */
+.team-section, .team-section * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+.team-section {
+  margin-top: 36px;
+  margin-bottom: 54px;
+}
+
+.team-header {
+  max-width: var(--team-maxw);
+  margin: 0 auto 20px;
+  padding: 0 16px;
+  text-align: left;
+}
+
+.team-eyebrow {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .16em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.team-header h3 {
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.24;
+  margin: 0 0 8px 0;
+  color: var(--card-fg);
+}
+
+.team-sub {
+  color: var(--muted);
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.team-grid {
+  max-width: var(--team-maxw);
+  margin: 18px auto 0;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (min-width: 560px) {
+  .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 920px) {
+  .team-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+}
+
+/* === Card === */
+.team-card {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--card-bg) 100%, transparent), color-mix(in oklab, var(--card-bg) 82%, transparent));
+  box-shadow: var(--shadow);
+  isolation: isolate;
+  transition: transform 220ms cubic-bezier(.2,.7,.3,1), box-shadow 220ms ease, filter 220ms ease;
+  transform: translateZ(0);
+  cursor: pointer;
+  /* interactive cursor variables */
+  --mx: .5; --my: .5; --rx: 0deg; --ry: 0deg; --scale: 1;
+}
+
+/* Hairline border like iOS panels */
+.team-card__hairline {
+  position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 .5px var(--hairline);
+}
+
+.team-card:hover { transform: translateY(-4px); }
+
+/* Subtle interactive spotlight */
+.team-card__glow {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(220px circle at calc(var(--mx, .5) * 100%) calc(var(--my, .5) * 100%), color-mix(in oklab, #ffffff 8%, transparent), transparent 60%);
+  transition: opacity 180ms ease;
+}
+.team-card:hover .team-card__glow { opacity: 1; }
+
+/* sheen that tracks the cursor */
+.team-card__sheen {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.22) 50%, rgba(255,255,255,0) 65%);
+  transform: translate(
+    calc((var(--mx, .5) - .5) * 8%),
+    calc((var(--my, .5) - .5) * 8%)
+  );
+  mix-blend-mode: screen;
+  transition: opacity 180ms ease, transform 200ms ease;
+}
+.team-card.is-hovering .team-card__sheen { opacity: .5; }
+
+.team-card__media {
+  position: relative;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--scale));
+  transform-style: preserve-3d;
+  transition: transform 260ms cubic-bezier(.22,.61,.36,1);
+  will-change: transform;
+}
+.team-card__media img {
+  width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+  filter: saturate(1.02);
+  backface-visibility: hidden;
+}
+
+/* Frosted badge */
+.team-card__badge {
+  position: absolute; left: 12px; bottom: 12px;
+  padding: 6px 10px; font-size: 12px; font-weight: 700;
+  border-radius: 999px; color: var(--card-fg);
+  background: color-mix(in oklab, var(--card-bg) 65%, #fff 20%);
+  backdrop-filter: saturate(180%) blur(10px);
+  box-shadow: 0 2px 10px rgba(0,0,0,.18), inset 0 0 0 .5px var(--hairline);
+  transform: translate(
+    calc((var(--mx, .5) - .5) * 6px),
+    calc((var(--my, .5) - .5) * 6px)
+  );
+  transition: transform 180ms ease;
+}
+.team-card.is-hovering .team-card__badge { transition: transform 90ms ease; }
+
+.team-card__body { padding: var(--pad); }
+.team-card__name {
+  margin: 0; font-size: 16px; font-weight: 800; color: var(--card-fg);
+}
+
+/* Keyboard focus (focus-visible only) */
+.team-card:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow), 0 0 0 3px color-mix(in oklab, #7c3aed 34%, transparent);
+}
+
+/* ===============================
+   Modal (Card Detail)
+   =============================== */
+.team-modal { position: fixed; inset: 0; display: none; z-index: 1000; }
+.team-modal.open { display: block; }
+.team-modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(10px); }
+
+.team-modal__dialog {
+  position: relative; margin: 8vh auto; width: min(900px, calc(100% - 32px));
+  border-radius: 22px; overflow: hidden; color: var(--card-fg);
+  /* Apple glass panel with accent wash */
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--acc1) 6%, transparent), color-mix(in oklab, var(--acc2) 6%, transparent)),
+    color-mix(in oklab, var(--card-bg) 88%, #fff 6%);
+  backdrop-filter: saturate(180%) blur(18px);
+  box-shadow: 0 30px 80px rgba(0,0,0,.30), 0 2px 0 rgba(255,255,255,.06) inset;
+  animation: modal-pop .28s ease;
+}
+.team-modal__dialog::before {
+  /* gradient hairline border */
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  padding: 1px; background: linear-gradient(135deg, var(--acc1), var(--acc2));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: .85;
+}
+@keyframes modal-pop { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+
+.team-modal__media img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; filter: saturate(1.06) contrast(1.02); }
+/* color edge overlay for media */
+.team-modal__media { position: relative; }
+.team-modal__media::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--acc1) 16%, transparent) 0%, transparent 30%, transparent 70%, color-mix(in oklab, var(--acc2) 16%, transparent) 100%);
+  mix-blend-mode: color-dodge; opacity: .45;
+}
+
+.team-modal__body { padding: 20px; position: relative; z-index: 1; }
+.team-modal__title { margin: 0 0 6px 0; font-size: clamp(20px, 2.2vw, 28px); font-weight: 900; }
+.team-modal__role {
+  display: inline-block; font-size: 12px; font-weight: 800;
+  background: color-mix(in oklab, var(--card-bg) 70%, #fff 18%);
+  color: var(--card-fg); border-radius: 999px; padding: 6px 10px;
+  box-shadow: inset 0 0 0 .5px var(--hairline);
+  border: 1px solid transparent;
+  border-image: linear-gradient(90deg, var(--acc1), var(--acc2)) 1;
+}
+.team-modal__bio { margin-top: 12px; color: var(--muted); line-height: 1.7; }
+
+.team-modal__close {
+  position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border-radius: 999px;
+  border: none; background: color-mix(in oklab, var(--card-bg) 72%, #fff 12%); color: var(--card-fg); font-size: 18px; cursor: pointer;
+  box-shadow: inset 0 0 0 .5px var(--hairline);
+  transition: transform .16s ease, filter .16s ease, background .2s ease;
+}
+.team-modal__close:hover { filter: brightness(1.06); transform: scale(1.06); }
+.team-modal__close:focus-visible { outline: 2px solid color-mix(in oklab, var(--acc1) 40%, transparent); outline-offset: 2px; }
+
+.no-scroll { overflow: hidden !important; }
+
+/* === New: Ambient aurora + gradient text + divider === */
+.team-modal__aura {
+  position: absolute; inset: -10% -20% -20% -10%; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(40% 30% at 20% 20%, color-mix(in oklab, var(--acc1) 28%, transparent), transparent 60%),
+    radial-gradient(35% 25% at 80% 10%, color-mix(in oklab, var(--acc2) 28%, transparent), transparent 60%),
+    radial-gradient(50% 40% at 60% 90%, color-mix(in oklab, var(--acc1) 18%, transparent), transparent 70%);
+  filter: blur(28px) saturate(1.1);
+  animation: aura-shift 12s ease-in-out infinite alternate;
+}
+@keyframes aura-shift {
+  0% { transform: translate3d(0,0,0) scale(1); opacity: .7; }
+  100% { transform: translate3d(0,-2%,0) scale(1.02); opacity: .9; }
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--acc1), var(--acc2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.team-modal__divider {
+  height: 1px; margin: 12px 0; background: linear-gradient(90deg, color-mix(in oklab, var(--acc1) 50%, transparent), color-mix(in oklab, var(--acc2) 50%, transparent));
+  opacity: .6;
+}
+
+/* ===============================
+   Reveal on View (Entrance Animation)
+   =============================== */
+.reveal-item { opacity: 0; transform: translateY(10px); }
+.reveal-item.is-visible { opacity: 1; transform: none; transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1); }
+.team-grid .team-card.reveal-item { transition-delay: var(--delay, 0ms); }
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-item, .reveal-item.is-visible, .team-card, .team-card__glow, .team-modal__dialog { transition: none !important; animation: none !important; }
+  .team-card { --rx: 0deg !important; --ry: 0deg !important; --scale: 1 !important; }
+  .team-card__media { transform: none !important; }
+  .team-card__sheen { display: none !important; }
+}
