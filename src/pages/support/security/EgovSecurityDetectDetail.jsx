@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -111,6 +111,7 @@ const basename = (path) => (path ? path.split("/").pop() : "-");
  * - 로딩 스켈레톤, 에러 배너, 빈 상태 UI
  */
 export default function EgovSecurityDetectDetail() {
+  const location = useLocation();
   const [all, setAll] = useState([]); // 원본
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -174,14 +175,15 @@ Servlet Container는 보안 관련된 기능을 지원한다. 따라서 서블�
   const [pageSize, setPageSize] = useState(10);
 
   const sessionUser = getSessionItem("loginUser");
-  let jobId = location.state?.jobId;
+  const jobId = location.state?.jobId;
+  const s3ReportJsonPath = location.state?.s3ReportJsonPath;
 
   const fetchList = useCallback(async () => {
     if (!sessionUser?.id) return;
     setLoading(true);
     setError("");
     try {
-      const retrieveListURL = `/agents/view/${sessionUser.id}/${jobId}/security/security_reports/report.json`;
+      const retrieveListURL = `/agents/view/${s3ReportJsonPath}`;
       const requestOptions = { method: "GET", headers: { "Content-Type": "application/json" } };
       const data = await new Promise((resolve, reject) => {
         EgovNet.requestFetch(
@@ -483,6 +485,14 @@ Servlet Container는 보안 관련된 기능을 지원한다. 따라서 서블�
           flex: 1 1 0;
           min-width: 280px; /* 최소 폭 보장 */
           overflow-x: auto; /* 테이블이 넘칠 때 스크롤 */
+        }
+
+        .two-pane > *:first-child {
+          flex: 7;  /* 전체 10 중 7 */
+        }
+
+        .two-pane > *:last-child {
+          flex: 3;  /* 전체 10 중 3 */
         }
 
         /* 반응형: 화면 좁아지면 세로 배치 */

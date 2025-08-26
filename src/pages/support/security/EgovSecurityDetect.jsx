@@ -390,7 +390,12 @@ export default function EgovSecurityDetect() {
                                 <div className="action-cell">
                                   <Link
                                     to={{ pathname: URL.SUPPORT_SECURITY_DETECT_DETAIL }}
-                                    state={{ jobId: item.jobId }}
+                                    state={{ 
+                                      jobId: item.jobId,
+                                      s3AgentInputsPath: item.s3AgentInputsPath,
+                                      s3ReportsDir: item.s3ReportsDir,
+                                      s3ReportJsonPath: item.s3ReportJsonPath
+                                     }}
                                     className="detail-btn"
                                     title="상세 보기"
                                   >
