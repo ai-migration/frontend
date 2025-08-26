@@ -5,6 +5,8 @@ import "@/css/modern-styles.css";
 
 function EgovAboutSite() {
   const [animatedStats, setAnimatedStats] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalScale, setModalScale] = useState(1);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -215,7 +217,17 @@ function EgovAboutSite() {
                        <h3>사업 솔루션</h3>
                        <p>프로젝트의 핵심 솔루션과 비즈니스 모델을 한눈에</p>
                        <div className="material-preview">
-                         <img src="/assets/project/solution.png" alt="사업 솔루션" className="material-image" />
+                         <img src="/assets/images/solution.jpg" alt="사업 솔루션" className="material-image" />
+                         <button 
+                           className="zoom-button" 
+                           onClick={() => setIsModalOpen(true)}
+                           title="확대보기"
+                         >
+                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                             <circle cx="11" cy="11" r="8"></circle>
+                             <path d="m21 21-4.35-4.35"></path>
+                           </svg>
+                         </button>
                        </div>
                      </div>
                    </div>
@@ -374,6 +386,71 @@ function EgovAboutSite() {
           </main>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {isModalOpen && (
+        <div className="image-modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="image-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>사업 솔루션</h3>
+              <div className="modal-controls">
+                <button 
+                  className="zoom-control-btn"
+                  onClick={() => setModalScale(Math.min(modalScale + 0.2, 3))}
+                  title="확대"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    <line x1="11" y1="8" x2="11" y2="14"></line>
+                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                  </svg>
+                </button>
+                <button 
+                  className="zoom-control-btn"
+                  onClick={() => setModalScale(Math.max(modalScale - 0.2, 0.5))}
+                  title="축소"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                  </svg>
+                </button>
+                <button 
+                  className="zoom-control-btn"
+                  onClick={() => setModalScale(1)}
+                  title="원본 크기"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="9" cy="9" r="2"></circle>
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                  </svg>
+                </button>
+                <button 
+                  className="close-btn"
+                  onClick={() => setIsModalOpen(false)}
+                  title="닫기"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="modal-content">
+              <img 
+                src="/assets/images/solution.jpg" 
+                alt="사업 솔루션" 
+                className="modal-image"
+                style={{ transform: `scale(${modalScale})` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
                  /* Hero Content Override */
@@ -634,8 +711,142 @@ function EgovAboutSite() {
          .material-image {
            width: 100%;
            height: auto;
-           max-height: 200px;
-           object-fit: cover;
+           max-height: 400px;
+           object-fit: contain;
+         }
+
+         .material-preview {
+           position: relative;
+         }
+
+         .zoom-button {
+           position: absolute;
+           top: 10px;
+           right: 10px;
+           width: 36px;
+           height: 36px;
+           background: rgba(0, 0, 0, 0.7);
+           border: none;
+           border-radius: 50%;
+           color: white;
+           cursor: pointer;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           transition: all 0.3s ease;
+           opacity: 0;
+         }
+
+         .material-preview:hover .zoom-button {
+           opacity: 1;
+         }
+
+         .zoom-button:hover {
+           background: rgba(0, 0, 0, 0.9);
+           transform: scale(1.1);
+         }
+
+         .zoom-button svg {
+           width: 18px;
+           height: 18px;
+         }
+
+         /* Modal Styles */
+         .image-modal-overlay {
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           background: rgba(0, 0, 0, 0.9);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           z-index: 9999;
+           backdrop-filter: blur(5px);
+         }
+
+         .image-modal {
+           background: white;
+           border-radius: 16px;
+           max-width: 90vw;
+           max-height: 90vh;
+           overflow: hidden;
+           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+         }
+
+         .modal-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 1rem 1.5rem;
+           border-bottom: 1px solid var(--gray-200);
+           background: var(--gray-50);
+         }
+
+         .modal-header h3 {
+           margin: 0;
+           font-size: 1.125rem;
+           font-weight: 600;
+           color: var(--gray-900);
+         }
+
+         .modal-controls {
+           display: flex;
+           gap: 0.5rem;
+           align-items: center;
+         }
+
+         .zoom-control-btn,
+         .close-btn {
+           width: 36px;
+           height: 36px;
+           border: none;
+           border-radius: 8px;
+           background: var(--gray-200);
+           color: var(--gray-700);
+           cursor: pointer;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           transition: all 0.3s ease;
+         }
+
+         .zoom-control-btn:hover,
+         .close-btn:hover {
+           background: var(--gray-300);
+           transform: translateY(-1px);
+         }
+
+         .close-btn {
+           background: #ef4444;
+           color: white;
+         }
+
+         .close-btn:hover {
+           background: #dc2626;
+         }
+
+         .zoom-control-btn svg,
+         .close-btn svg {
+           width: 16px;
+           height: 16px;
+         }
+
+         .modal-content {
+           padding: 1.5rem;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           overflow: auto;
+           max-height: calc(90vh - 80px);
+         }
+
+         .modal-image {
+           max-width: 100%;
+           max-height: 100%;
+           object-fit: contain;
+           transition: transform 0.3s ease;
          }
 
          .material-download {

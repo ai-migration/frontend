@@ -198,7 +198,7 @@ export default function EgovSecurityDetect() {
             <svg className="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9,18 15,12 9,6"></polyline>
             </svg>
-            <span className="breadcrumb-current">보안 취약점탐지</span>
+            <span className="breadcrumb-current">보안 검사결과</span>
           </div>
         </nav>
 
@@ -219,10 +219,10 @@ export default function EgovSecurityDetect() {
                       <polyline points="10,9 9,9 8,9"></polyline>
                     </svg>
                   </div>
-                  <h1 className="hero-title">보안 취약점탐지</h1>
+                  <h1 className="hero-title">보안 검사결과</h1>
                 </div>
                 <p className="hero-description">
-                  AI가 자동으로 <strong>보안 취약점</strong>을 분석합니다.
+                  AI가 탐지한 <strong>보안 취약점 결과를 </strong>확인할 수 있습니다.
                 </p>
               </div>
             </section>
