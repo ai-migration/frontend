@@ -115,12 +115,14 @@ export default function EgovSecurityDetectDetail() {
   const [all, setAll] = useState([]); // 원본
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [preview, setPreview] = useState(
+    const [preview, setPreview] = useState(
 `
-
+ 
 `
 
   );
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   // 필터/정렬 상태
   const [query, setQuery] = useState(""); // jobId, 파일명, 경로에 대해 포함 검색
@@ -220,7 +222,7 @@ export default function EgovSecurityDetectDetail() {
     [page, pageSize, total]
   );
 
-  const loadMarkdown = useCallback(async (fileName) => {
+  const loadMarkdown = useCallback(async (fileName, index) => {
     if (!sessionUser?.id) return;
     try {
       const url = `${GET_BASE}/agents/view/${sessionUser.id}/${jobId}/security/security_reports/${fileName}`;
@@ -228,16 +230,25 @@ export default function EgovSecurityDetectDetail() {
       
       const text = await res.text();
       setPreview(text);
-      // if (presigned) {
-      //   window.location.href = presigned;
-      // } else {
-      //   alert("다운로드 URL을 받지 못했습니다.");
-      // }
+      setCurrentFileIndex(index);
     } catch (e) {
       console.error(e);
-      alert("다운로드 중 오류가 발생했습니다.");
+      alert("파일을 불러오는 중 오류가 발생했습니다.");
     }
-  }, [sessionUser?.id]);
+  }, [sessionUser?.id, jobId]);
+
+  const navigateToFile = useCallback((direction) => {
+    if (pageItems.length === 0) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = currentFileIndex > 0 ? currentFileIndex - 1 : pageItems.length - 1;
+    } else {
+      newIndex = currentFileIndex < pageItems.length - 1 ? currentFileIndex + 1 : 0;
+    }
+    
+    loadMarkdown(pageItems[newIndex], newIndex);
+  }, [currentFileIndex, pageItems, loadMarkdown]);
 
   // 액션: 프리사인 URL 받아 다운로드
   const handleDownload = useCallback(async (jobId) => {
@@ -300,19 +311,23 @@ export default function EgovSecurityDetectDetail() {
             {/* Hero Section */}
             <section className="content-hero">
               <div className="hero-content">
-                <div className="hero-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14,2 14,8 20,8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10,9 9,9 8,9"></polyline>
-                  </svg>
+                <div className="hero-header">
+                  <div className="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                  </div>
+                  <div className="hero-text">
+                    <h1 className="hero-title">취약점 상세보기</h1>
+                    <p className="hero-description">
+                      AI가 분석한 <strong>보안 취약점</strong>을 확인할 수 있습니다.
+                    </p>
+                  </div>
                 </div>
-                <h1 className="hero-title">취약점 상세보기</h1>
-                <p className="hero-description">
-                  AI가 분석한 <strong>보안 취약점</strong>을 확인할 수 있습니다.
-                </p>
               </div>
             </section>
 
@@ -333,80 +348,148 @@ export default function EgovSecurityDetectDetail() {
 
                 {/* Data Table */}
                 <div className="table-wrapper two-pane">
-                  <section className="content-section modern-card">
-                    {/* 좌측: Markdown 미리보기 (4) */}
-                    <div className="pane-md markdown-body">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          code({ inline, className, children }) {
-                            const m = /language-(\w+)/.exec(className || "");
-                            return !inline && m ? (
-                              <SyntaxHighlighter
-                                style={github}
-                                language={m[1]}
-                                PreTag="div"
-                              >
-                                {String(children).replace(/\n$/, "")}
-                              </SyntaxHighlighter>
-                            ) : (
-                              <code className={className}>{children}</code>
-                            );
-                          },
-                        }}
-                      >
-                        {preview}
-                      </ReactMarkdown>
-                    </div>
-                  </section>
-
-
-                  <table className="modern-table">
-                    <thead>
-                      <tr>
-                        <th className="table-header">파일</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* Loading State */}
-                      {loading ? (
-                        Array.from({ length: pageSize }).map((_, i) => (
-                          <tr key={i} className="skeleton-row">
-                            <td><div className="skeleton-item"></div></td>
-                            <td><div className="skeleton-item"></div></td>
-                            <td><div className="skeleton-item"></div></td>
-                            <td><div className="skeleton-item"></div></td>
-                            <td><div className="skeleton-item"></div></td>
-                          </tr>
-                        ))
-                      ) : pageItems.length === 0 ? (
-                        <tr>
-                          <td colSpan="5" className="empty-state">
-                            <div className="empty-content">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="M21 21l-4.35-4.35"></path>
-                              </svg>
-                              <p>검색된 결과가 없습니다.</p>
-                              <span>다른 검색 조건을 시도해보세요.</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        /* Data Rows */
-                        pageItems.map((item, idx) => (
-                          <tr key={idx} className="table-row">
-                            <td>
-                              <button 
-                              onClick={() => loadMarkdown(item)}
-                              className="table-cell w_full" 
-                              style={{background:"#ffffff"}}>{item}</button>
-                            </td>
-                          </tr>
-                        ))
+                                     <section className="content-section modern-card markdown-viewer">
+                     <div className="markdown-header">
+                       <div className="markdown-title">
+                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                           <polyline points="14,2 14,8 20,8"></polyline>
+                           <line x1="16" y1="13" x2="8" y2="13"></line>
+                           <line x1="16" y1="17" x2="8" y2="17"></line>
+                           <polyline points="10,9 9,9 8,9"></polyline>
+                         </svg>
+                         <div className="title-content">
+                           <span className="title-text">마크다운 뷰어</span>
+                           {pageItems.length > 0 && (
+                             <span className="file-counter">
+                               {currentFileIndex + 1} / {pageItems.length}
+                             </span>
+                           )}
+                         </div>
+                       </div>
+                                               <div className="markdown-actions">
+                          <button 
+                            className="action-btn" 
+                            title={isZoomed ? "축소" : "확대"}
+                            onClick={() => setIsZoomed(!isZoomed)}
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="M21 21l-4.35-4.35"></path>
+                              <line x1="11" y1="8" x2="11" y2="14"></line>
+                              <line x1="8" y1="11" x2="14" y2="11"></line>
+                            </svg>
+                          </button>
+                        </div>
+                     </div>
+                                           <div className={`pane-md markdown-body ${isZoomed ? 'zoomed' : ''}`}>
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            code({ inline, className, children }) {
+                              const m = /language-(\w+)/.exec(className || "");
+                              return !inline && m ? (
+                                <SyntaxHighlighter
+                                  style={github}
+                                  language={m[1]}
+                                  PreTag="div"
+                                  customStyle={{
+                                    background: '#f8f9fa',
+                                    border: '1px solid #e9ecef',
+                                    borderRadius: '8px',
+                                    padding: '16px',
+                                    fontSize: '14px',
+                                    lineHeight: '1.5'
+                                  }}
+                                >
+                                  {String(children).replace(/\n$/, "")}
+                                </SyntaxHighlighter>
+                              ) : (
+                                <code className={className}>{children}</code>
+                              );
+                            },
+                          }}
+                        >
+                          {preview}
+                        </ReactMarkdown>
+                      </div>
+                                           {pageItems.length > 0 && (
+                        <div className="markdown-navigation">
+                          <button 
+                            className="nav-btn prev-btn" 
+                            onClick={() => navigateToFile('prev')}
+                            title="이전 파일"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="15,18 9,12 15,6"></polyline>
+                            </svg>
+                          </button>
+                          <button 
+                            className="nav-btn next-btn" 
+                            onClick={() => navigateToFile('next')}
+                            title="다음 파일"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
+                          </button>
+                        </div>
                       )}
-                    </tbody>
-                  </table>
+                   </section>
+
+
+                                     <div className="file-list-container">
+                     <h3 className="file-list-title">파일</h3>
+                     <div className="file-list">
+                       {/* Loading State */}
+                       {loading ? (
+                         Array.from({ length: pageSize }).map((_, i) => (
+                           <div key={i} className="file-item skeleton">
+                             <div className="skeleton-item"></div>
+                           </div>
+                         ))
+                       ) : pageItems.length === 0 ? (
+                         <div className="empty-state">
+                           <div className="empty-content">
+                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                               <circle cx="11" cy="11" r="8"></circle>
+                               <path d="M21 21l-4.35-4.35"></path>
+                             </svg>
+                             <p>검색된 결과가 없습니다.</p>
+                             <span>다른 검색 조건을 시도해보세요.</span>
+                           </div>
+                         </div>
+                       ) : (
+                         /* File Items */
+                         pageItems.map((item, idx) => (
+                           <button 
+                             key={idx} 
+                             onClick={() => loadMarkdown(item, idx)}
+                             className={`file-item ${currentFileIndex === idx ? 'active' : ''}`}
+                           >
+                             <div className="file-icon">
+                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                 <polyline points="14,2 14,8 20,8"></polyline>
+                                 <line x1="16" y1="13" x2="8" y2="13"></line>
+                                 <line x1="16" y1="17" x2="8" y2="17"></line>
+                                 <polyline points="10,9 9,9 8,9"></polyline>
+                               </svg>
+                             </div>
+                             <div className="file-info">
+                               <span className="file-name">{item}</span>
+                               <span className="file-type">Markdown</span>
+                             </div>
+                             <div className="file-arrow">
+                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                 <polyline points="9,18 15,12 9,6"></polyline>
+                               </svg>
+                             </div>
+                           </button>
+                         ))
+                       )}
+                     </div>
+                   </div>
                 </div>
               </div>
 
@@ -483,11 +566,386 @@ export default function EgovSecurityDetectDetail() {
           padding-left: 1.5em;
         }
 
-        .markdown-body code {
-          background: #f5f5f5;
-          padding: 2px 4px;
-          border-radius: 4px;
-        }
+                 .markdown-body code {
+           background: #f5f5f5;
+           padding: 2px 4px;
+           border-radius: 4px;
+         }
+
+         /* File List Styles */
+         .file-list-container {
+           background: white;
+           border-radius: 16px;
+           border: 1px solid var(--gray-200);
+           overflow: hidden;
+           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+         }
+
+         .file-list-title {
+           text-align: center;
+           margin: 0;
+           padding: 1.5rem;
+           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+           color: white;
+           font-size: 1.25rem;
+           font-weight: 600;
+           border-bottom: 1px solid var(--gray-200);
+         }
+
+         .file-list {
+           max-height: 600px;
+           overflow-y: auto;
+         }
+
+         .file-item {
+           display: flex;
+           align-items: center;
+           gap: 1rem;
+           padding: 1rem 1.5rem;
+           border: none;
+           background: white;
+           cursor: pointer;
+           transition: all 0.2s ease;
+           border-bottom: 1px solid var(--gray-100);
+           width: 100%;
+           text-align: left;
+         }
+
+                   .file-item:hover {
+            background: var(--light-blue);
+            transform: translateX(4px);
+          }
+
+          .file-item.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+
+          .file-item.active .file-name {
+            color: white;
+          }
+
+          .file-item.active .file-type {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+          }
+
+          .file-item.active .file-arrow {
+            color: white;
+          }
+
+         .file-item:last-child {
+           border-bottom: none;
+         }
+
+         .file-icon {
+           width: 40px;
+           height: 40px;
+           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+           border-radius: 8px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: white;
+           flex-shrink: 0;
+         }
+
+         .file-icon svg {
+           width: 20px;
+           height: 20px;
+         }
+
+         .file-info {
+           flex: 1;
+           display: flex;
+           flex-direction: column;
+           gap: 0.25rem;
+         }
+
+                   .file-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 0.95rem;
+            word-break: break-all;
+            line-height: 1.4;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+
+         .file-type {
+           font-size: 0.75rem;
+           color: var(--gray-500);
+           background: var(--gray-100);
+           padding: 0.25rem 0.5rem;
+           border-radius: 12px;
+           width: fit-content;
+         }
+
+         .file-arrow {
+           color: var(--gray-400);
+           transition: all 0.2s ease;
+         }
+
+         .file-item:hover .file-arrow {
+           color: var(--primary-blue);
+           transform: translateX(4px);
+         }
+
+         .file-arrow svg {
+           width: 16px;
+           height: 16px;
+         }
+
+         /* Markdown Viewer Styles */
+         .markdown-viewer {
+           background: white;
+           border-radius: 16px;
+           border: 1px solid var(--gray-200);
+           overflow: hidden;
+           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+         }
+
+         .markdown-header {
+           display: flex;
+           align-items: center;
+           justify-content: space-between;
+           padding: 1rem 1.5rem;
+           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+           color: white;
+           border-bottom: 1px solid var(--gray-200);
+         }
+
+                   .markdown-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+          }
+
+          .title-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+          }
+
+          .title-text {
+            font-size: 1.125rem;
+            font-weight: 600;
+          }
+
+          .file-counter {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 500;
+          }
+
+         .markdown-title svg {
+           width: 20px;
+           height: 20px;
+         }
+
+         .markdown-actions {
+           display: flex;
+           gap: 0.5rem;
+         }
+
+         .action-btn {
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           width: 32px;
+           height: 32px;
+           border: none;
+           background: rgba(255, 255, 255, 0.2);
+           color: white;
+           border-radius: 6px;
+           cursor: pointer;
+           transition: all 0.2s ease;
+         }
+
+         .action-btn:hover {
+           background: rgba(255, 255, 255, 0.3);
+           transform: scale(1.05);
+         }
+
+         .action-btn svg {
+           width: 16px;
+           height: 16px;
+         }
+
+         .markdown-body {
+           padding: 2rem;
+           max-height: 600px;
+           overflow-y: auto;
+           background: #fafbfc;
+         }
+
+         .markdown-body h1,
+         .markdown-body h2,
+         .markdown-body h3,
+         .markdown-body h4,
+         .markdown-body h5,
+         .markdown-body h6 {
+           color: var(--gray-900);
+           margin: 1.5rem 0 1rem;
+           font-weight: 700;
+           line-height: 1.3;
+         }
+
+         .markdown-body h1 {
+           font-size: 2rem;
+           border-bottom: 2px solid var(--primary-blue);
+           padding-bottom: 0.5rem;
+         }
+
+         .markdown-body h2 {
+           font-size: 1.75rem;
+           border-bottom: 1px solid var(--gray-300);
+           padding-bottom: 0.25rem;
+         }
+
+         .markdown-body h3 {
+           font-size: 1.5rem;
+         }
+
+         .markdown-body p {
+           margin: 1rem 0;
+           line-height: 1.7;
+           color: var(--gray-700);
+         }
+
+         .markdown-body ul,
+         .markdown-body ol {
+           margin: 1rem 0;
+           padding-left: 2rem;
+         }
+
+         .markdown-body li {
+           margin: 0.5rem 0;
+           line-height: 1.6;
+           color: var(--gray-700);
+         }
+
+         .markdown-body blockquote {
+           margin: 1.5rem 0;
+           padding: 1rem 1.5rem;
+           background: var(--light-blue);
+           border-left: 4px solid var(--primary-blue);
+           border-radius: 0 8px 8px 0;
+         }
+
+         .markdown-body blockquote p {
+           margin: 0;
+           color: var(--gray-800);
+           font-style: italic;
+         }
+
+         .markdown-body code {
+           background: #f1f3f4;
+           padding: 0.25rem 0.5rem;
+           border-radius: 4px;
+           font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+           font-size: 0.875rem;
+           color: #d73a49;
+         }
+
+         .markdown-body pre {
+           margin: 1.5rem 0;
+           border-radius: 8px;
+           overflow: hidden;
+         }
+
+         .markdown-body table {
+           width: 100%;
+           border-collapse: collapse;
+           margin: 1.5rem 0;
+           border-radius: 8px;
+           overflow: hidden;
+           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+         }
+
+         .markdown-body th,
+         .markdown-body td {
+           padding: 0.75rem 1rem;
+           text-align: left;
+           border-bottom: 1px solid var(--gray-200);
+         }
+
+         .markdown-body th {
+           background: var(--gray-50);
+           font-weight: 600;
+           color: var(--gray-900);
+         }
+
+                   .markdown-body tr:hover {
+            background: var(--gray-50);
+          }
+
+          /* Zoom Functionality */
+          .markdown-body.zoomed {
+            transform: scale(1.1);
+            transform-origin: top left;
+            transition: transform 0.3s ease;
+          }
+
+          /* Navigation Styles */
+          .markdown-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-top: 1px solid var(--gray-200);
+          }
+
+          .nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+          }
+
+          .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+
+          .nav-btn:active {
+            transform: scale(0.95);
+          }
+
+          .nav-btn svg {
+            width: 20px;
+            height: 20px;
+          }
+
+          .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+          }
+
+          .nav-btn:disabled:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: none;
+            box-shadow: none;
+          }
 
         /* Modern Page Styles */
         .modern-page-container {
@@ -555,19 +1013,24 @@ export default function EgovSecurityDetectDetail() {
         }
 
         .content-hero {
-          text-align: center;
-          padding: 3rem 0;
+          padding: 2rem 0;
         }
 
         .hero-content {
-          max-width: 600px;
+          max-width: 1200px;
           margin: 0 auto;
+        }
+
+        .hero-header {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          margin-bottom: 2rem;
         }
 
         .hero-icon {
           width: 80px;
           height: 80px;
-          margin: 0 auto 1.5rem;
           background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
           border-radius: var(--border-radius-2xl);
           display: flex;
@@ -575,6 +1038,7 @@ export default function EgovSecurityDetectDetail() {
           justify-content: center;
           color: white;
           box-shadow: var(--shadow-xl);
+          flex-shrink: 0;
         }
 
         .hero-icon svg {
@@ -582,8 +1046,12 @@ export default function EgovSecurityDetectDetail() {
           height: 40px;
         }
 
+        .hero-text {
+          flex: 1;
+        }
+
         .hero-title {
-          margin: 0 0 1rem;
+          margin: 0 0 0.5rem;
           font-size: 2.5rem;
           font-weight: 700;
           color: var(--gray-900);
@@ -981,6 +1449,12 @@ export default function EgovSecurityDetectDetail() {
         @media (max-width: 768px) {
           .modern-page-wrapper {
             padding: 1rem;
+          }
+
+          .hero-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
           }
 
           .hero-title {

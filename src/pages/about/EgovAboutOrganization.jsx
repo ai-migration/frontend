@@ -60,7 +60,7 @@ function EgovAboutOrganization() {
     {
       id: 6,
       name: "신현승",
-      role: "테스트 엔지니어",
+      role: "AI 에이전트 / 프론트엔드 / 데이터베이스/ 클라우드",
       department: "Testing & Quality Assurance",
       image: "/src/assets/images/member6.jpg",
       description: "자동 테스트 코드 생성 및 실행 시스템 개발",
