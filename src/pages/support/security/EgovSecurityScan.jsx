@@ -167,11 +167,12 @@ function EgovSecurityScan() {
       es.addEventListener("agent-message", (e) => {
         const payload = JSON.parse(e.data);  // ← JSON 파싱
         console.log(payload);
-        appendLog(`STEP: ${payload.description}`);
+        if(payload.description == null)
+          appendLog(`STEP: 보안 분석이 완료되었습니다.`);
         if(payload.language != null)
           appendLog(`LANGUAGE: ${payload.language}`);
         setProgress((prev) => {
-          const v = Math.min(prev + 12.5, 100);
+          const v = Math.min(prev + 100, 100);
           if (v >= 100) {
             setLoadingType(null);
             setSuccessType(type);
