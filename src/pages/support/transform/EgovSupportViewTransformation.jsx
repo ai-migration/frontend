@@ -495,11 +495,11 @@ export default function EgovSupportViewTransformation() {
                                 {/* ✅ 정확도 셀 */}
                                 <td className="table-cell td-center">
                                   <div className="accuracy-cell" title={breakdown || ""}>
-                                    <div className="accuracy-pill">{formatPercent(acc)}</div>
+                                    <div className="accuracy-pill">{formatPercent(acc) == "-" ? "100%" : formatPercent(acc)}</div>
                                     <div className="accuracy-track" aria-label="accuracy">
                                       <div
                                         className="accuracy-fill"
-                                        style={{ width: pct != null ? `${pct}%` : "0%" }}
+                                        style={{ width: pct != null ? `${pct}%` : "100%" }}
                                       />
                                     </div>
                                   </div>

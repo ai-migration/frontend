@@ -162,6 +162,8 @@ export default function EgovSecurityDetectDetail() {
       const list = Array.isArray(fileList.files) ? fileList.files : [];
       // 저장일자 내림차순 기본 정렬
       // list.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+      if(fileList != null)
+        loadMarkdown(fileList.files[0], 0);
       setAll(list);
       setPage(1);
     } catch (e) {
