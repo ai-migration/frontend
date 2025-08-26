@@ -85,26 +85,21 @@ function EgovMypageEdit() {
       },
     };
     
-    EgovNet.requestFetch(requestTokenURL, requestOptions)
-      .then((resp) => {
-        console.log("resp : ", resp);
-        if (resp.resultCode === "200") {
-          alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
-          setUserDetail({
-              ...userDetail,
-              tokenIssued: true,
-            })
-        } else {
-          navigate(
-            { pathname: URL.ERROR },
-            { state: { msg: resp.resultMessage } }
-          );
-        }
-      })
-      .catch((error) => {
-        console.log("error : ", error);
-        alert("토큰 발급 중 오류가 발생했습니다.");
-      });
+    EgovNet.requestFetch(requestTokenURL, requestOptions, function (resp) {
+      console.log("resp : ", resp);
+      if (resp.resultCode === "200") {
+        alert("토큰 발급이 요청되었습니다. 토큰 발급 후 서비스 이용이 가능합니다.");
+        setUserDetail({
+            ...userDetail,
+            tokenIssued: true,
+          })
+      } else {
+        navigate(
+          { pathname: URL.ERROR },
+          { state: { msg: resp.resultMessage } }
+        );
+      }
+    });
   }
 
   const updateUser = () => {
