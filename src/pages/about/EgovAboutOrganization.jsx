@@ -10,12 +10,12 @@ function EgovAboutOrganization() {
     {
       id: 1,
       name: "이유민",
-      role: "팀장 / 프로젝트 총괄",
-      department: "AI Code Migration",
-      image: "/src/assets/images/member1.jpg",
-      description: "프로젝트 전체 기획 및 관리, AI 에이전트 시스템 아키텍처 설계",
-      skills: ["프로젝트 관리", "시스템 설계", "AI/ML", "Java/Spring"],
-      email: "hyunseung@example.com"
+      role: "AI 엔지니어",
+      department: "AI & Backend & DevOps",
+      image: "/src/assets/images/member7.jpg",
+      description: "AI 개발, Backend 개발, 클라우드 인프라 구축 및 배포 자동화",
+      skills: ["LangGraph", "RAG", "SpringBoot", "Python", "Kafka", "MongoDB", "AWS", "Docker", "Kubernetes", "CI/CD"],
+      email: "lee_yumin@naver.com"
     },
     {
       id: 2,
@@ -60,12 +60,12 @@ function EgovAboutOrganization() {
     {
       id: 6,
       name: "신현승",
-      role: "AI 에이전트 / 프론트엔드 / 데이터베이스/ 클라우드",
+      role: "AI 에이전트 / 프론트엔드 / 데이터베이스 / 클라우드",
       department: "Testing & Quality Assurance",
       image: "/src/assets/images/member6.jpg",
       description: "자동 테스트 코드 생성 및 실행 시스템 개발",
-      skills: ["JUnit", "테스트 자동화", "품질 관리", "CI/CD"],
-      email: "soyoung@example.com"
+      skills: ["LangGraph", "RAG", "Python", "MongoDB","MySQL","AWS","Kafka","Docker","React","Vite"],
+      email: "dnclgk9@naver.com"
     },
     {
       id: 7,

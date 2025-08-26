@@ -66,22 +66,7 @@ function EgovLeftNavTransform() {
             </NavLink>
           </li>
 
-          <li className="nav-item">
-            <NavLink to="/support/transform/download" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
-              <div className="link-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7,10 12,15 17,10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-              </div>
-              <div className="link-content">
-                <span className="link-title">다운로드</span>
-                <span className="link-desc">변환된 코드 파일을 다운로드합니다</span>
-              </div>
-        
-            </NavLink>
-          </li>
+
         </ul>
       </div>
     </nav>
