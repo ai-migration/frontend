@@ -255,7 +255,7 @@ function EgovMain(props) {
                 </div>
                 <h1 className="hero-title">
                   <span className="title-main">AI CODE MIGRATION</span>
-                  <span className="title-subtitle">전자정부 경량환경</span>
+                  <span className="title-subtitle">전자정부표준프레임워크 자동 변환</span>
                 </h1>
                 <p className="hero-description">
                   최신 AI 기술을 활용한 코드 변환 및 보안 검사 서비스로
@@ -496,7 +496,16 @@ function EgovMain(props) {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          filter: brightness(1.1) contrast(1.05) saturate(1.1);
+          object-position: center;
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: crisp-edges;
+          image-rendering: pixelated;
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          will-change: transform;
+          -webkit-will-change: transform;
         }
         .main-header-overlay {
           position: absolute;
@@ -504,7 +513,7 @@ function EgovMain(props) {
           left: 0;
           width: 100%;
           height: 100%;
-          background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
+          background: transparent;
         }
 
         /* Modern Main */
@@ -523,13 +532,13 @@ function EgovMain(props) {
 
         /* Hero Text Section */
         .hero-text-section { display:flex; flex-direction:column; gap:2rem; }
-        .hero-badge { display:inline-flex; align-items:center; gap:.75rem; padding:.75rem 1.5rem; background:linear-gradient(135deg, rgba(102,126,234,.15), rgba(118,75,162,.15)); border:1px solid rgba(102,126,234,.3); border-radius:50px; color:#667eea; font-size:.875rem; font-weight:600; width:fit-content; backdrop-filter: blur(10px); box-shadow:0 4px 15px rgba(102,126,234,.1); transition:.3s; }
-        .hero-badge:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(102,126,234,.2); }
+                 .hero-badge { display:inline-flex; align-items:center; gap:.75rem; padding:.75rem 1.5rem; background:linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.1)); border:1px solid rgba(255,255,255,.3); border-radius:50px; color:#fff; font-size:.875rem; font-weight:600; width:fit-content; backdrop-filter: blur(10px); box-shadow:0 4px 15px rgba(255,255,255,.1); transition:.3s; }
+                 .hero-badge:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(255,255,255,.2); }
         .badge-icon { font-size:1.25rem; animation:pulse 2s infinite; }
         @keyframes pulse {0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
 
         .hero-title { display:flex; flex-direction:column; gap:1rem; margin:0; font-family:"Poppins","spoqa_regular",sans-serif; }
-        .title-main { font-size:4rem; font-weight:800; line-height:1.1; color:#fff; text-shadow:2px 2px 4px rgba(0,0,0,.5); background:linear-gradient(135deg,#fff 0%,#e0e7ff 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-.02em; }
+                 .title-main { font-size:4rem; font-weight:800; line-height:1.1; color:#fff; text-shadow:2px 2px 4px rgba(0,0,0,.5); letter-spacing:-.02em; }
         .title-subtitle { font-size:1.75rem; font-weight:600; color:#e0e7ff; margin-top:.5rem; text-shadow:1px 1px 2px rgba(0,0,0,.5); font-family:"spoqa_medium",sans-serif; }
         .hero-description { font-size:1.25rem; line-height:1.6; color:#e0e7ff; margin:0; text-shadow:1px 1px 2px rgba(0,0,0,.5); font-family:"spoqa_regular",sans-serif; letter-spacing:-.01em; }
 
@@ -537,8 +546,8 @@ function EgovMain(props) {
         .hero-btn { display:flex; align-items:center; gap:.75rem; padding:1rem 2rem; border-radius:16px; text-decoration:none; font-weight:600; font-size:1rem; transition:.3s; border:2px solid transparent; position:relative; overflow:hidden; }
         .hero-btn.primary { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; box-shadow:0 4px 15px rgba(102,126,234,.4); }
         .hero-btn.primary:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(102,126,234,.6); }
-        .hero-btn.secondary { background:rgba(255,255,255,.1); backdrop-filter: blur(10px); border:2px solid rgba(255,255,255,.2); color:#fff; }
-        .hero-btn.secondary:hover { background:rgba(255,255,255,.2); transform:translateY(-3px); box-shadow:0 12px 30px rgba(255,255,255,.2); }
+        .hero-btn.secondary { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; box-shadow:0 4px 15px rgba(102,126,234,.4); }
+        .hero-btn.secondary:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(102,126,234,.6); }
         .btn-icon { display:flex; align-items:center; justify-content:center; width:24px; height:24px; }
         .btn-arrow { display:flex; align-items:center; justify-content:center; width:20px; height:20px; opacity:0; transform:translateX(-10px); transition:.3s; }
         .hero-btn:hover .btn-arrow { opacity:1; transform:none; }
@@ -559,7 +568,22 @@ function EgovMain(props) {
 
         /* Section Background */
         .section-background { position:absolute; inset:0; z-index:-1; overflow:hidden; }
-        .section-background video { width:100%; height:100%; object-fit:cover; filter: brightness(.8) contrast(1.3) saturate(1.2); }
+        .section-background video { 
+          width:100%; 
+          height:100%; 
+          object-fit:cover; 
+          object-position: center;
+          filter: brightness(.8) contrast(1.3) saturate(1.2);
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: crisp-edges;
+          image-rendering: pixelated;
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          will-change: transform;
+          -webkit-will-change: transform;
+        }
         .section-overlay { position:absolute; inset:0; background: linear-gradient(135deg, rgba(0,0,0,.5), rgba(0,0,0,.3), rgba(0,0,0,.1)); }
 
         /* Animated base */

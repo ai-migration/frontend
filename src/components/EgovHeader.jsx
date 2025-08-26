@@ -411,39 +411,12 @@ export default function EgovHeader() {
           {/* 로고 영역 */}
           <div className="logo-section">
             <h1 className="logo">
-              <HLink to={URL2.MAIN} className="logo-link" aria-label="홈으로 이동">
-                <div className="logo-icon">
-                  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#667eea"/>
-                        <stop offset="50%" stopColor="#764ba2"/>
-                        <stop offset="100%" stopColor="#f093fb"/>
-                      </linearGradient>
-                      <filter id="glow">
-                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                        <feMerge> 
-                          <feMergeNode in="coloredBlur"/>
-                          <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                      </filter>
-                    </defs>
-                    <rect width="40" height="40" rx="12" fill="url(#logoGradient)" filter="url(#glow)"/>
-                    <g fill="white" fillOpacity="0.9">
-                      <circle cx="12" cy="15" r="2"/>
-                      <circle cx="20" cy="15" r="2"/>
-                      <circle cx="28" cy="15" r="2"/>
-                      <path d="M8 25h24v3H8z" rx="1.5"/>
-                      <path d="M10 20h20v2H10z" rx="1"/>
-                    </g>
-                    <rect width="40" height="40" rx="12" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
-                  </svg>
-                </div>
-                <div className="logo-text">
-                  <span className="logo-title">AI CODE MIGRATION</span>
-                  <span className="logo-subtitle">전자정부 경량환경</span>
-                </div>
-              </HLink>
+                             <HLink to={URL2.MAIN} className="logo-link" aria-label="홈으로 이동">
+                 <div className="logo-text">
+                   <span className="logo-title">AI CODE MIGRATION</span>
+                   <span className="logo-subtitle">전자정부표준프레임워크 자동 변환</span>
+                 </div>
+               </HLink>
             </h1>
           </div>
 
@@ -683,81 +656,94 @@ export default function EgovHeader() {
           z-index: 1001;
         }
 
-        /* Header Container */
-        .header-container {
-          max-width: 1440px;
-          margin: 0 auto;
-          padding: 0 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          height: 80px;
-          gap: 2rem;
-          position: relative;
-        }
+                 /* Header Container */
+         .header-container {
+           max-width: 1440px;
+           margin: 0 auto;
+           padding: 0 2rem;
+           display: flex;
+           align-items: center;
+           justify-content: space-between;
+           height: 100px;
+           gap: 2rem;
+           position: relative;
+         }
 
-        /* Logo Section */
-        .logo-section {
-          flex-shrink: 0;
-          min-width: 280px;
-        }
+                 /* Logo Section */
+         .logo-section {
+           flex-shrink: 0;
+           min-width: 280px;
+         }
 
-        .logo {
-          margin: 0;
-        }
+         .logo {
+           margin: 0;
+         }
 
-        .logo-link {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          text-decoration: none;
-          color: inherit;
-          transition: all 0.3s ease;
-        }
+         .logo-link {
+           display: flex;
+           align-items: center;
+           gap: 1rem;
+           text-decoration: none;
+           color: inherit;
+           transition: all 0.3s ease;
+           flex-direction: row;
+           flex-wrap: nowrap;
+         }
 
-        .logo-link:hover {
-          transform: translateY(-2px);
-        }
+         .logo-link:hover {
+           transform: translateY(-2px);
+         }
 
-        .logo-icon {
-          width: 48px;
-          height: 48px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 12px;
-          background: linear-gradient(135deg, #667eea, #764ba2);
-          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-          transition: all 0.3s ease;
-        }
+         .logo-icon {
+           width: 48px;
+           height: 48px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           border-radius: 12px;
+           background: linear-gradient(135deg, #667eea, #764ba2);
+           box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+           transition: all 0.3s ease;
+           flex-shrink: 0;
+         }
 
-        .logo-icon:hover {
-          transform: scale(1.1);
-          box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
-        }
+         .logo-icon:hover {
+           transform: scale(1.1);
+           box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+         }
 
-        .logo-text {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          gap: 0.5rem;
-          min-width: 200px;
-        }
+                   .logo-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.3rem;
+            min-width: 200px;
+            justify-content: center;
+            font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+          }
 
-        .logo-title {
-          font-size: 1.25rem;
-          font-weight: 800;
-          color: #374151;
-          line-height: 1.2;
-          white-space: nowrap;
-        }
+          .logo-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
 
-        .logo-subtitle {
-          font-size: 0.75rem;
-          color: #6b7280;
-          font-weight: 500;
-          white-space: nowrap;
-        }
+          .logo-subtitle {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-weight: 400;
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.8;
+          }
 
         /* Desktop Navigation */
         .desktop-nav {
@@ -1033,21 +1019,21 @@ export default function EgovHeader() {
 
 
 
-        /* Mobile Menu */
-        .mobile-menu {
-          position: fixed;
-          top: 80px;
-          left: 0;
-          right: 0;
-          background: rgba(255, 255, 255, 0.99);
-          backdrop-filter: blur(10px);
-          border-top: 1px solid rgba(0, 0, 0, 0.1);
-          transform: translateY(-100%);
-          opacity: 0;
-          visibility: hidden;
-          transition: all 0.3s ease;
-          z-index: 999;
-        }
+                 /* Mobile Menu */
+         .mobile-menu {
+           position: fixed;
+           top: 100px;
+           left: 0;
+           right: 0;
+           background: rgba(255, 255, 255, 0.99);
+           backdrop-filter: blur(10px);
+           border-top: 1px solid rgba(0, 0, 0, 0.1);
+           transform: translateY(-100%);
+           opacity: 0;
+           visibility: hidden;
+           transition: all 0.3s ease;
+           z-index: 999;
+         }
 
         .mobile-menu.open {
           transform: translateY(0);
@@ -1325,13 +1311,19 @@ export default function EgovHeader() {
             min-width: 200px;
           }
 
-          .logo-title {
-            font-size: 1rem;
-          }
+                     .logo-title {
+             font-size: 1.2rem;
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+           }
 
-          .logo-subtitle {
-            font-size: 0.7rem;
-          }
+           .logo-subtitle {
+             font-size: 0.75rem;
+             text-transform: uppercase;
+             letter-spacing: 0.05em;
+           }
 
           .mobile-menu-toggle {
             display: flex;
@@ -1350,33 +1342,42 @@ export default function EgovHeader() {
           }
         }
 
-        @media (max-width: 768px) {
-          .header-container {
-            height: 70px;
-          }
+                 @media (max-width: 768px) {
+           .header-container {
+             height: 80px;
+           }
 
-          .logo-text {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.3rem;
-          }
+           .logo-text {
+             display: flex;
+             flex-direction: column;
+             align-items: flex-start;
+             gap: 0.2rem;
+             justify-content: center;
+           }
 
-          .logo-title {
-            font-size: 0.9rem;
-          }
+                       .logo-title {
+              font-size: 1.1rem;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+            }
 
-          .logo-subtitle {
-            font-size: 0.6rem;
-          }
+            .logo-subtitle {
+              font-size: 0.7rem;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            }
 
-          .chat-drawer {
-            width: 100%;
-            right: -100%;
-          }
+           .chat-drawer {
+             width: 100%;
+             right: -100%;
+           }
 
-
-        }
+           .mobile-menu {
+             top: 80px;
+           }
+         }
 
         @media (max-width: 480px) {
           .header-container {
@@ -1388,20 +1389,61 @@ export default function EgovHeader() {
             height: 40px;
           }
 
-          .logo-title {
-            font-size: 0.8rem;
-          }
+                     .logo-title {
+             font-size: 1rem;
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+           }
 
-          .logo-subtitle {
-            font-size: 0.5rem;
-          }
+           .logo-subtitle {
+             font-size: 0.65rem;
+             text-transform: uppercase;
+             letter-spacing: 0.05em;
+           }
 
-          .logo-text {
-            min-width: 150px;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.2rem;
-          }
+                                                      .logo-text {
+             min-width: 150px;
+             flex-direction: column;
+             align-items: flex-start;
+             gap: 0.2rem;
+             justify-content: center;
+           }
+                 /* --- 고급 로고 텍스트 스타일링 --- */
+         .logo-section { 
+           min-width: 0 !important; 
+         }
+         
+         .logo-section .logo-link {
+           display: flex !important;
+           align-items: center !important;
+           justify-content: center !important;
+           width: auto !important;
+         }
+         
+         .logo-section .logo-text {
+           display: flex !important;
+           flex-direction: column !important;
+           align-items: center !important;
+           text-align: center !important;
+           min-width: 0 !important;
+           white-space: nowrap !important;
+         }
+
+         /* 모바일에서도 중앙 정렬 유지 */
+         @media (max-width: 768px) {
+           .logo-section .logo-link { 
+             justify-content: center !important; 
+           }
+         }
+         
+         @media (max-width: 480px) {
+           .logo-section .logo-link { 
+             justify-content: center !important; 
+           }
+         }
+
         }
       `}</style>
     </>
