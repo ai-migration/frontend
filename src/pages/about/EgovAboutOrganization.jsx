@@ -70,12 +70,12 @@ function EgovAboutOrganization() {
     {
       id: 7,
       name: "양준모",
-      role: "DevOps 엔지니어",
-      department: "DevOps & Infrastructure",
+      role: "AI 엔지니어",
+      department: "AI Agent Development",
       image: "/src/assets/images/member7.jpg",
-      description: "클라우드 인프라 구축 및 배포 자동화",
-      skills: ["AWS", "Docker", "Kubernetes", "CI/CD", "인프라 관리"],
-      email: "donghyun@example.com"
+      description: "분석 Agent 설계 및 AI Agent 개발",
+      skills: ["Python", "Java", "LangGraph", "에이전트 개발"],
+      email: "jooniee802@gmail.com"
     },
     {
       id: 8,

@@ -532,7 +532,7 @@ function EgovMain(props) {
 
         /* Hero Text Section */
         .hero-text-section { display:flex; flex-direction:column; gap:2rem; }
-                 .hero-badge { display:inline-flex; align-items:center; gap:.75rem; padding:.75rem 1.5rem; background:linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.1)); border:1px solid rgba(255,255,255,.3); border-radius:50px; color:#fff; font-size:.875rem; font-weight:600; width:fit-content; backdrop-filter: blur(10px); box-shadow:0 4px 15px rgba(255,255,255,.1); transition:.3s; }
+                 .hero-badge { display:inline-flex; align-items:center; gap:.75rem; padding:.75rem 1.5rem; background:linear-gradient(135deg, rgba(255,255,255,.15), rgba(255,255,255,.1)); border:1px solid rgba(255,255,255,.3); border-radius:50px; color:#fff; font-size:.875rem; font-weight:600; width:fit-content; box-shadow:0 4px 15px rgba(255,255,255,.1); transition:.3s; }
                  .hero-badge:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(255,255,255,.2); }
         .badge-icon { font-size:1.25rem; animation:pulse 2s infinite; }
         @keyframes pulse {0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
@@ -554,7 +554,7 @@ function EgovMain(props) {
 
         /* Slideshow */
         .hero-slideshow-section { display:flex; justify-content:center; align-items:center; }
-        .slideshow-container { width:100%; height:500px; border-radius:20px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,.3); position:relative; background:rgba(255,255,255,.1); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.2); margin:0 auto; z-index:1; }
+        .slideshow-container { width:100%; height:500px; border-radius:20px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,.3); position:relative; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); margin:0 auto; z-index:1; }
         .slideshow-track { width:100%; height:100%; position:relative; }
         .slideshow-slide { position:absolute; inset:0; background-size:cover; background-position:center; background-repeat:no-repeat; opacity:0; transition: opacity .8s ease-in-out; }
         .slideshow-slide.active { opacity:1; }
@@ -573,7 +573,6 @@ function EgovMain(props) {
           height:100%; 
           object-fit:cover; 
           object-position: center;
-          filter: brightness(.8) contrast(1.3) saturate(1.2);
           image-rendering: -webkit-optimize-contrast;
           image-rendering: crisp-edges;
           image-rendering: pixelated;

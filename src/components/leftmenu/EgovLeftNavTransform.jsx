@@ -3,8 +3,7 @@ import "@/css/modern-styles.css";
 
 function EgovLeftNavTransform() {
   return (
-    <>
-      <nav className="modern-left-nav">
+    <nav className="modern-left-nav">
       <div className="nav-container">
         <div className="nav-header">
           <div className="nav-icon">
@@ -66,20 +65,7 @@ function EgovLeftNavTransform() {
           
             </NavLink>
           </li>
-          <li className="nav-item">
-            <NavLink to="/support/transform/view_test" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
-              <div className="link-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6-6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 6V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-              </div>
-              <div className="link-content">
-                <span className="link-title">테스트 이력 조회</span>
-                <span className="link-desc">테스트 이력을 확인합니다</span>
-              </div>
-        
-            </NavLink>
-          </li>
+
           <li className="nav-item">
             <NavLink to="/support/transform/download" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
               <div className="link-icon">
@@ -99,41 +85,6 @@ function EgovLeftNavTransform() {
         </ul>
       </div>
     </nav>
-
-    <style dangerouslySetInnerHTML={{ __html: `
-      .modern-left-nav {
-        color: #000000 !important;
-      }
-      
-      .nav-title {
-        color: #000000 !important;
-      }
-      
-      .link-text {
-        color: #000000 !important;
-      }
-      
-      .nav-link {
-        color: #000000 !important;
-      }
-      
-      .nav-link:hover {
-        color: #000000 !important;
-      }
-      
-      .nav-link.active {
-        color: #000000 !important;
-      }
-      
-      .link-title {
-        color: #000000 !important;
-      }
-      
-      .link-desc {
-        color: #000000 !important;
-      }
-    `}} />
-    </>
   );
 }
 

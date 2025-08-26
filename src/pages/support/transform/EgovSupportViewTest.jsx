@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import EgovLeftNavTransform from "@/components/leftmenu/EgovLeftNavTransform";
 import "@/css/modern-styles.css";
 
 function EgovSupportViewTest() {
@@ -28,8 +27,6 @@ function EgovSupportViewTest() {
         </nav>
 
         <div className="modern-layout">
-          <EgovLeftNavTransform />
-          
           <main className="modern-content" id="contents">
             {/* Hero Section */}
             <section className="content-hero">

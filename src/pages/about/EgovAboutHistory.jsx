@@ -103,7 +103,7 @@ function EgovAboutHistory() {
                       </div>
                       <div className="progress-info">
                         <h3>기획 및 설계</h3>
-                        <span className="progress-period">2024.01 - 2024.03</span>
+                        <span className="progress-period">2025.07 - 2025.07</span>
                       </div>
                     </div>
                     <div className="progress-bar">
@@ -122,7 +122,7 @@ function EgovAboutHistory() {
                       </div>
                       <div className="progress-info">
                         <h3>개발 및 구현</h3>
-                        <span className="progress-period">2024.04 - 2024.08</span>
+                        <span className="progress-period">2025.07 - 2025.08</span>
                       </div>
                     </div>
                     <div className="progress-bar">
@@ -142,7 +142,7 @@ function EgovAboutHistory() {
                       </div>
                       <div className="progress-info">
                         <h3>테스트 및 검증</h3>
-                        <span className="progress-period">2024.09 - 2024.10</span>
+                        <span className="progress-period">2025.08 - 2025.8</span>
                       </div>
                     </div>
                     <div className="progress-bar">
@@ -162,7 +162,7 @@ function EgovAboutHistory() {
                       </div>
                       <div className="progress-info">
                         <h3>배포 및 런칭</h3>
-                        <span className="progress-period">2024.11 - 현재</span>
+                        <span className="progress-period">2025.8 - 현재</span>
                       </div>
                     </div>
                     <div className="progress-bar">
@@ -190,7 +190,7 @@ function EgovAboutHistory() {
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <div className="timeline-content">
-                      <h4>2024년 1월</h4>
+                      <h4>2025년 7월</h4>
                       <h3>프로젝트 기획 시작</h3>
                       <p>전자정부 표준프레임워크 변환의 필요성 인식 및 AI 기반 솔루션 기획</p>
                     </div>
@@ -199,7 +199,7 @@ function EgovAboutHistory() {
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <div className="timeline-content">
-                      <h4>2024년 3월</h4>
+                      <h4>2025년 7월 3주차</h4>
                       <h3>시스템 아키텍처 설계 완료</h3>
                       <p>8개 AI 에이전트 구조 설계 및 마스터 에이전트 조율 시스템 구상</p>
                     </div>
@@ -208,7 +208,7 @@ function EgovAboutHistory() {
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <div className="timeline-content">
-                      <h4>2024년 6월</h4>
+                      <h4>2025년 8월 1주차</h4>
                       <h3>핵심 에이전트 개발 완료</h3>
                       <p>분석, 변환, 검사 에이전트의 핵심 기능 구현 및 테스트</p>
                     </div>
@@ -217,7 +217,7 @@ function EgovAboutHistory() {
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <div className="timeline-content">
-                      <h4>2024년 8월</h4>
+                      <h4>2025년 8월 4주차</h4>
                       <h3>통합 시스템 완성</h3>
                       <p>모든 에이전트 통합 및 웹 인터페이스 개발 완료</p>
                     </div>
@@ -226,7 +226,7 @@ function EgovAboutHistory() {
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <div className="timeline-content">
-                      <h4>2024년 11월</h4>
+                      <h4>2025년 8월 28일</h4>
                       <h3>베타 서비스 런칭</h3>
                       <p>첫 공개 및 베타 테스터 모집, 초기 피드백 수집</p>
                     </div>
@@ -235,7 +235,7 @@ function EgovAboutHistory() {
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <div className="timeline-content">
-                      <h4>2024년 12월</h4>
+                      <h4>2025년 9월 2일</h4>
                       <h3>정식 서비스 준비</h3>
                       <p>피드백 반영 및 성능 최적화, 정식 서비스 준비 완료</p>
                     </div>
@@ -253,7 +253,7 @@ function EgovAboutHistory() {
                     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                   </svg>
-                  <h2>주요 성과</h2>
+                  <h2>eGovFramework 주요 성과</h2>
                 </div>
               </div>
               <div className="card-content">
