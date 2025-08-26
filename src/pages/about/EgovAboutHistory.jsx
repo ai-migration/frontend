@@ -330,9 +330,16 @@ function EgovAboutHistory() {
       </div>
 
       <style>{`
+                 /* Page Container Override */
+         .modern-page-wrapper {
+           max-width: 1200px;
+           margin: 0 auto;
+           padding: 2rem;
+         }
+
                  /* Hero Content Override */
          .hero-content {
-           max-width: 800px;
+           max-width: 600px;
            margin: 0 auto;
            text-align: center;
            display: flex;
@@ -569,7 +576,7 @@ function EgovAboutHistory() {
 
         /* New styles for improved readability and trendy look */
         .hero-content {
-          max-width: 800px;
+          max-width: 600px;
           margin: 0 auto;
           text-align: center;
           display: flex;
