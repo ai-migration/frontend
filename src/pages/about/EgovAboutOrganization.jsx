@@ -25,37 +25,29 @@ function EgovAboutOrganization() {
       image: "/src/assets/images/member2.jpg",
       description: "LLM 기반 코드 변환 알고리즘 개발 및 최적화",
       skills: ["Python", "TensorFlow", "LLM", "NLP", "코드 분석"],
-      email: "jiwon@example.com"
+      email: "gyu@example.com"
     },
     {
       id: 3,
       name: "김동영",
-      role: "백엔드 개발자",
+      role: "AI 개발자",
       department: "Backend Development",
       image: "/src/assets/images/member3.jpg",
-      description: "전자정부 표준프레임워크 변환 엔진 개발",
-      skills: ["Java", "Spring", "eGovFrame", "REST API", "데이터베이스"],
-      email: "minsu@example.com"
+      description: "전자정부 표준프레임워크 버전 변환 개발",
+      skills: ["Python"],
+      email: "dongyoung@example.com"
     },
-    {
-      id: 4,
-      name: "김지현",
-      role: "프론트엔드 개발자",
-      department: "Frontend Development",
-      image: "/src/assets/images/member4.jpg",
-      description: "웹 기반 결과 코드 에디터 및 시각화 UI 개발",
-      skills: ["React", "JavaScript", "TypeScript", "UI/UX", "웹 개발"],
-      email: "sujin@example.com"
-    },
+    
+  { id: 4, name: "김지현", role: "AI 엔지니어", department: "AI & Backend", image: "/src/assets/images/member7.jpg", description: "보안 에이전트 개발, 백엔드 설계·구축, MSA 아키텍처 설계·구축, 데이터베이스 구축·운영, 클라우드 인프라 담당.", skills: ["MSA", "LangGraph", "RAG", "SpringBoot", "Python", "Kafka", "MongoDB", "AWS", "Docker", "Kubernetes", "SonarQube", "Faiss", "API Gateway", "JWT", "S3"], email: "wlgus021107@gmail.com" },
     {
       id: 5,
       name: "박기웅",
-      role: "보안 전문가",
-      department: "Security & Quality Assurance",
+      role: "챗봇 엔지니어",
+      department: "Chatbot",
       image: "/src/assets/images/member5.jpg",
-      description: "보안 검사 에이전트 개발 및 코드 품질 관리",
-      skills: ["보안 분석", "SonarQube", "코드 검사", "보안 가이드"],
-      email: "taeho@example.com"
+      description: "챗봇 기능 개발",
+      skills: ["Streamlit","Chatbot"],
+      email: "giwoong@example.com"
     },
     {
       id: 6,
@@ -80,13 +72,14 @@ function EgovAboutOrganization() {
     {
       id: 8,
       name: "옥정우",
-      role: "데이터 엔지니어",
-      department: "Data Engineering",
+      role: "프론트엔드 / 백엔드 / AI 에이전트",
+      department: "Frontend PM & Backend & AI",
       image: "/src/assets/images/member8.jpg",
-      description: "코드 분석 데이터 처리 및 RAG 시스템 구축",
-      skills: ["데이터 처리", "RAG", "벡터 DB", "데이터 파이프라인"],
-      email: "seoyeon@example.com"
+      description: "프론트엔드 및 백엔드 개발, RAG 시스템 구축",
+      skills: ["Java", "Spring", "Javascript", "React", "MySQL", "MongoDB", "Python", "Kafka", "RAG"],
+      email: "okjungwoo@naver.com"
     }
+
   ];
 
   return (
