@@ -13,7 +13,7 @@ function EgovAboutOrganization() {
       role: "개발 총괄/AI/Backend/DevOps",
       department: "AI Research & Development",
       image: "/src/assets/images/member7.jpg",
-      description: "LLM 기반 프레임워크 변환 에이전트 설계·개발, eGov 문서 기반 RAG 구축, 전체 시스템 아키텍처·동작 구조 설계, 백엔드 API 설계 및 개발, Kafka 이벤트 파이프라인 설계·구현, 데이터베이스 스키마 설계·운영, 서비스 빌드·배포·운영, 클라우드 인프라 구성",
+      description: "LLM 기반 프레임워크 변환 에이전트 설계·개발, RAG 구축, 전체 시스템 아키텍처·동작 구조 설계, 백엔드 API 설계 및 개발, Kafka 이벤트 파이프라인 설계·구현, 데이터베이스 스키마 설계·운영, 서비스 빌드·배포·운영, 클라우드 인프라 구성",
       skills: [
               "LangGraph",
               "CrewAI",
@@ -23,13 +23,11 @@ function EgovAboutOrganization() {
               "Python",
               "Java",
               "Kafka",
-              "Event Storming",
               "OpenAI/HuggingFace Embeddings",
               "MongoDB",
               "AWS",
               "Docker",
               "Docker Compose",
-              "Kubernetes"
             ],
       email: "lee_yumin@naver.com"
     },
