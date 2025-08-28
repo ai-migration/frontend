@@ -10,11 +10,27 @@ function EgovAboutOrganization() {
     {
       id: 1,
       name: "이유민",
-      role: "AI 엔지니어",
-      department: "AI & Backend & DevOps",
+      role: "개발 총괄/AI/Backend/DevOps",
+      department: "AI Research & Development",
       image: "/src/assets/images/member7.jpg",
-      description: "AI 개발, Backend 개발, 클라우드 인프라 구축 및 배포 자동화",
-      skills: ["LangGraph", "RAG", "SpringBoot", "Python", "Kafka", "MongoDB", "AWS", "Docker", "Kubernetes", "CI/CD"],
+      description: "LLM 기반 프레임워크 변환 에이전트 설계·개발, eGov 문서 기반 RAG 구축, 전체 시스템 아키텍처·동작 구조 설계, 백엔드 API 설계 및 개발, Kafka 이벤트 파이프라인 설계·구현, 데이터베이스 스키마 설계·운영, 서비스 빌드·배포·운영, 클라우드 인프라 구성",
+      skills: [
+              "LangGraph",
+              "CrewAI",
+              "FAISS",
+              "FastAPI",
+              "Spring Boot",
+              "Python",
+              "Java",
+              "Kafka",
+              "Event Storming",
+              "OpenAI/HuggingFace Embeddings",
+              "MongoDB",
+              "AWS",
+              "Docker",
+              "Docker Compose",
+              "Kubernetes"
+            ],
       email: "lee_yumin@naver.com"
     },
     {
@@ -38,7 +54,7 @@ function EgovAboutOrganization() {
       email: "dongyoung@example.com"
     },
     
-  { id: 4, name: "김지현", role: "AI 엔지니어", department: "AI & Backend", image: "/src/assets/images/member7.jpg", description: "보안 에이전트 개발, 백엔드 설계·구축, MSA 아키텍처 설계·구축, 데이터베이스 구축·운영, 클라우드 인프라 담당.", skills: ["MSA", "LangGraph", "RAG", "SpringBoot", "Python", "Kafka", "MongoDB", "AWS", "Docker", "Kubernetes", "SonarQube", "Faiss", "API Gateway", "JWT", "S3"], email: "wlgus021107@gmail.com" },
+  { id: 4, name: "김지현", role: "AI 엔지니어", department: "AI Research & Development", image: "/src/assets/images/member7.jpg", description: "보안 에이전트 개발, 백엔드 설계·구축, MSA 아키텍처 설계·구축, 데이터베이스 구축·운영, 클라우드 인프라 담당.", skills: ["MSA", "LangGraph", "RAG", "SpringBoot", "Python", "Kafka", "MongoDB", "AWS", "Docker", "Kubernetes", "SonarQube", "Faiss", "API Gateway", "JWT", "S3"], email: "wlgus021107@gmail.com" },
     {
       id: 5,
       name: "박기웅",
